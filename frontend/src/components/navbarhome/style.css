@@ -1,0 +1,253 @@
+:root {
+  --white: #ffffff;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-light: #93c5fd;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+}
+
+/* Enhanced dropdown animations */
+.dropdown-menu {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top center;
+}
+
+.dropdown-menu.show {
+  animation: dropdownShow 0.3s ease-out forwards;
+}
+
+.dropdown-menu.hide {
+  animation: dropdownHide 0.2s ease-in forwards;
+}
+
+@keyframes dropdownShow {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownHide {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+}
+
+/* Active state indicator */
+.nav-link-active {
+  position: relative;
+}
+
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(1.2);
+  }
+}
+
+/* Enhanced hover effects */
+.nav-link:hover {
+  transform: translateY(-1px);
+}
+
+.nav-link:active {
+  transform: translateY(0);
+}
+
+/* Mobile menu animations */
+.mobile-menu-enter {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.mobile-menu-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 0.3s ease-out;
+}
+
+.mobile-menu-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.mobile-menu-exit-active {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.2s ease-in;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced focus states for accessibility */
+.nav-link:focus-visible,
+.dropdown-trigger:focus-visible {
+  outline: 2px solid var(--blue-500);
+  outline-offset: 2px;
+  border-radius: 0.75rem;
+}
+
+/* Loading state styles */
+.navbar-loading {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.navbar-loading .spinner {
+  border: 3px solid var(--slate-200);
+  border-top: 3px solid var(--blue-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 4rem;
+  padding: 0 1.5rem;
+}
+
+.container ul {
+  height: 100%;
+}
+
+.nav ul {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav ul li {
+  list-style: none;
+}
+
+.container ul li {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  height: 100%;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.linksRight {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.linksRight button {
+  padding: 0.5rem 1.875rem;
+  border: 1px solid var(--white);
+  border-radius: 1.25rem;
+  background: transparent;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.langDropdown {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.langDropdown svg {
+  margin: -6px;
+  font-size: 30px;
+}
+
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 75rem) {
+  .nav ul {
+    display: none;
+  }
+
+  .linksRight {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
+
+.brandLogo {
+  font-size: 2.25rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  background: linear-gradient(to right, var(--blue-400), var(--blue-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.brandLogo:hover {
+  background: linear-gradient(to right, var(--blue-500), var(--blue-600));
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform: scale(1.05);
+}
+
+[data-theme='dark'] .brandLogo {
+  background: linear-gradient(to right, var(--blue-light), var(--blue-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@media (max-width: 1024px) {
+  .brandLogo {
+    font-size: 1.875rem;
+  }
+}

@@ -1,0 +1,138 @@
+**Project Plan: SF-Bank (Bank RSS untuk Rise of Kingdoms) — MySQL Storage**
+
+**Tujuan**: Mengubah rencana penyimpanan dari file CSV ke MySQL sehingga aplikasi lebih skalabel, konsisten, dan aman untuk operasi multi-user di masa depan. Rencana ini mencakup skema database, migrasi, konfigurasi, backup, dan roadmap implementasi untuk backend Node.js.
+
+**Ruang Lingkup (disesuaikan)**
+- **Core (wajib)**: Manajemen anggota, input setoran per minggu (1..100), laporan rentang minggu, import massal dengan validasi, API CRUD untuk anggota dan setoran.
+- **Opsional (fase berikutnya)**: Audit log (table), export ke Excel/PDF, UI lebih interaktif, caching query.
+
+**Desain Storage (MySQL)**
+- Database: MySQL (versi 8.x direkomendasikan).
+- Lokasi konfigurasi: `backend/config/database.js` (atau `.ts`) menggunakan environment variables.
+- Sambungan harus memakai pooling dan opsi reconnect.
+
+**Skema Database (awal)**
+-- Tabel `members`:
+  ```sql
+  CREATE TABLE members (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    external_id VARCHAR(128) UNIQUE, -- optional: original id from CSV or external system
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(64),
+    joined_date DATE,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+  ```
+
+-- Tabel `deposits`:
+  ```sql
+  CREATE TABLE deposits (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    deposit_uuid VARCHAR(64) UNIQUE, -- optional uuid
+    week TINYINT UNSIGNED NOT NULL,
+    member_id BIGINT UNSIGNED NOT NULL,
+    amount INT NOT NULL,
+    date_entered DATETIME DEFAULT CURRENT_TIMESTAMP,
+    entered_by VARCHAR(128),
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
+  );
+  ```
+
+-- Indexes:
+  - `deposits(member_id)`
+  - `deposits(week)`
+  - `members(external_id)` if used
+
+**Integritas & Validasi**
+- Validasi `week` di layer aplikasi: 1..100.
+- Gunakan constraints dan transaksi untuk operasi multi-step (mis. saat menggabungkan setoran).
+
+**Data Access Layer**
+- Pilihan ORM/Query Builder (rekomendasi):
+  - `Sequelize` + `sequelize-cli` (migrations, models, seeders)
+  - atau `Knex.js` + `objection.js` jika ingin query builder ringan
+- Buat folder `backend/models/` dan `backend/migrations/` serta `backend/seeders/`.
+
+**Konfigurasi & Environment**
+- Environment variables (contoh):
+  - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_POOL_MAX`, `DB_POOL_MIN`
+- Contoh koneksi di `backend/config/database.js` yang membaca variabel di atas.
+
+**Migrasi & Seed**
+- Gunakan `sequelize-cli` atau `knex migrate`:
+  - migration pertama: create `members` and `deposits` tables
+  - seed: contoh anggota dan setoran untuk testing
+- Pastikan migrasi dapat dijalankan dengan `npm run migrate` dan `npm run seed`.
+
+**Docker (opsional tapi direkomendasikan untuk dev)**
+- Tambahkan `docker-compose.yml` dengan service `db` (MySQL) dan konfigurasi volume untuk persistensi.
+
+**Backup & Recovery**
+- Backup rutin: gunakan `mysqldump` atau `mysqlpump` untuk snapshot.
+- Scripting: `scripts/backup_mysql.sh` untuk perkembangan lokal/cron job.
+
+**Import Data (dari CSV lama)**
+- Implement import script `backend/scripts/import_csv_to_mysql.js`:
+  - Parse CSV, validasi baris, map ke kolom, jalankan dalam transaksi per-batch.
+  - Log baris gagal ke `import_errors.log`.
+  - Support `--dry-run` untuk preview tanpa commit.
+
+**API & Controller Changes**
+- Update controller untuk menggunakan model MySQL (ganti operasi file dengan queries/ORM).
+- Endpoint utama:
+  - `GET /api/v1/members`
+  - `POST /api/v1/members`
+  - `PUT /api/v1/members/:id`
+  - `DELETE /api/v1/members/:id`
+  - `GET /api/v1/deposits?week=..&from=..&to=..`
+  - `POST /api/v1/deposits`
+  - `PUT /api/v1/deposits/:id`
+
+**Monitoring & Performance**
+- Tambahkan slow query log ketika perlu optimisasi.
+- Pertimbangkan caching di query laporan (Redis) jika dataset besar.
+
+**Roadmap Implementasi (disesuaikan untuk MySQL)**
+1. Finalisasi skema DB & file `backend/config/database.js` (0.5 hari).
+2. Tambah dependency & setup ORM (`sequelize`/`knex`) + konfigurasi CLI (0.5 hari).
+3. Tulis migrations untuk `members` dan `deposits` + run di dev (0.5 hari).
+4. Implement model layer dan fungsi CRUD dasar (1 hari).
+5. Migrasi controller: ganti operasi CSV ke model/ORM (1 hari).
+6. Buat import script CSV→MySQL dengan `--dry-run` (0.5 hari).
+7. Tambah seed data, tests sederhana, dan dokumentasi (0.5 hari).
+Estimasi total: ~4–5 hari kerja (tergantung prioritas fitur UI/API).
+
+**Acceptance Criteria (MySQL)**
+- Tabel `members` dan `deposits` tersedia via migration.
+- API CRUD untuk anggota dan setoran bekerja dan terhubung ke MySQL.
+- Import CSV dapat memindahkan data lama ke MySQL dengan log error dan opsi dry-run.
+- Laporan rentang minggu dapat dihasilkan dari query MySQL dan diekspor ke CSV jika perlu.
+
+**Contoh Perintah (dev)**
+- Install dependencies:
+  ```pwsh
+  cd backend
+  npm install sequelize sequelize-cli mysql2
+  ```
+- Menjalankan migrasi/seed (contoh):
+  ```pwsh
+  npx sequelize-cli db:migrate
+  npx sequelize-cli db:seed:all
+  ```
+
+**Risiko & Mitigasi (MySQL-specific)**
+- Risiko: konfigurasi environment dan koneksi (mitigasi: dokumentasi env vars & fallback lokal).
+- Risiko: data inconsistency saat import (mitigasi: transaksi, batch, dan dry-run).
+
+**Next Steps — pilih aksi yang Anda mau saya kerjakan sekarang**
+- [A] Buat file `backend/config/database.js` dan skeleton untuk `sequelize` konfigurasi + `package.json` script `migrate`/`seed`.
+- [B] Tulis migration dan model untuk `members` dan `deposits` + run migrations di lingkungan dev.
+- [C] Buat script import CSV→MySQL dengan opsi `--dry-run`.
+- [D] Buat contoh `docker-compose.yml` dengan service MySQL untuk pengembangan.
+
+-- End of Plan (MySQL)
