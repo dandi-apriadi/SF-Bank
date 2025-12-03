@@ -1,107 +1,62 @@
 import React from "react";
 import {
   FiHome,
-  FiCheckCircle,
-  FiAward,
-  FiTarget,
   FiUsers,
-  FiFileText
+  FiDollarSign,
+  FiUpload,
+  FiBarChart2,
+  FiFileText,
+  FiSettings,
 } from "react-icons/fi";
 
-// Main Dashboard Components
-import UnitDashboard from "views/ppmpp/dashboard/UnitDashboard";
+// Admin views (SF BANK)
+import Dashboard from "views/admin/Dashboard";
+import Deposits from "views/admin/Deposits";
+import Reports from "views/admin/Reports";
+import UserManagement from "views/admin/UserManagement";
+import Settings from "views/admin/Settings";
 
-// Document Validation Components
-import DocumentValidation from "views/ppmpp/validation/DocumentValidation";
-
-// Accreditation Instrument Management Components
-import AccreditationInstruments from "views/ppmpp/accreditation/AccreditationInstruments";
-
-// Follow-up Action Tracking Components
-import ActionTracking from "views/ppmpp/tracking/ActionTracking";
-
-// Quality Assurance Components
-import QualityAssurance from "views/ppmpp/quality/QualityAssurance";
-// News Management Component
-import NewsManagement from "views/ppmpp/news/NewsManagement";
-// User Management Component
-import UserManagement from "views/ppmpp/users/UserManagement";
-
+// Routes aligned with SF BANK plan
 const routes = [
-  // ============================================
-  // UNIVERSITY-WIDE DASHBOARD (dengan semua analitik dan overview terintegrasi)
-  // ============================================
   {
-    name: "Dashboard Universitas",
-    layout: "/ppmpp",
+    name: "Dashboard",
+    layout: "/admin",
     path: "dashboard",
     icon: <FiHome className="h-6 w-6" />,
-    component: <UnitDashboard />,
+    component: <Dashboard />,
   },
-  
-  // ============================================
-  // DOCUMENT VALIDATION (semua validasi dalam satu menu)
-  // ============================================
+
+
   {
-    name: "Validasi Dokumen",
-    layout: "/ppmpp",
-    path: "validation",
-    icon: <FiCheckCircle className="h-6 w-6" />,
-    component: <DocumentValidation />,
+    name: "Deposits",
+    layout: "/admin",
+    path: "deposits",
+    icon: <FiDollarSign className="h-6 w-6" />,
+    component: <Deposits />,
   },
-  
-  // ============================================
-  // ACCREDITATION INSTRUMENTS (semua instrumen dalam satu menu)
-  // ============================================
+
   {
-    name: "Instrumen Akreditasi",
-    layout: "/ppmpp",
-    path: "accreditation",
-    icon: <FiAward className="h-6 w-6" />,
-    component: <AccreditationInstruments />,
+    name: "Reports",
+    layout: "/admin",
+    path: "reports",
+    icon: <FiBarChart2 className="h-6 w-6" />,
+    component: <Reports />,
   },
-  
-  // ============================================
-  // ACTION TRACKING (semua tracking dalam satu menu)
-  // ============================================
+
   {
-    name: "Pelacakan Tindakan",
-    layout: "/ppmpp",
-    path: "tracking",
-    icon: <FiTarget className="h-6 w-6" />,
-    component: <ActionTracking />,
-  },
-  
-  // ============================================
-  // QUALITY ASSURANCE (semua QA dalam satu menu)
-  // ============================================
-  {
-    name: "Jaminan Mutu",
-    layout: "/ppmpp",
-    path: "quality",
-    icon: <FiCheckCircle className="h-6 w-6" />,
-    component: <QualityAssurance />,
-  },
-  
-  // ============================================
-  // NEWS MANAGEMENT (manajemen berita & pengumuman)
-  // ============================================
-  {
-    name: "Manajemen Berita",
-    layout: "/ppmpp",
-    path: "news",
-    icon: <FiFileText className="h-6 w-6" />,
-    component: <NewsManagement />,
-  },
-  // ============================================
-  // USER MANAGEMENT (kelola akun & peran)
-  // ============================================
-  {
-    name: "Manajemen User",
-    layout: "/ppmpp",
+    name: "User Management",
+    layout: "/admin",
     path: "users",
     icon: <FiUsers className="h-6 w-6" />,
     component: <UserManagement />,
+  },
+
+  {
+    name: "Settings",
+    layout: "/admin",
+    path: "settings",
+    icon: <FiSettings className="h-6 w-6" />,
+    component: <Settings />,
   },
 ];
 

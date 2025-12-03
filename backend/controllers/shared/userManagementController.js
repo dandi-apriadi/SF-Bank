@@ -8,8 +8,8 @@ export const getUsers = async (req, res) => {
         
         const users = await User.findAll({
             attributes: [
-                'user_id', 'fullname', 'email', 'role', 'gender', 'nip', 
-                'phone', 'department', 'study_program', 'position', 
+                'user_id', 'fullname', 'email', 'role',
+                'phone',
                 'is_active', 'last_login', 'created_at', 'updated_at'
             ],
             order: [['created_at', 'DESC']]
@@ -39,8 +39,8 @@ export const getUserById = async (req, res) => {
         const user = await User.findOne({
             where: { user_id: id },
             attributes: [
-                'user_id', 'fullname', 'email', 'role', 'gender', 'nip', 
-                'phone', 'department', 'study_program', 'position', 
+                'user_id', 'fullname', 'email', 'role',
+                'phone',
                 'is_active', 'last_login', 'created_at', 'updated_at'
             ]
         });
@@ -80,12 +80,7 @@ export const createUser = async (req, res) => {
             email, 
             role, 
             password, 
-            gender, 
-            nip, 
-            phone, 
-            department, 
-            study_program, 
-            position 
+            phone
         } = req.body;
 
         // Validate required fields
@@ -125,19 +120,7 @@ export const createUser = async (req, res) => {
             });
         }
 
-        // Check if NIP already exists (if provided)
-        if (nip) {
-            const existingNIP = await User.findOne({
-                where: { nip }
-            });
-
-            if (existingNIP) {
-                return res.status(400).json({
-                    success: false,
-                    msg: 'NIP sudah terdaftar'
-                });
-            }
-        }
+        // NIP removed from schema; skip NIP validation
 
         // Create new user
         const newUser = await User.create({
@@ -145,12 +128,7 @@ export const createUser = async (req, res) => {
             email,
             role,
             password, // Will be hashed by model hook
-            gender,
-            nip,
             phone,
-            department,
-            study_program,
-            position,
             is_active: true
         }, { transaction });
 
@@ -200,8 +178,6 @@ export const createUser = async (req, res) => {
             
             if (field === 'email') {
                 message = 'Email sudah terdaftar';
-            } else if (field === 'nip') {
-                message = 'NIP sudah terdaftar';
             }
             
             return res.status(400).json({
@@ -232,12 +208,7 @@ export const updateUser = async (req, res) => {
             email, 
             role, 
             password, 
-            gender, 
-            nip, 
             phone, 
-            department, 
-            study_program, 
-            position,
             is_active
         } = req.body;
 
@@ -287,22 +258,7 @@ export const updateUser = async (req, res) => {
             });
         }
 
-        // Check if NIP already exists (if provided and changed)
-        if (nip && nip !== user.nip) {
-            const existingNIP = await User.findOne({
-                where: { 
-                    nip,
-                    user_id: { [db.Sequelize.Op.ne]: id }
-                }
-            });
-
-            if (existingNIP) {
-                return res.status(400).json({
-                    success: false,
-                    msg: 'NIP sudah terdaftar'
-                });
-            }
-        }
+        // NIP removed from schema; skip NIP uniqueness checks
 
         // Prepare update data
         const updateData = {};
@@ -310,12 +266,8 @@ export const updateUser = async (req, res) => {
         if (email !== undefined) updateData.email = email;
         if (role !== undefined) updateData.role = role;
         if (password && password.trim() !== '') updateData.password = password; // Will be hashed by model hook
-        if (gender !== undefined) updateData.gender = gender;
-        if (nip !== undefined) updateData.nip = nip;
         if (phone !== undefined) updateData.phone = phone;
-        if (department !== undefined) updateData.department = department;
-        if (study_program !== undefined) updateData.study_program = study_program;
-        if (position !== undefined) updateData.position = position;
+        // 'position' field not present in model; ignore if provided
         if (is_active !== undefined) updateData.is_active = is_active;
 
         // Update user
@@ -330,8 +282,8 @@ export const updateUser = async (req, res) => {
         const updatedUser = await User.findOne({
             where: { user_id: id },
             attributes: [
-                'user_id', 'fullname', 'email', 'role', 'gender', 'nip', 
-                'phone', 'department', 'study_program', 'position', 
+                'user_id', 'fullname', 'email', 'role',
+                'phone',
                 'is_active', 'last_login', 'created_at', 'updated_at'
             ]
         });

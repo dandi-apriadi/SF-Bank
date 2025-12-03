@@ -1,12 +1,6 @@
-import {
-  Kpi,
-  AccreditationCycle,
-  PpeppAction,
-  StudyProgram,
-  Evidence
-} from '../../models/index.js';
+import db from '../../config/Database.js';
 
-// Simple health check controller that performs lightweight DB queries
+// Lightweight health check using DB connection and a simple query.
 export const healthController = {
   status: async (req, res, next) => {
     try {
@@ -14,53 +8,27 @@ export const healthController = {
 
       const results = {};
 
+      // Check DB connection
       try {
-        const kpiCount = await Kpi.count();
-        console.log('KPI count:', kpiCount);
-        results.kpi = { ok: true, count: kpiCount };
+        await db.authenticate();
+        results.database = { ok: true };
       } catch (e) {
-        console.error('KPI check failed', e.message);
-        results.kpi = { ok: false, error: e.message };
+        console.error('Database authentication failed:', e.message);
+        results.database = { ok: false, error: e.message };
       }
 
+      // Simple raw query to ensure queries run
       try {
-        const cycle = await AccreditationCycle.findOne({ order: [['updated_at', 'DESC']] });
-        console.log('Latest accreditation cycle:', !!cycle);
-        results.accreditation = { ok: true, found: !!cycle };
+        const [rows] = await db.query('SELECT 1 + 1 AS result');
+        const ok = Array.isArray(rows) && rows.length > 0;
+        results.simpleQuery = { ok, result: ok ? rows[0].result : null };
       } catch (e) {
-        console.error('Accreditation cycle check failed', e.message);
-        results.accreditation = { ok: false, error: e.message };
+        console.error('Simple query failed:', e.message);
+        results.simpleQuery = { ok: false, error: e.message };
       }
 
-      try {
-        const action = await PpeppAction.findOne();
-        console.log('PPEPP action available:', !!action);
-        results.ppepp = { ok: true, found: !!action };
-      } catch (e) {
-        console.error('PPEPP action check failed', e.message);
-        results.ppepp = { ok: false, error: e.message };
-      }
-
-      try {
-        const spCount = await StudyProgram.count();
-        console.log('StudyProgram count:', spCount);
-        results.studyPrograms = { ok: true, count: spCount };
-      } catch (e) {
-        console.error('StudyProgram check failed', e.message);
-        results.studyPrograms = { ok: false, error: e.message };
-      }
-
-      try {
-        const evidenceCount = await Evidence.count();
-        console.log('Evidence count:', evidenceCount);
-        results.evidence = { ok: true, count: evidenceCount };
-      } catch (e) {
-        console.error('Evidence check failed', e.message);
-        results.evidence = { ok: false, error: e.message };
-      }
-
-      const ok = Object.values(results).every(r => r.ok === true);
-      res.json({ ok, checks: results, timestamp: new Date().toISOString() });
+      const okOverall = Object.values(results).every(r => r.ok === true);
+      res.json({ ok: okOverall, checks: results, timestamp: new Date().toISOString() });
     } catch (err) {
       next(err);
     }

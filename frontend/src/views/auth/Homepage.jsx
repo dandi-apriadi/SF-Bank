@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../../assets/css/Homepage.css';
-import { apiClient } from 'services/api';
+// apiClient removed — homepage uses local fallback data now
 import { 
   FaGraduationCap, FaShieldAlt, FaUsers, FaCog, FaChartLine, FaGlobe,
   FaCheckCircle, FaStar, FaQuoteLeft, FaArrowRight, FaPlayCircle,
@@ -117,18 +117,14 @@ const Homepage = () => {
 
   // Load homepage aggregate from backend
   useEffect(() => {
+    // Network calls removed: use local fallback data for homepage
     let mounted = true;
-    apiClient.get('/api/homepage')
-      .then((data) => {
-        if (!mounted) return;
-        setRemoteNews(data.news || []);
-        setRemoteStats(data.stats || null);
-        setRemoteServices(data.services || []);
-        setRemoteTestimonials(data.testimonials || []);
-      })
-      .catch((err) => {
-        console.error('Failed to load /api/homepage', err);
-      });
+    if (mounted) {
+      setRemoteNews(newsData || []);
+      setRemoteStats(stats || null);
+      setRemoteServices([]);
+      setRemoteTestimonials(testimonials || []);
+    }
     return () => { mounted = false; };
   }, []);
 

@@ -25,18 +25,10 @@ const User = db.define('users', {
         comment: 'Full name of the user'
     },
     role: {
-        type: DataTypes.ENUM('koordinator', 'unit', 'pimpinan'),
+        type: DataTypes.ENUM('admin', 'staff', 'auditor'),
         allowNull: false,
-        defaultValue: 'koordinator',
-        comment: 'User role: koordinator (Study Program Coordinator), unit (PPMPP Unit), pimpinan (Institutional Leadership)'
-    },
-    gender: {
-        type: DataTypes.ENUM('male', 'female'),
-        allowNull: true,
-        validate: {
-            isIn: [['male', 'female']]
-        },
-        comment: 'Gender of the user'
+        defaultValue: 'staff',
+        comment: 'User role for SF BANK (admin, staff, auditor)'
     },
     email: {
         type: DataTypes.STRING(191),
@@ -54,12 +46,6 @@ const User = db.define('users', {
         },
         comment: 'Hashed password using Argon2'
     },
-    nip: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-        comment: 'NIP (Nomor Induk Pegawai) for academic staff identification'
-    },
-    // nidn removed with dosen role elimination
     phone: {
         type: DataTypes.STRING(20),
         allowNull: true,
@@ -68,27 +54,7 @@ const User = db.define('users', {
         },
         comment: 'Phone number for contact'
     },
-    department: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-        comment: 'Department or faculty affiliation'
-    },
-    study_program: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-        comment: 'Study program for coordinators'
-    },
-    // Foreign key to study_programs table (added to support association)
-    study_program_id: {
-        type: DataTypes.STRING(36),
-        allowNull: true,
-        comment: 'FK ke study_programs.study_program_id'
-    },
-    position: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-        comment: 'Academic position or job title'
-    },
+    // For SF BANK we keep contact, profile and account status fields.
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -134,22 +100,10 @@ const User = db.define('users', {
             fields: ['email']
         },
         {
-            unique: true,
-            fields: ['nip'],
-            where: {
-                nip: {
-                    [Sequelize.Op.ne]: null
-                }
-            }
-        },
-        {
             fields: ['role']
         },
         {
             fields: ['is_active']
-        },
-        {
-            fields: ['study_program_id']
         }
     ],
     hooks: {
@@ -246,9 +200,6 @@ User.findByEmail = function(email) {
     return this.findOne({ where: { email } });
 };
 
-User.findByNIP = function(nip) {
-    return this.findOne({ where: { nip } });
-};
 
 User.findActiveUsers = function() {
     return this.findAll({ where: { is_active: true } });

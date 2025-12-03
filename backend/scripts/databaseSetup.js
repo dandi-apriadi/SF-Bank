@@ -3,7 +3,9 @@ import db from '../config/Database.js';
 import { User } from '../models/userModel.js';
 // Import semua model terpusat (akan memuat asosiasi)
 import '../models/index.js';
-import { Kpi, QualityRisk, QualityRecommendation } from '../models/index.js';
+// Note: many models may be absent during repo cleanup. Avoid static imports
+// for optional models (Kpi, QualityRisk, QualityRecommendation) and access
+// them dynamically via `db.models` when available.
 
 // Helper untuk mendapatkan/akses model dari Sequelize instance
 const allModels = () => db.models;
@@ -12,69 +14,36 @@ const allModels = () => db.models;
 const VERBOSE = (process.env.VERBOSE_DB_SETUP || '').toLowerCase() === 'true';
 const log = (...args) => { if (VERBOSE) console.log(...args); };
 
-// Urutan pembuatan tabel agar FK tidak gagal
-const TABLE_CREATION_ORDER = [
-    // Organization / Auth basic
-    'faculties', 'departments', 'study_programs', 'users', 'user_program_roles',
-    // Auth extras
-    'sessions', 'password_resets',
-    // Accreditation master & cycles
-    'accreditation_criteria', 'accreditation_cycles', 'cycle_criteria_progress',
-    'narratives', 'narrative_versions',
-    'evidences', 'evidence_tags', 'evidence_versions',
-    'accreditation_scores', 'score_simulations',
-    // Documents
-    'document_templates', 'documents', 'document_versions',
-    // Evaluation / PPEPP / Follow up
-    'evaluations', 'ppepp_cycles', 'ppepp_actions', 'follow_up_items',
-    // Analytics & Quality
-    'heatmaps', 'quality_kpis', 'quality_risks', 'quality_recommendations',
-    // Notifications & activity
-    'notifications', 'activity_logs',
-    // News
-    'news_posts', 'news_attachments',
-    // Integration
-    'integration_sources', 'integration_jobs', 'integration_job_logs', 'reconciliation_results'
-];
+// NOTE: Removed hard-coded table creation order. The script will now only
+// attempt to sync models that are actually registered on the Sequelize
+// instance (`db.models`). This avoids warnings/errors when many model
+// files are intentionally absent during cleanup.
 
 /**
  * Membuat tabel yang belum ada berdasarkan daftar model.
  * Tidak mengubah struktur tabel yang sudah ada (tidak pakai alter). 
  */
 const ensureAllTables = async () => {
-    log('🧱 Memeriksa & membuat tabel yang belum ada...');
-    const qi = db.getQueryInterface();
-    const existing = await qi.showAllTables();
-
-    // Normalisasi nama (MySQL bisa case-insensitive)
-    const existingSet = new Set(existing.map(t => t.toLowerCase()));
-
+    log('🧱 Memeriksa & mensinkronkan model yang tersedia...');
     const models = allModels();
-    let createdCount = 0;
+    if (!models || Object.keys(models).length === 0) {
+        log('ℹ️  Tidak ada model terdaftar pada Sequelize. Lewati pembuatan tabel.');
+        return;
+    }
 
-    for (const tableName of TABLE_CREATION_ORDER) {
-        if (!models) continue;
-        // Cari model yang tableName-nya cocok
-        const model = Object.values(models).find(m => m.getTableName().toString().toLowerCase() === tableName.toLowerCase());
-        if (!model) {
-            console.warn(`⚠️  Model untuk tabel '${tableName}' tidak ditemukan. Lewati.`);
-            continue;
-        }
-        if (existingSet.has(tableName.toLowerCase())) {
-            // Sudah ada
-            continue;
-        }
+    let synced = 0;
+    for (const modelName of Object.keys(models)) {
+        const model = models[modelName];
         try {
-            log(`📋 Membuat tabel: ${tableName}`);
+            log(`📋 Mensinkronkan model: ${modelName} (table: ${model.getTableName()})`);
             await model.sync({ force: false });
-            createdCount++;
+            synced++;
         } catch (err) {
-            console.error(`❌ Gagal membuat tabel ${tableName}:`, err.message);
-            throw err;
+            console.warn(`⚠️  Gagal mensinkronkan model ${modelName}: ${err.message}`);
         }
     }
 
-    log(`✅ Pemeriksaan tabel selesai. Tabel baru dibuat: ${createdCount}`);
+    log(`✅ Sinkronisasi selesai. Model tersinkron: ${synced}`);
 };
 
 /**
@@ -125,50 +94,42 @@ const setupDatabase = async () => {
         // Auto seed minimal quality data bila kosong (hanya di development)
         if ((process.env.NODE_ENV || 'development') === 'development') {
             try {
-                const kpiCount = await Kpi.count();
-                if (kpiCount === 0) {
-                    log('🌱 Seeding sample quality KPIs...');
-                    await Kpi.bulkCreate([
-                        { code: 'KPI-ACC-001', label: 'Program Terakreditasi A/B', category: 'Akreditasi', description: 'Persentase program studi akreditasi A/B', responsible: 'Tim Akreditasi', current_value: 22, current_total: 28, current_percentage: 78.6, previous_value: 20, previous_total: 28, previous_percentage: 71.4, target_value: 26, target_total: 28, target_percentage: 92.9, trend: 'up', status: 'good' },
-                        { code: 'KPI-DOC-002', label: 'Dokumen Mutu Valid', category: 'Dokumentasi', description: 'Dokumen standar operasional tervalidasi', responsible: 'PPMPP', current_value: 412, current_total: 520, current_percentage: 79.2, previous_value: 380, previous_total: 520, previous_percentage: 73.1, target_value: 468, target_total: 520, target_percentage: 90.0, trend: 'up', status: 'good' }
-                    ]);
+                const models = db.models;
+                if (models && models.Kpi) {
+                    const kpiCount = await models.Kpi.count();
+                    if (kpiCount === 0) {
+                        log('🌱 Seeding sample quality KPIs...');
+                        await models.Kpi.bulkCreate([
+                            { code: 'KPI-ACC-001', label: 'Program Terakreditasi A/B', category: 'Akreditasi', description: 'Persentase program studi akreditasi A/B', responsible: 'Tim Akreditasi', current_value: 22, current_total: 28, current_percentage: 78.6, previous_value: 20, previous_total: 28, previous_percentage: 71.4, target_value: 26, target_total: 28, target_percentage: 92.9, trend: 'up', status: 'good' },
+                            { code: 'KPI-DOC-002', label: 'Dokumen Mutu Valid', category: 'Dokumentasi', description: 'Dokumen standar operasional tervalidasi', responsible: 'PPMPP', current_value: 412, current_total: 520, current_percentage: 79.2, previous_value: 380, previous_total: 520, previous_percentage: 73.1, target_value: 468, target_total: 520, target_percentage: 90.0, trend: 'up', status: 'good' }
+                        ]);
+                    }
                 }
-                const riskCount = await QualityRisk.count();
-                if (riskCount === 0) {
-                    log('🌱 Seeding sample quality risks...');
-                    await QualityRisk.bulkCreate([
-                        { code: 'RSK-001', category: 'Penelitian', issue: 'Output penelitian belum mencapai target', description: 'Publikasi dan paten rendah', severity: 'high', probability: 'high', impact: 'high', risk_score: 9, owner: 'LPPM', status: 'active', mitigation: 'Pelatihan & hibah', timeline: '3 bulan', progress: 65 },
-                        { code: 'RSK-002', category: 'Alumni', issue: 'Response tracer study rendah', description: 'Response rate < 70%', severity: 'high', probability: 'medium', impact: 'high', risk_score: 6, owner: 'Career Center', status: 'in-progress', mitigation: 'Platform digital & engagement', timeline: '6 bulan', progress: 40 }
-                    ]);
+
+                if (models && models.QualityRisk) {
+                    const riskCount = await models.QualityRisk.count();
+                    if (riskCount === 0) {
+                        log('🌱 Seeding sample quality risks...');
+                        await models.QualityRisk.bulkCreate([
+                            { code: 'RSK-001', category: 'Penelitian', issue: 'Output penelitian belum mencapai target', description: 'Publikasi dan paten rendah', severity: 'high', probability: 'high', impact: 'high', risk_score: 9, owner: 'LPPM', status: 'active', mitigation: 'Pelatihan & hibah', timeline: '3 bulan', progress: 65 },
+                            { code: 'RSK-002', category: 'Alumni', issue: 'Response tracer study rendah', description: 'Response rate < 70%', severity: 'high', probability: 'medium', impact: 'high', risk_score: 6, owner: 'Career Center', status: 'in-progress', mitigation: 'Platform digital & engagement', timeline: '6 bulan', progress: 40 }
+                        ]);
+                    }
                 }
-                const recCount = await QualityRecommendation.count();
-                if (recCount === 0) {
-                    log('🌱 Seeding sample quality recommendations...');
-                    await QualityRecommendation.bulkCreate([
-                        { category: 'Penelitian', priority: 'high', title: 'Penguatan Ekosistem Penelitian Kolaboratif', description: 'Jejaring lintas prodi & institusi', actions: ['Cluster unggulan','Visiting researcher','Hibah kolaborasi'], timeline: '6 bulan', budget: 'Rp 500.000.000', expected_impact: 'Publikasi naik 40%' },
-                        { category: 'Pembelajaran', priority: 'medium', title: 'Standarisasi & Digitalisasi RPS', description: 'Template & workflow digital', actions: ['Template standar','Workflow approval','Integrasi SI Akademik'], timeline: '3 bulan', budget: 'Rp 200.000.000', expected_impact: 'Efisiensi 60%' }
-                    ]);
+
+                if (models && models.QualityRecommendation) {
+                    const recCount = await models.QualityRecommendation.count();
+                    if (recCount === 0) {
+                        log('🌱 Seeding sample quality recommendations...');
+                        await models.QualityRecommendation.bulkCreate([
+                            { category: 'Penelitian', priority: 'high', title: 'Penguatan Ekosistem Penelitian Kolaboratif', description: 'Jejaring lintas prodi & institusi', actions: ['Cluster unggulan','Visiting researcher','Hibah kolaborasi'], timeline: '6 bulan', budget: 'Rp 500.000.000', expected_impact: 'Publikasi naik 40%' },
+                            { category: 'Pembelajaran', priority: 'medium', title: 'Standarisasi & Digitalisasi RPS', description: 'Template & workflow digital', actions: ['Template standar','Workflow approval','Integrasi SI Akademik'], timeline: '3 bulan', budget: 'Rp 200.000.000', expected_impact: 'Efisiensi 60%' }
+                        ]);
+                    }
                 }
             } catch (seedErr) {
                 console.warn('⚠️  Auto seed quality data failed:', seedErr.message);
             }
-        }
-
-        // Pastikan kolom study_program_id ada di tabel users (dibutuhkan oleh asosiasi StudyProgram.hasMany(User))
-        const qiUsers = db.getQueryInterface();
-        try {
-            const usersDesc = await qiUsers.describeTable('users');
-            if (!usersDesc.study_program_id) {
-                log('🛠  Adding missing column users.study_program_id ...');
-                await qiUsers.addColumn('users', 'study_program_id', {
-                    type: Sequelize.STRING(36),
-                    allowNull: true,
-                    comment: 'FK ke study_programs.study_program_id'
-                });
-                log('✅ Column study_program_id added to users table');
-            }
-        } catch (colErr) {
-            console.warn('⚠️  Could not verify/add study_program_id column:', colErr.message);
         }
 
         // Khusus index users (logika sebelumnya) dipertahankan
@@ -176,10 +137,8 @@ const setupDatabase = async () => {
         const indexes = await qi.showIndex('users');
         const requiredIndexes = [
             { name: 'users_email_unique', unique: true, fields: ['email'] },
-            { name: 'users_nip_unique', unique: true, fields: ['nip'], where: { nip: { [Sequelize.Op.ne]: null } } },
             { name: 'users_role_index', fields: ['role'] },
-            { name: 'users_is_active_index', fields: ['is_active'] },
-            { name: 'users_study_program_id_index', fields: ['study_program_id'] }
+            { name: 'users_is_active_index', fields: ['is_active'] }
         ];
         for (const reqIndex of requiredIndexes) {
             const existingIndex = indexes.find(idx => idx.name === reqIndex.name);

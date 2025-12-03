@@ -1,138 +1,229 @@
-**Project Plan: SF-Bank (Bank RSS untuk Rise of Kingdoms) — MySQL Storage**
+================================================================================
+                    Kingdom 3946 - DESIGN & DEVELOPMENT PLAN
+================================================================================
 
-**Tujuan**: Mengubah rencana penyimpanan dari file CSV ke MySQL sehingga aplikasi lebih skalabel, konsisten, dan aman untuk operasi multi-user di masa depan. Rencana ini mencakup skema database, migrasi, konfigurasi, backup, dan roadmap implementasi untuk backend Node.js.
+TEMA DESAIN
+-----------
+Nuansa: "Medieval", "Megah", dan "Serius" ala Game Strategy
+Catatan: Hindari desain kartun yang terlalu cerah
 
-**Ruang Lingkup (disesuaikan)**
-- **Core (wajib)**: Manajemen anggota, input setoran per minggu (1..100), laporan rentang minggu, import massal dengan validasi, API CRUD untuk anggota dan setoran.
-- **Opsional (fase berikutnya)**: Audit log (table), export ke Excel/PDF, UI lebih interaktif, caching query.
 
-**Desain Storage (MySQL)**
-- Database: MySQL (versi 8.x direkomendasikan).
-- Lokasi konfigurasi: `backend/config/database.js` (atau `.ts`) menggunakan environment variables.
-- Sambungan harus memakai pooling dan opsi reconnect.
+================================================================================
+A. PALET WARNA (COLOR SCHEME)
+================================================================================
 
-**Skema Database (awal)**
--- Tabel `members`:
-  ```sql
-  CREATE TABLE members (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    external_id VARCHAR(128) UNIQUE, -- optional: original id from CSV or external system
-    name VARCHAR(255) NOT NULL,
-    role VARCHAR(64),
-    joined_date DATE,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  );
-  ```
+1. PRIMARY BACKGROUND (Latar Belakang Utama)
+   • Hex: #0F172A (Deep Navy / Midnight Blue)
+   • Alasan: Memberikan kontras tinggi dan kesan elegan/misterius
 
--- Tabel `deposits`:
-  ```sql
-  CREATE TABLE deposits (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    deposit_uuid VARCHAR(64) UNIQUE, -- optional uuid
-    week TINYINT UNSIGNED NOT NULL,
-    member_id BIGINT UNSIGNED NOT NULL,
-    amount INT NOT NULL,
-    date_entered DATETIME DEFAULT CURRENT_TIMESTAMP,
-    entered_by VARCHAR(128),
-    note TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
-  );
-  ```
+2. PRIMARY ACCENT (Warna Emas - Mewakili Kerajaan/VIP)
+   • Hex: #FFD700 (Classic Gold) atau #C5A059 (Antique Gold)
+   • Penggunaan: 
+     - Judul (Headings)
+     - Border tombol
+     - Ikon DKP
 
--- Indexes:
-  - `deposits(member_id)`
-  - `deposits(week)`
-  - `members(external_id)` if used
+3. SECONDARY ACCENT (Merah Perang - Mewakili Militer)
+   • Hex: #880808 (Blood Red)
+   • Penggunaan:
+     - Tombol "Battle Alerts"
+     - Status "Closed"
+     - Angka Dead Troops
 
-**Integritas & Validasi**
-- Validasi `week` di layer aplikasi: 1..100.
-- Gunakan constraints dan transaksi untuk operasi multi-step (mis. saat menggabungkan setoran).
+4. TEXT COLOR (Teks Bacaan)
+   • Hex: #E2E8F0 (Off-White / Parchment Light)
+   • Alasan: Putih murni terlalu menyilaukan di latar gelap
+   • Catatan: Gunakan warna kertas kuno yang sangat muda
 
-**Data Access Layer**
-- Pilihan ORM/Query Builder (rekomendasi):
-  - `Sequelize` + `sequelize-cli` (migrations, models, seeders)
-  - atau `Knex.js` + `objection.js` jika ingin query builder ringan
-- Buat folder `backend/models/` dan `backend/migrations/` serta `backend/seeders/`.
+5. COMPONENT BACKGROUND (Latar Kartu/Konten)
+   • Hex: #1E293B (Slate Dark) dengan Opacity 90%
+   • Efek: Glassmorphism (efek kaca gelap) sangat cocok
 
-**Konfigurasi & Environment**
-- Environment variables (contoh):
-  - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_POOL_MAX`, `DB_POOL_MIN`
-- Contoh koneksi di `backend/config/database.js` yang membaca variabel di atas.
 
-**Migrasi & Seed**
-- Gunakan `sequelize-cli` atau `knex migrate`:
-  - migration pertama: create `members` and `deposits` tables
-  - seed: contoh anggota dan setoran untuk testing
-- Pastikan migrasi dapat dijalankan dengan `npm run migrate` dan `npm run seed`.
+================================================================================
+B. TIPOGRAFI (FONTS)
+================================================================================
 
-**Docker (opsional tapi direkomendasikan untuk dev)**
-- Tambahkan `docker-compose.yml` dengan service `db` (MySQL) dan konfigurasi volume untuk persistensi.
+Sumber: Google Fonts (Gratis)
 
-**Backup & Recovery**
-- Backup rutin: gunakan `mysqldump` atau `mysqlpump` untuk snapshot.
-- Scripting: `scripts/backup_mysql.sh` untuk perkembangan lokal/cron job.
+1. JUDUL & HEADER
+   • Font: "Cinzel" atau "Trajan Pro" (jika ada)
+   • Karakteristik: Memberikan kesan epik, sinematik, dan kerajaan Romawi
+   • Style: Uppercase (Huruf Besar Semua) dengan letter-spacing sedikit renggang
 
-**Import Data (dari CSV lama)**
-- Implement import script `backend/scripts/import_csv_to_mysql.js`:
-  - Parse CSV, validasi baris, map ke kolom, jalankan dalam transaksi per-batch.
-  - Log baris gagal ke `import_errors.log`.
-  - Support `--dry-run` untuk preview tanpa commit.
+2. TEKS BODY & ISI
+   • Font: "Lato" atau "Roboto"
+   • Karakteristik: Mudah dibaca untuk aturan panjang dan angka statistik
 
-**API & Controller Changes**
-- Update controller untuk menggunakan model MySQL (ganti operasi file dengan queries/ORM).
-- Endpoint utama:
-  - `GET /api/v1/members`
-  - `POST /api/v1/members`
-  - `PUT /api/v1/members/:id`
-  - `DELETE /api/v1/members/:id`
-  - `GET /api/v1/deposits?week=..&from=..&to=..`
-  - `POST /api/v1/deposits`
-  - `PUT /api/v1/deposits/:id`
 
-**Monitoring & Performance**
-- Tambahkan slow query log ketika perlu optimisasi.
-- Pertimbangkan caching di query laporan (Redis) jika dataset besar.
+================================================================================
+C. ASET VISUAL & TEKSTUR
+================================================================================
 
-**Roadmap Implementasi (disesuaikan untuk MySQL)**
-1. Finalisasi skema DB & file `backend/config/database.js` (0.5 hari).
-2. Tambah dependency & setup ORM (`sequelize`/`knex`) + konfigurasi CLI (0.5 hari).
-3. Tulis migrations untuk `members` dan `deposits` + run di dev (0.5 hari).
-4. Implement model layer dan fungsi CRUD dasar (1 hari).
-5. Migrasi controller: ganti operasi CSV ke model/ORM (1 hari).
-6. Buat import script CSV→MySQL dengan `--dry-run` (0.5 hari).
-7. Tambah seed data, tests sederhana, dan dokumentasi (0.5 hari).
-Estimasi total: ~4–5 hari kerja (tergantung prioritas fitur UI/API).
+1. BACKGROUND TEXTURE
+   • Gunakan overlay tipis tekstur "Peta Kuno" atau "Batu Marmer Gelap" 
+     pada background biru
 
-**Acceptance Criteria (MySQL)**
-- Tabel `members` dan `deposits` tersedia via migration.
-- API CRUD untuk anggota dan setoran bekerja dan terhubung ke MySQL.
-- Import CSV dapat memindahkan data lama ke MySQL dengan log error dan opsi dry-run.
-- Laporan rentang minggu dapat dihasilkan dari query MySQL dan diekspor ke CSV jika perlu.
+2. ICON SET
+   • Style: "RPG Game"
+   • Contoh: Pedang, Perisai, Mahkota, Gulungan Kertas
 
-**Contoh Perintah (dev)**
-- Install dependencies:
-  ```pwsh
-  cd backend
-  npm install sequelize sequelize-cli mysql2
-  ```
-- Menjalankan migrasi/seed (contoh):
-  ```pwsh
-  npx sequelize-cli db:migrate
-  npx sequelize-cli db:seed:all
-  ```
+3. DIVIDER (Pemisah)
+   • Gunakan garis hiasan bergaya filigree emas di antara seksi halaman
 
-**Risiko & Mitigasi (MySQL-specific)**
-- Risiko: konfigurasi environment dan koneksi (mitigasi: dokumentasi env vars & fallback lokal).
-- Risiko: data inconsistency saat import (mitigasi: transaksi, batch, dan dry-run).
 
-**Next Steps — pilih aksi yang Anda mau saya kerjakan sekarang**
-- [A] Buat file `backend/config/database.js` dan skeleton untuk `sequelize` konfigurasi + `package.json` script `migrate`/`seed`.
-- [B] Tulis migration dan model untuk `members` dan `deposits` + run migrations di lingkungan dev.
-- [C] Buat script import CSV→MySQL dengan opsi `--dry-run`.
-- [D] Buat contoh `docker-compose.yml` dengan service MySQL untuk pengembangan.
+================================================================================
+D. STRUKTUR MENU ADMIN
+================================================================================
 
--- End of Plan (MySQL)
+FITUR ADMIN (Fltur Admin)
+--------------------------
+
+1. USER MANAGEMENT
+   • Manajemen akun pengguna (CRUD)
+   • Role & permission assignment
+   • User activity logs
+   • Status aktif/non-aktif
+
+2. BANK MANAGEMENT
+   • Pengaturan sistem perbankan
+   • Konfigurasi rekening
+   • Transaksi monitoring
+   • Laporan keuangan
+
+3. EVENT MANAGEMENT
+   • Pembuatan & pengelolaan event
+   • Jadwal event
+   • Pendaftaran peserta
+   • Reward & hadiah event
+
+4. GALLERY MANAGEMENT
+   • Upload & organize media
+   • Album/kategori foto
+   • Caption & deskripsi
+   • Featured images
+
+5. FORM MANAGEMENT
+   • Form builder & editor
+   • Template form
+   • Submission tracking
+   • Export data form
+
+6. KVK MANAGEMENT (Kingdom vs Kingdom)
+   • Jadwal KvK
+   • Pendaftaran alliance
+   • Scoring & ranking
+   • Battle reports
+
+7. DONATION MANAGEMENT
+   • Tracking donasi member
+   • History transaksi
+   • Target & achievement
+   • Donor leaderboard
+
+8. BLOG MANAGEMENT
+   • Artikel & news posts
+   • Categories & tags
+   • SEO settings
+   • Publish scheduling
+
+9. BLACK LIST MANAGER
+   • Database pemain bermasalah
+   • Alasan blacklist
+   • Expiry management
+   • Appeal system
+
+10. INPUT DATA KDP (Kingdom Defense Points)
+    • Entry manual KDP
+    • Import from CSV/Excel
+    • Validation & verification
+    • History tracking
+
+
+================================================================================
+E. STRUKTUR MENU PENGUNJUNG (Public Features)
+================================================================================
+
+FITUR PENGUNJUNG (Fiture pengunjung)
+-------------------------------------
+
+1. LANDINGPAGE
+   • Homepage kerajaan
+   • Hero banner dengan tema medieval
+   • Informasi kingdom overview
+   • Call-to-action untuk join/apply
+
+2. KVK (Kingdom vs Kingdom)
+   • Jadwal KvK mendatang
+   • Live scores & rankings
+   • Historical results
+   • Hall of Fame
+
+3. EVENT
+   • Kalender event kingdom
+   • Detail event & rules
+   • Pendaftaran event
+   • Winners announcement
+
+4. GIVEAWAY
+   • Daftar giveaway aktif
+   • Syarat & ketentuan
+   • Form partisipasi
+   • Pemenang giveaway
+
+5. FORM
+   • Form pendaftaran member
+   • Form aplikasi alliance
+   • Form feedback/suggestion
+   • Custom forms
+
+6. DONATION
+   • Informasi sistem donasi
+   • Leaderboard donatur
+   • Progress target donasi
+   • History donasi (untuk member)
+
+7. ABOUT KINGDOM
+   • Sejarah kingdom 3946
+   • Struktur organisasi
+   • Rules & regulations
+   • Vision & mission
+
+8. YOUTUBE
+   • Video gallery
+   • Tutorial & guides
+   • Battle highlights
+   • Kingdom vlogs
+
+9. BLOG
+   • Artikel & berita kingdom
+   • Strategy guides
+   • Updates & announcements
+   • Community stories
+
+10. LAWS (Aturan Kingdom)
+    • Hukum & peraturan kingdom
+    • Code of conduct
+    • Punishment system
+    • FAQs
+
+
+================================================================================
+F. CATATAN PENGEMBANGAN
+================================================================================
+
+• Prioritaskan tampilan Mobile (Mobile First) 
+  → 90% pemain RoK membuka via HP
+
+• Gunakan Discord Webhook 
+  → Setiap ada aplikasi migrasi baru di website, notifikasi langsung 
+    masuk ke channel Discord admin
+
+• Implementasi Role-Based Access Control (RBAC)
+  → Setiap menu admin memiliki permission level yang dapat dikonfigurasi
+
+• Audit Trail
+  → Semua aksi admin harus tercatat (who, what, when)
+
+
+================================================================================

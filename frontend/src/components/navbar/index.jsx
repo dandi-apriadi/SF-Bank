@@ -5,7 +5,7 @@ import { FiAlignJustify } from "react-icons/fi";
 import { BsArrowBarUp } from "react-icons/bs";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 // Notification dropdown removed per request
-import { MdSchool, MdAssessment } from "react-icons/md";
+// removed campus icon import (not used)
 import Dropdown from "components/dropdown";
 import { useLogout } from "hooks/useLogout";
 
@@ -34,15 +34,8 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
       <div className="ml-4">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center h-6 pt-1">
-          <Link
-      to={user?.role === "koordinator" ? "/koordinator/dashboard" :
-        user?.role === "ppmpp" ? "/ppmpp/dashboard" :
-                user?.role === "pimpinan" ? "/pimpinan/dashboard" :
-                "/auth/sign-in"}
-            className="text-sm font-normal text-navy-700 hover:underline flex items-center"
-          >
-            <MdSchool className="mr-1 h-3.5 w-3.5" />
-            PRIMA
+          <Link to={user ? "/admin/dashboard" : "/auth/sign-in"} className="text-sm font-normal text-navy-700 hover:underline flex items-center">
+            SF BANK
           </Link>
           <span className="mx-1 text-sm text-navy-700">/</span>
           <span className="text-sm font-normal capitalize text-navy-700">
@@ -51,9 +44,7 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
         </div>
 
         {/* Page Title */}
-        <h1 className="text-2xl sm:text-[28px] font-bold capitalize text-navy-700 mt-1">
-          {brandText}
-        </h1>
+        <h1 className="text-2xl sm:text-[28px] font-bold capitalize text-navy-700 mt-1">{brandText}</h1>
       </div>
 
       {/* Right Side - Controls & User Interface */}
@@ -97,17 +88,7 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
           </button>
         </div>
 
-        {/* Dashboard Link */}
-        <Link
-      to={user?.role === "koordinator" ? "/koordinator/dashboard" :
-        user?.role === "ppmpp" ? "/ppmpp/dashboard" :
-              user?.role === "pimpinan" ? "/pimpinan/dashboard" :
-              "/auth/sign-in"}
-          className="flex h-[40px] w-[40px] items-center justify-center rounded-full hover:bg-lightPrimary border border-gray-200 transition-all"
-          title="Dashboard"
-        >
-          <MdSchool className="h-5 w-5 text-gray-600" />
-        </Link>
+        {/* Dashboard Link removed (icon near logout) */}
 
         {/* Profile Dropdown */}
         <Dropdown
@@ -127,23 +108,13 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
                     👋 Halo, {user?.fullname || "User"}
                   </p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-gray-600">
-                  {user?.role === "koordinator" ? "Koordinator Prodi" :
-                   user?.role === "ppmpp" ? "Unit PPMPP" :
-                   user?.role === "pimpinan" ? "Pimpinan Institusi" : "Pengguna"}
-                </p>
+                <p className="mt-1 text-xs font-medium text-gray-600">{user?.role || "User"}</p>
               </div>
               <div className="h-px w-full bg-gray-200" />
 
               {/* Menu Items */}
               <div className="flex flex-col p-3">
-                <Link
-          to={user?.role === "koordinator" ? "/koordinator/profile" :
-            user?.role === "ppmpp" ? "/ppmpp/profile" :
-                      user?.role === "pimpinan" ? "/pimpinan/profile" :
-                      "/auth/sign-in"}
-                  className="flex items-center rounded-lg px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors"
-                >
+                <Link to={user ? "/admin/profile" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors">
                   <span className="mr-2 text-gray-600">
                     <svg
                       width="16"
@@ -166,13 +137,7 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
                   </span>
                   Profil Saya
                 </Link>
-                <Link
-          to={user?.role === "koordinator" ? "/koordinator/settings" :
-            user?.role === "ppmpp" ? "/ppmpp/settings" :
-                      user?.role === "pimpinan" ? "/pimpinan/settings" :
-                      "/auth/sign-in"}
-                  className="flex items-center rounded-lg px-3 py-2 mt-1 text-sm text-gray-800 hover:bg-gray-100 transition-colors"
-                >
+                <Link to={user ? "/admin/settings" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 mt-1 text-sm text-gray-800 hover:bg-gray-100 transition-colors">
                   <span className="mr-2 text-gray-600">
                     <svg
                       width="16"

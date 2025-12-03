@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser, reset } from "../../store/slices/authSlice";
-import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff, FiBookOpen, FiUsers, FiAward, FiShield, FiBarChart, FiTarget } from "react-icons/fi";
-import { MdSchool, MdAssessment, MdVerifiedUser, MdAnalytics } from "react-icons/md";
+import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff, FiUsers, FiAward, FiShield, FiBarChart, FiTarget } from "react-icons/fi";
+import { MdAssessment, MdVerifiedUser, MdAnalytics } from "react-icons/md";
+import { GiCastle, GiCrossedSwords } from "react-icons/gi";
 import Checkbox from "components/checkbox";
 import Swal from 'sweetalert2';
 
@@ -12,6 +13,8 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'SF BANK';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isLoading, isError, isSuccess, message } = useSelector(
@@ -19,7 +22,7 @@ const SignIn = () => {
   );
 
   useEffect(() => {
-    document.title = "Masuk - PRIMA | Platform Integrasi Manajemen Mutu Akademik";
+    document.title = `Masuk - ${APP_NAME} | Portal SF BANK`;
     
     return () => {
       dispatch(reset());
@@ -32,10 +35,11 @@ const SignIn = () => {
     if (isSuccess && user) {
       const role = (user.role || '').toLowerCase();
       console.log("Login successful role:", role);
-      let route = "/auth/homepage";
-      if (role === 'koordinator') route = "/koordinator/dashboard";
-      else if (role === 'ppmpp') route = "/ppmpp/dashboard";
-      else if (role === 'pimpinan') route = "/pimpinan/dashboard";
+      let route = "/dashboard";
+      if (role === 'customer') route = "/customer/dashboard";
+      else if (role === 'teller') route = "/teller/dashboard";
+      else if (role === 'manager') route = "/manager/dashboard";
+      else if (role === 'admin') route = "/admin/dashboard";
       navigate(route);
       dispatch(reset());
     }
@@ -130,8 +134,8 @@ const SignIn = () => {
         {/* Background with overlay */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1986&q=80" 
-            alt="Modern university building representing academic excellence" 
+            src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1986&q=80" 
+            alt="Epic fantasy landscape representing kingdoms and battles" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/95 via-blue-800/90 to-gray-900/95"></div>
@@ -142,12 +146,12 @@ const SignIn = () => {
           {/* Header */}
           <div>
             <Link to="/auth/homepage" className="flex items-center mb-8 hover:opacity-80 transition-opacity duration-200">
-              <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
-                <MdSchool className="h-8 w-8 text-blue-200" />
+                <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
+                <GiCastle className="h-8 w-8 text-yellow-200" />
               </div>
               <div className="ml-4">
-                <h1 className="text-3xl font-bold">PRIMA</h1>
-                <p className="text-blue-200 text-sm">Platform Integrasi Manajemen Mutu Akademik</p>
+                <h1 className="text-3xl font-bold">SF BANK</h1>
+                <p className="text-blue-200 text-sm">Portal Internal & Layanan Perbankan</p>
               </div>
             </Link>
           </div>
@@ -156,39 +160,39 @@ const SignIn = () => {
           <div className="flex-1 flex flex-col justify-center space-y-12">
             <div className="text-center">
               <h2 className="text-4xl font-bold mb-6 leading-tight">
-                Sistem Manajemen
-                <span className="text-blue-300 block">Mutu Akademik Terpadu</span>
+                Bangun Kerajaan Anda
+                <span className="text-yellow-300 block">Rise of Kingdoms — Pimpin Kerajaan</span>
               </h2>
-              <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
-                Platform digital untuk mendukung proses akreditasi dan peningkatan mutu akademik berkelanjutan
+              <p className="text-xl text-yellow-100 max-w-2xl mx-auto leading-relaxed">
+                Masuki dunia epik, rekrut komandan, dan perluas wilayah Anda melalui strategi dan aliansi.
               </p>
             </div>
             
             {/* Role Cards */}
               <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
-                <FiUsers className="h-8 w-8 text-green-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Koordinator Prodi</h3>
-                <p className="text-blue-200 text-sm">Monitor progress dan kelola kriteria akreditasi</p>
+                <GiCrossedSwords className="h-8 w-8 text-red-300 mb-3" />
+                <h3 className="font-semibold text-lg mb-2">Komandan</h3>
+                <p className="text-yellow-200 text-sm">Pimpin pasukan dan kuasai medan perang</p>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
-                <MdVerifiedUser className="h-8 w-8 text-cyan-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Unit PPMPP</h3>
-                <p className="text-blue-200 text-sm">Validasi dokumen dan kelola instrumen akreditasi</p>
+                <FiUsers className="h-8 w-8 text-cyan-300 mb-3" />
+                <h3 className="font-semibold text-lg mb-2">Gubernur</h3>
+                <p className="text-yellow-200 text-sm">Kelola sumber daya dan kembangkan kota Anda</p>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
                 <FiAward className="h-8 w-8 text-purple-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Pimpinan Institusi</h3>
-                <p className="text-blue-200 text-sm">Dashboard eksekutif dan visualisasi pengambilan keputusan</p>
+                <h3 className="font-semibold text-lg mb-2">Pemimpin Aliansi</h3>
+                <p className="text-yellow-200 text-sm">Koordinasi aliansi dan raih kemenangan bersama</p>
               </div>
             </div>
           </div>
           
           {/* Footer */}
           <div className="text-blue-200 text-sm">
-            © 2025 PRIMA - Platform Integrasi Manajemen Mutu Akademik
+            © 2025 SF BANK - Portal Perbankan Internal
           </div>
         </div>
       </div>
@@ -199,18 +203,18 @@ const SignIn = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link to="/auth/homepage" className="inline-block hover:opacity-80 transition-opacity duration-200">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl mb-4 shadow-lg">
-                <MdSchool className="h-8 w-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-2xl mb-4 shadow-lg">
+                <GiCastle className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-800">PRIMA</h1>
-              <p className="text-gray-600 text-sm">Manajemen Mutu Akademik</p>
+              <h1 className="text-2xl font-bold text-gray-800">SF BANK</h1>
+              <p className="text-gray-600 text-sm">Tema: Rise of Kingdoms — Visual</p>
             </Link>
           </div>
           
           {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h2>
-            <p className="text-gray-600">Masuk ke akun Anda untuk mengakses sistem PRIMA</p>
+            <p className="text-gray-600">Masuk ke akun Anda untuk mengakses portal SF BANK</p>
           </div>
           
           {/* Sign In Form */}
@@ -235,7 +239,7 @@ const SignIn = () => {
                   className="block w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-700 
                              placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                              transition-all duration-200 hover:border-gray-300"
-                  placeholder="nama@universitas.ac.id"
+                  placeholder="user@sfbank.co.id"
                 />
               </div>
             </div>
@@ -328,9 +332,10 @@ const SignIn = () => {
             {/* Contact Admin link removed per request */}
           </form>
           
-          {/* Footer Links */}
-          <div className="mt-12 pt-8 border-t border-gray-200 text-center text-xs text-gray-500">
-            <p className="mb-2">© 2025 PRIMA - Platform Integrasi Manajemen Mutu Akademik</p>
+          {/* Info panel removed per request */}
+
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
+            <p className="mb-2">© 2025 SF BANK - Portal Perbankan Internal</p>
             <div className="space-x-4">
               <Link to="/auth/terms" className="text-blue-600 hover:text-blue-700 transition-colors">
                 Syarat & Ketentuan

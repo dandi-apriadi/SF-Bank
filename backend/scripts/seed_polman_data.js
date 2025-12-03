@@ -3,8 +3,6 @@ import {
   User,
   Faculty,
   Department,
-  StudyProgram,
-  UserProgramRole,
   NewsPost,
   NewsAttachment
 } from '../models/index.js';
@@ -41,7 +39,7 @@ async function seed() {
     await db.authenticate();
     console.log('DB connected, starting seed...');
 
-    const tablesToBackup = ['users','faculties','departments','study_programs','user_program_roles','news_posts','news_attachments'];
+    const tablesToBackup = ['users','faculties','departments','news_posts','news_attachments'];
     for (const t of tablesToBackup) {
       try { await backupTable(t); } catch(e) { console.warn('Backup failed for', t, e.message); }
     }
@@ -74,38 +72,16 @@ async function seed() {
       await Department.create({ faculty_id: d.faculty.faculty_id, name: d.name, code: d.name.toUpperCase().replace(/\s+/g,'_') });
     }
 
-    // Create study programs
-    const programs = [
-      { faculty: createdFaculties[0], name: 'Teknik Mesin', code: 'TM-D3', jenjang: 'D3', student_count: 420, faculty_count: 18, accreditation_grade: 'B' },
-      { faculty: createdFaculties[0], name: 'Teknik Elektro', code: 'TE-D3', jenjang: 'D3', student_count: 360, faculty_count: 15, accreditation_grade: 'B' },
-      { faculty: createdFaculties[2], name: 'Teknik Informatika', code: 'TI-D4', jenjang: 'D4', student_count: 520, faculty_count: 24, accreditation_grade: 'A' },
-      { faculty: createdFaculties[1], name: 'Akuntansi', code: 'AK-D3', jenjang: 'D3', student_count: 300, faculty_count: 10, accreditation_grade: 'B' },
-      { faculty: createdFaculties[1], name: 'Manajemen', code: 'MN-D3', jenjang: 'D3', student_count: 280, faculty_count: 9, accreditation_grade: 'B' }
-    ];
 
-    const createdPrograms = [];
-    for (const p of programs) {
-      const pr = await StudyProgram.create({
-        faculty_id: p.faculty.faculty_id,
-        name: p.name,
-        code: p.code,
-        jenjang: p.jenjang,
-        accreditation_grade: p.accreditation_grade,
-        overall_score: Math.round((70 + Math.random()*25)*100)/100,
-        student_count: p.student_count,
-        faculty_count: p.faculty_count
-      });
-      createdPrograms.push(pr);
-    }
 
     // Create users (admin + coordinators + sample staff)
     // Passwords will be hashed by model hooks (argon2). Use distinct passwords but prompt to change them after seed.
     const users = [
-      { fullname: 'Administrator Politeknik', role: 'pimpinan', email: 'admin@polman.ac.id', password: 'PrimaAdmin123!', position: 'Kepala Sistem', is_active: true },
-      { fullname: 'Koordinator Teknik Mesin', role: 'koordinator', email: 'koor_tm@polman.ac.id', password: 'KoorTm123!', position: 'Koordinator Prodi', study_program_id: createdPrograms[0].study_program_id },
-      { fullname: 'Koordinator Teknik Elektro', role: 'koordinator', email: 'koor_te@polman.ac.id', password: 'KoorTe123!', position: 'Koordinator Prodi', study_program_id: createdPrograms[1].study_program_id },
-      { fullname: 'Koordinator Teknik Informatika', role: 'koordinator', email: 'koor_ti@polman.ac.id', password: 'KoorTi123!', position: 'Koordinator Prodi', study_program_id: createdPrograms[2].study_program_id },
-      { fullname: 'Koordinator Akuntansi', role: 'koordinator', email: 'koor_ak@polman.ac.id', password: 'KoorAk123!', position: 'Koordinator Prodi', study_program_id: createdPrograms[3].study_program_id }
+      { fullname: 'Administrator Politeknik', role: 'pimpinan', email: 'admin@polman.ac.id', password: 'PrimaAdmin123!', is_active: true },
+      { fullname: 'Koordinator Teknik Mesin', role: 'staff', email: 'koor_tm@polman.ac.id', password: 'KoorTm123!' },
+      { fullname: 'Koordinator Teknik Elektro', role: 'staff', email: 'koor_te@polman.ac.id', password: 'KoorTe123!' },
+      { fullname: 'Koordinator Teknik Informatika', role: 'staff', email: 'koor_ti@polman.ac.id', password: 'KoorTi123!' },
+      { fullname: 'Koordinator Akuntansi', role: 'staff', email: 'koor_ak@polman.ac.id', password: 'KoorAk123!' }
     ];
 
     const createdUsers = [];
@@ -114,12 +90,7 @@ async function seed() {
       createdUsers.push(nu);
     }
 
-    // Link user_program_roles for coordinators
-    for (const u of createdUsers) {
-      if (u.role === 'koordinator' && u.study_program_id) {
-        await UserProgramRole.create({ user_id: u.user_id, study_program_id: u.study_program_id, role: 'koordinator', is_primary: true });
-      }
-    }
+    // No study program associations in SF BANK. Skipping user_program_roles linking.
 
     // Create sample news posts
     const newsSamples = [
@@ -155,7 +126,6 @@ async function seed() {
 
     console.log('Seeding complete. Summary:');
     console.log('Faculties:', await Faculty.count());
-    console.log('Programs:', await StudyProgram.count());
     console.log('Users:', await User.count());
     console.log('News posts:', await NewsPost.count());
 

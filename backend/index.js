@@ -10,16 +10,8 @@ import multer from 'multer';
 import crypto from 'crypto';
 import db from './config/Database.js';
 import authRoutes from './routes/shared/authRoutes.js';
-import organizationRoutes from './routes/organization/organizationRoutes.js';
-import institutionRoutes from './routes/organization/institutionRoutes.js';
-import accreditationRoutes from './routes/accreditation/accreditationRoutes.js';
-import documentRoutes from './routes/documents/documentRoutes.js';
-import evaluationRoutes from './routes/evaluation/evaluationRoutes.js';
-import analyticsRoutes from './routes/analytics/analyticsRoutes.js';
-import notificationRoutes from './routes/notification/notificationRoutes.js';
-import integrationRoutes from './routes/integration/integrationRoutes.js';
-import newsRoutes from './routes/news/newsRoutes.js';
-import homeRoutes from './routes/home/homeRoutes.js';
+// Note: many route modules were removed/cleaned from the repo.
+// Only import shared routes that exist to avoid startup errors.
 import contactRoutes from './routes/shared/contactRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 
@@ -106,17 +98,8 @@ app.use('/api/shared', authRoutes);
 // Note: `userManagementRoutes` (administrator) was removed/cleaned from the repo.
 // If you need admin routes again, restore `backend/routes/administrator/userManagementRoutes.js`
 // and re-enable the line below.
-// app.use('/', userManagementRoutes);
-app.use('/', organizationRoutes);
-app.use('/', institutionRoutes);
-app.use('/', accreditationRoutes);
-app.use('/', documentRoutes);
-app.use('/', evaluationRoutes);
-app.use('/', analyticsRoutes);
-app.use('/', notificationRoutes);
-app.use('/', integrationRoutes);
-app.use('/', newsRoutes);
-app.use('/', homeRoutes);
+// The application currently exposes only shared routes present in `routes/shared` and health route.
+// Restore the other routes if/when those files are re-added to `backend/routes/`.
 app.use('/', contactRoutes);
 app.use('/', healthRoutes);
 

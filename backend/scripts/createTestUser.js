@@ -18,40 +18,27 @@ const createTestUsers = async () => {
         if (existingUsers.length === 0) {
             const testUsers = [
                 // Dosen test user removed
-                {
-                    fullname: 'Dr. Siti Aminah',
-                    email: 'coordinator@gmail.com',
-                    password: 'password123',
-                    role: 'koordinator',
-                    gender: 'female',
-                    nip: '198702152011012002',
-                    phone: '081234567891',
-                    department: 'Teknik Informatika',
-                    study_program: 'Sistem Informasi',
-                    position: 'Koordinator Prodi'
-                },
-                {
-                    fullname: 'Prof. Budi Santoso',
-                    email: 'admin@gmail.com',
-                    password: 'password123',
-                    role: 'unit',
-                    gender: 'male',
-                    nip: '197801012005011001',
-                    phone: '081234567892',
-                    department: 'PPMPP',
-                    position: 'Kepala Unit PPMPP'
-                },
-                {
-                    fullname: 'Prof. Dr. Indira Sari',
-                    email: 'director@gmail.com',
-                    password: 'password123',
-                    role: 'pimpinan',
-                    gender: 'female',
-                    nip: '197505102000032001',
-                    phone: '081234567893',
-                    department: 'Universitas',
-                    position: 'Direktur'
-                }
+                            {
+                                fullname: 'Siti Aminah',
+                                email: 'coordinator@gmail.com',
+                                password: 'password123',
+                                role: 'staff',
+                                phone: '081234567891'
+                            },
+                            {
+                                fullname: 'Budi Santoso',
+                                email: 'admin@gmail.com',
+                                password: 'password123',
+                                role: 'admin',
+                                phone: '081234567892'
+                            },
+                            {
+                                fullname: 'Indira Sari',
+                                email: 'director@gmail.com',
+                                password: 'password123',
+                                role: 'auditor',
+                                phone: '081234567893'
+                            }
             ];
 
             for (const userData of testUsers) {

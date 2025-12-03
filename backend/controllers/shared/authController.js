@@ -127,7 +127,7 @@ export const login = async (req, res) => {
 // Register (simple user creation)
 export const register = async (req, res) => {
     try {
-        const { fullname, email, password, role = 'koordinator', gender, phone, department, study_program, position } = req.body || {};
+        const { fullname, email, password, role = 'staff', phone } = req.body || {};
         if (!fullname || !email || !password) {
             return res.status(400).json({ msg: "fullname, email, dan password wajib diisi" });
         }
@@ -145,11 +145,7 @@ export const register = async (req, res) => {
             email,
             password,
             role,
-            gender,
-            phone,
-            department,
-            study_program,
-            position
+            phone
         });
 
         // Start session directly after registration
@@ -202,7 +198,8 @@ export const Me = async (req, res) => {
                 'fullname',
                 'email',
                 'role',
-                'gender',
+                'phone',
+                'profile_picture',
                 'created_at',
                 'updated_at'
             ],
