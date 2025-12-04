@@ -138,8 +138,8 @@ const Navbar = ({ forceTransparent = false }) => {
     <>
       <nav className={`fixed w-full z-50 transition-all duration-300 ${
         (scrolled && !forceTransparent)
-          ? 'bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 shadow-sm' 
-          : 'bg-transparent border-b border-transparent'
+          ? 'bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md shadow-sm' 
+          : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-20">

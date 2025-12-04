@@ -422,6 +422,11 @@ const Homepage = () => {
       <section className="relative min-h-screen flex items-center pt-20 pb-20 px-6 overflow-hidden">
         {/* Dynamic Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Royal Pattern Overlay - Hero Background */}
+          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+               style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '24px 24px' }}>
+          </div>
+
           <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#FFD700]/10 dark:bg-blue-500/20 rounded-full blur-[100px] animate-pulse"></div>
           <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-[#C5A059]/10 dark:bg-indigo-500/10 rounded-full blur-[120px]" style={{ animationDelay: '2s' }}></div>
         </div>
@@ -510,17 +515,28 @@ const Homepage = () => {
               </motion.div>
 
               {/* Trust Indicators */}
-              <motion.div variants={fadeInUp} className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10 flex items-center gap-8">
-                <div className="flex -space-x-4">
-                  {[1,2,3,4].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-[#0a0e27] bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
-                      <FiUsers className="w-4 h-4 text-slate-400" />
+              <motion.div variants={fadeInUp} className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                  {[
+                    { label: 'Active Members', value: '150+', icon: FiUsers, color: 'text-blue-600 dark:text-blue-400' },
+                    { label: 'Battles Fought', value: '45', icon: GiCrossedSwords, color: 'text-red-600 dark:text-red-400' },
+                    { label: 'Victories', value: '38', icon: GiTrophyCup, color: 'text-[#C5A059] dark:text-[#FFD700]' },
+                    { label: 'Total Donations', value: '2.5M', icon: GiTwoCoins, color: 'text-green-600 dark:text-green-400' }
+                  ].map((stat, index) => (
+                    <div key={index} className="group">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 group-hover:bg-white/10 transition-colors">
+                          <stat.icon className="w-5 h-5 text-slate-600 dark:text-[#FFD700] group-hover:text-[#FFD700] transition-colors" />
+                        </div>
+                        <span className={`text-2xl font-black ${stat.color}`}>
+                          {stat.value}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-500 dark:text-[#FFD700] uppercase tracking-widest">
+                        {stat.label}
+                      </p>
                     </div>
                   ))}
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">{stats.members}+</p>
-                  <p className="text-xs text-slate-500 dark:text-white font-semibold uppercase tracking-wider">Active Commanders</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -539,7 +555,7 @@ const Homepage = () => {
                   {/* Main Glass Card */}
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[500px] bg-gradient-to-br from-white/60 to-white/20 dark:from-[#1E293B]/90 dark:to-[#0F172A]/90 backdrop-blur-3xl rounded-[40px] border-2 border-[#FFD700]/30 dark:border-[#FFD700]/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(197,160,89,0.15)] z-10 overflow-hidden group">
                     {/* Royal Pattern Overlay */}
-                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+                    <div className="absolute inset-0 opacity-[0.15] dark:opacity-[0.25] pointer-events-none" 
                          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '24px 24px' }}>
                     </div>
                     
@@ -714,42 +730,6 @@ const Homepage = () => {
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] border border-dashed border-slate-300 dark:border-white/10 rounded-full -z-10 animate-[spin_40s_linear_infinite_reverse]"></div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Stats Section - Kingdom Achievements */}
-      <section className="py-16 px-6 bg-gradient-to-r from-slate-100 via-white to-slate-100 dark:from-[#1E293B] dark:via-[#0F172A] dark:to-[#1E293B] border-y-2 border-slate-200 dark:border-[#C5A059]/30">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
-            className="grid grid-cols-2 md:grid-cols-4 gap-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={staggerContainer}
-          >
-            {[
-              { icon: FiUsers, label: "Active Members", value: stats.members, suffix: "+" },
-              { icon: GiCrossedSwords, label: "Battles Fought", value: stats.battles, suffix: "" },
-              { icon: GiTrophyCup, label: "Victories", value: stats.victories, suffix: "" },
-              { icon: GiTwoCoins, label: "Total Donations", value: `${(stats.donations / 1000000).toFixed(1)}M`, suffix: "" }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={scaleIn}
-                className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 text-center shadow-lg border-2 border-slate-200 dark:border-[#C5A059]/30 hover:border-[#C5A059] dark:hover:border-[#FFD700]/50 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(197,160,89,0.2)]"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-xl mb-4 shadow-lg">
-                  <stat.icon className="w-8 h-8 text-[#0F172A]" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-[#FFD700] mb-2" style={{ fontFamily: 'Cinzel, serif' }}>
-                  {stat.value}{stat.suffix}
-                </div>
-                <div className="text-sm text-slate-600 dark:text-[#E2E8F0]/70 font-semibold tracking-wide">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
