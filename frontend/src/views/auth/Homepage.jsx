@@ -435,6 +435,29 @@ const Homepage = () => {
               variants={staggerContainer}
               className="text-left relative"
             >
+              {/* Decorative Elements (Left Side) - Enhanced Visibility */}
+              
+              {/* 1. Massive Rotating Rune Circles */}
+              <div className="absolute top-[-20%] left-[-20%] w-[700px] h-[700px] border-[2px] border-dashed border-[#FFD700]/20 dark:border-[#FFD700]/10 rounded-full -z-20 animate-[spin_120s_linear_infinite]"></div>
+              <div className="absolute top-[-5%] left-[-5%] w-[500px] h-[500px] border border-[#FFD700]/30 dark:border-[#FFD700]/20 rounded-full -z-20 animate-[spin_80s_linear_infinite_reverse]"></div>
+
+              {/* 2. Large Floating Background Icons */}
+              <div className="absolute top-[-5%] left-[-5%] w-[500px] h-[500px] flex items-center justify-center -z-10 pointer-events-none">
+                <motion.div 
+                  className="text-[#FFD700]/10 dark:text-[#FFD700]/5"
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    opacity: [0.3, 0.6, 0.3]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <GiSwordsEmblem className="w-96 h-96" />
+                </motion.div>
+              </div>
+
+              {/* 3. Vivid Gradient Orbs */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-[#FFD700]/10 to-transparent rounded-full blur-[80px] -z-30"></div>
+
               {/* Status Badge */}
               <motion.div variants={fadeInUp} className="inline-flex items-center px-4 py-2 rounded-full bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md mb-8 shadow-sm">
                 <span className="relative flex h-3 w-3 mr-3">
@@ -514,11 +537,20 @@ const Homepage = () => {
                   className="absolute inset-0"
                 >
                   {/* Main Glass Card */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[500px] bg-gradient-to-br from-white/60 to-white/20 dark:from-[#1E293B]/80 dark:to-[#0F172A]/80 backdrop-blur-3xl rounded-[40px] border border-white/60 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] z-10 overflow-hidden group">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[500px] bg-gradient-to-br from-white/60 to-white/20 dark:from-[#1E293B]/90 dark:to-[#0F172A]/90 backdrop-blur-3xl rounded-[40px] border-2 border-[#FFD700]/30 dark:border-[#FFD700]/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(197,160,89,0.15)] z-10 overflow-hidden group">
+                    {/* Royal Pattern Overlay */}
+                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+                         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '24px 24px' }}>
+                    </div>
+                    
                     {/* Inner Glow & Effects */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/10 to-transparent opacity-50"></div>
-                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#FFD700]/20 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#C5A059]/20 rounded-full blur-3xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/10 via-transparent to-[#0F172A]/50 opacity-50"></div>
+                    <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#FFD700]/20 rounded-full blur-[80px] animate-pulse"></div>
+                    <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-[#C5A059]/20 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+                    
+                    {/* Decorative Corner Accents */}
+                    <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#FFD700]/30 rounded-tr-3xl"></div>
+                    <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#FFD700]/30 rounded-bl-3xl"></div>
                     
                     {/* Content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-20">
@@ -557,10 +589,10 @@ const Homepage = () => {
                           <button
                             key={idx}
                             onClick={(e) => { e.stopPropagation(); setCurrentSlide(idx); }}
-                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                            className={`h-1.5 rounded-full transition-all duration-300 shadow-sm ${
                               currentSlide === idx 
                                 ? 'w-6 bg-[#FFD700]' 
-                                : 'w-1.5 bg-slate-300 dark:bg-white/20 hover:bg-[#FFD700]/50'
+                                : 'w-1.5 bg-slate-400 dark:bg-white/30 hover:bg-[#FFD700]/50'
                             }`}
                           />
                         ))}
