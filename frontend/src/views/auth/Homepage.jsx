@@ -25,7 +25,9 @@ import {
   FiYoutube,
   FiArrowRight,
   FiUsers,
-  FiAward
+  FiAward,
+  FiChevronLeft,
+  FiChevronRight
 } from 'react-icons/fi';
 import Navbar from '../../components/navbarhome';
 
@@ -40,6 +42,295 @@ const Homepage = () => {
   useEffect(() => {
     document.title = "Kingdom 3946 - Rise of Kingdoms Community";
   }, []);
+
+  // Slider State
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const heroSlides = [
+    {
+      id: 'overview',
+      title: 'KINGDOM 3946',
+      subtitle: 'The Sovereign Territory',
+      icon: GiCastle,
+      mainContent: (
+        <>
+           <div className="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+            <div className="w-3/4 h-full bg-[#FFD700] rounded-full"></div>
+          </div>
+          <div className="flex justify-between w-full mt-2 text-xs font-bold text-slate-500 dark:text-slate-200">
+            <span>POWER</span>
+            <span>75M+</span>
+          </div>
+        </>
+      ),
+      floating: [
+        { 
+          type: 'stat', 
+          icon: GiTrophyCup, 
+          label: 'VICTORIES', 
+          value: '38 Wins', 
+          color: 'green', 
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'stat', 
+          icon: GiCrossedSwords, 
+          label: 'BATTLES', 
+          value: '45 Epic', 
+          color: 'red', 
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'profile', 
+          name: 'King 3946', 
+          role: 'Reigning King', 
+          status: 'Online',
+          pos: 'center-right',
+          delay: 0.1 
+        }
+      ]
+    },
+    {
+      id: 'alliances',
+      title: 'TOP ALLIANCES',
+      subtitle: 'Our Strongest Forces',
+      icon: GiSwordsEmblem,
+      floating: [
+        { 
+          type: 'stat', 
+          icon: GiShield, 
+          label: '[CL] Crimson Legion', 
+          value: '12.5B Power', 
+          color: 'blue', 
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'stat', 
+          icon: GiShield, 
+          label: '[GG] Golden Guard', 
+          value: '10.2B Power', 
+          color: 'yellow', 
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'stat', 
+          icon: GiShield, 
+          label: '[SH] Shadow Hunters', 
+          value: '9.8B Power', 
+          color: 'purple', 
+          pos: 'center-right',
+          delay: 0.1 
+        }
+      ]
+    },
+    {
+      id: 'kvk',
+      title: 'KVK HISTORY',
+      subtitle: 'Legacy of Conquest',
+      icon: GiCrossedSwords,
+      floating: [
+        { 
+          type: 'stat', 
+          icon: GiTrophyCup, 
+          label: 'Season 1', 
+          value: 'Victory (15M)', 
+          color: 'green', 
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'stat', 
+          icon: GiTrophyCup, 
+          label: 'Season 2', 
+          value: 'Victory (22M)', 
+          color: 'green', 
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'stat', 
+          icon: GiCrossedSwords, 
+          label: 'Season 3', 
+          value: 'Defeat (18M)', 
+          color: 'red', 
+          pos: 'center-right',
+          delay: 0.1 
+        }
+      ]
+    },
+    {
+      id: 'giveaway',
+      title: 'GIVEAWAY WINNERS',
+      subtitle: 'Community Rewards',
+      icon: FiGift,
+      floating: [
+        { 
+          type: 'stat', 
+          icon: FiGift, 
+          label: 'DragonSlayer', 
+          value: 'Gold Chest', 
+          color: 'yellow', 
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'stat', 
+          icon: FiGift, 
+          label: 'LadyRose', 
+          value: 'Speedups', 
+          color: 'blue', 
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'stat', 
+          icon: FiGift, 
+          label: 'WarLord99', 
+          value: 'Gems Pack', 
+          color: 'purple', 
+          pos: 'center-right',
+          delay: 0.1 
+        },
+        { 
+          type: 'stat', 
+          icon: FiGift, 
+          label: 'NightHawk', 
+          value: 'VIP Points', 
+          color: 'green', 
+          pos: 'top-left',
+          delay: 0.15 
+        },
+        { 
+          type: 'stat', 
+          icon: FiGift, 
+          label: 'StormBringer', 
+          value: 'Resource Pack', 
+          color: 'red', 
+          pos: 'bottom-right',
+          delay: 0.25 
+        }
+      ]
+    },
+    {
+      id: 'donators',
+      title: 'TOP DONATORS',
+      subtitle: 'Kingdom Supporters',
+      icon: GiTwoCoins,
+      floating: [
+        { 
+          type: 'stat', 
+          icon: GiTwoCoins, 
+          label: 'Sir Lancelot', 
+          value: '50M Gold', 
+          color: 'yellow', 
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'stat', 
+          icon: GiTwoCoins, 
+          label: 'Queen Mary', 
+          value: '35M Gold', 
+          color: 'yellow', 
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'stat', 
+          icon: GiTwoCoins, 
+          label: 'King Arthur', 
+          value: '30M Gold', 
+          color: 'yellow', 
+          pos: 'top-left',
+          delay: 0.1 
+        },
+        { 
+          type: 'stat', 
+          icon: GiTwoCoins, 
+          label: 'Merlin', 
+          value: '25M Gold', 
+          color: 'yellow', 
+          pos: 'bottom-right',
+          delay: 0.15 
+        }
+      ]
+    },
+    {
+      id: 'players',
+      title: 'TOP PLAYERS',
+      subtitle: 'Power Rankings',
+      icon: GiCrown,
+      floating: [
+        { 
+          type: 'profile', 
+          name: 'Emperor', 
+          role: 'Rank 1', 
+          status: '150M Power',
+          pos: 'top-right',
+          delay: 0 
+        },
+        { 
+          type: 'profile', 
+          name: 'Warlord', 
+          role: 'Rank 2', 
+          status: '145M Power',
+          pos: 'bottom-left',
+          delay: 0.2 
+        },
+        { 
+          type: 'profile', 
+          name: 'General', 
+          role: 'Rank 3', 
+          status: '140M Power',
+          pos: 'center-right',
+          delay: 0.1 
+        },
+        { 
+          type: 'profile', 
+          name: 'Commander', 
+          role: 'Rank 4', 
+          status: '135M Power',
+          pos: 'top-left',
+          delay: 0.15 
+        },
+        { 
+          type: 'profile', 
+          name: 'Strategist', 
+          role: 'Rank 5', 
+          status: '130M Power',
+          pos: 'bottom-right',
+          delay: 0.25 
+        },
+        { 
+          type: 'profile', 
+          name: 'Vanguard', 
+          role: 'Rank 6', 
+          status: '125M Power',
+          pos: 'center-left',
+          delay: 0.05 
+        }
+      ]
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [currentSlide]);
 
   // Animation variants
   const fadeInUp = {
@@ -167,7 +458,7 @@ const Homepage = () => {
               {/* Description */}
               <motion.p 
                 variants={fadeInUp}
-                className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-xl leading-relaxed font-medium"
+                className="text-lg md:text-xl text-slate-600 dark:text-white mb-10 max-w-xl leading-relaxed font-medium"
               >
                 Join the elite forces of Kingdom 3946. Experience the pinnacle of strategy, 
                 unity, and conquest in the ultimate Rise of Kingdoms community.
@@ -206,110 +497,190 @@ const Homepage = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">{stats.members}+</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Active Commanders</p>
+                  <p className="text-xs text-slate-500 dark:text-white font-semibold uppercase tracking-wider">Active Commanders</p>
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* Right Content - 3D Glass Composition */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="relative hidden lg:block h-[600px]"
-            >
-              {/* Main Glass Card */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[500px] bg-gradient-to-br from-white/40 to-white/10 dark:from-white/10 dark:to-transparent backdrop-blur-2xl rounded-[40px] border border-white/50 dark:border-white/10 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.3)] z-10 overflow-hidden group">
-                {/* Inner Glow */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/20 to-transparent opacity-50"></div>
-                
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                  <motion.div 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-32 h-32 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-3xl flex items-center justify-center shadow-lg mb-8 relative"
-                  >
-                    <GiCastle className="w-20 h-20 text-[#0F172A]" />
-                    <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg -z-10"></div>
-                  </motion.div>
-                  
-                  <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2" style={{ fontFamily: 'Cinzel, serif' }}>KINGDOM 3946</h3>
-                  <p className="text-slate-600 dark:text-blue-200/70 text-sm mb-8">The Sovereign Territory</p>
-                  
-                  <div className="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div className="w-3/4 h-full bg-[#FFD700] rounded-full"></div>
-                  </div>
-                  <div className="flex justify-between w-full mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-                    <span>POWER</span>
-                    <span>75M+</span>
-                  </div>
-                </div>
-              </div>
+            {/* Right Content - 3D Glass Composition with Slider */}
+            <div className="relative hidden lg:block h-[600px]">
+              <AnimatePresence mode='wait'>
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
+                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, rotateY: 20 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  {/* Main Glass Card */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[500px] bg-gradient-to-br from-white/60 to-white/20 dark:from-[#1E293B]/80 dark:to-[#0F172A]/80 backdrop-blur-3xl rounded-[40px] border border-white/60 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] z-10 overflow-hidden group">
+                    {/* Inner Glow & Effects */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/10 to-transparent opacity-50"></div>
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#FFD700]/20 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#C5A059]/20 rounded-full blur-3xl"></div>
+                    
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-20">
+                      <motion.div 
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="w-32 h-32 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-3xl flex items-center justify-center shadow-lg mb-8 relative group-hover:scale-105 transition-transform duration-500"
+                      >
+                        {React.createElement(heroSlides[currentSlide].icon, { className: "w-20 h-20 text-[#0F172A]" })}
+                        <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg -z-10"></div>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      </motion.div>
+                      
+                      <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight" style={{ fontFamily: 'Cinzel, serif' }}>
+                        {heroSlides[currentSlide].title}
+                      </h3>
+                      <p className="text-slate-600 dark:text-blue-100 text-sm mb-8 font-medium tracking-wide uppercase">
+                        {heroSlides[currentSlide].subtitle}
+                      </p>
+                      
+                      {heroSlides[currentSlide].mainContent}
+                    </div>
 
-              {/* Floating Elements - Parallax Effect */}
-              <motion.div 
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0 }}
-                className="absolute top-0 right-10 w-48 p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-20"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg text-green-600 dark:text-green-400">
-                    <GiTrophyCup className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">VICTORIES</p>
-                    <p className="text-lg font-bold text-slate-800 dark:text-white">38 Wins</p>
-                  </div>
-                </div>
-              </motion.div>
+                    {/* Navigation Buttons (Inside Card) */}
+                    <div className="absolute bottom-0 left-0 right-0 h-24 flex items-center justify-between px-8 z-30 bg-gradient-to-t from-white/50 dark:from-[#0F172A]/50 to-transparent pb-6">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                        className="p-2 rounded-full bg-white/20 hover:bg-[#FFD700] dark:bg-white/5 dark:hover:bg-[#FFD700] backdrop-blur-md border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
+                      >
+                        <FiChevronLeft className="w-5 h-5" />
+                      </button>
+                      
+                      {/* Slide Indicators (Inside Card) */}
+                      <div className="flex gap-1.5">
+                        {heroSlides.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={(e) => { e.stopPropagation(); setCurrentSlide(idx); }}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              currentSlide === idx 
+                                ? 'w-6 bg-[#FFD700]' 
+                                : 'w-1.5 bg-slate-300 dark:bg-white/20 hover:bg-[#FFD700]/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
 
-              <motion.div 
-                animate={{ y: [0, 15, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-0 left-10 w-48 p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-20"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 dark:bg-red-500/20 rounded-lg text-red-600 dark:text-red-400">
-                    <GiCrossedSwords className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">BATTLES</p>
-                    <p className="text-lg font-bold text-slate-800 dark:text-white">45 Epic</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* King Profile Card */}
-              <motion.div 
-                animate={{ x: [0, 10, 0], y: [0, -5, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute top-1/2 -right-8 transform -translate-y-1/2 p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-30 flex items-center gap-4 min-w-[220px]"
-              >
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] p-[2px]">
-                    <div className="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                       <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=King3946&backgroundColor=b6e3f4" alt="King" className="w-full h-full object-cover" />
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                        className="p-2 rounded-full bg-white/20 hover:bg-[#FFD700] dark:bg-white/5 dark:hover:bg-[#FFD700] backdrop-blur-md border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
+                      >
+                        <FiChevronRight className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FFD700] rounded-full flex items-center justify-center border-2 border-white dark:border-[#1E293B] shadow-sm">
-                    <GiCrown className="w-3 h-3 text-[#0F172A]" />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-0.5">Reigning King</p>
-                  <p className="text-base font-bold text-slate-800 dark:text-white leading-tight">King 3946</p>
-                  <div className="flex items-center mt-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></div>
-                    <span className="text-[10px] font-medium text-green-600 dark:text-green-400">Online</span>
-                  </div>
-                </div>
-              </motion.div>
+
+                  {/* Floating Elements */}
+                  {heroSlides[currentSlide].floating.map((item, idx) => {
+                    // Position classes
+                    const posClasses = {
+                      'top-right': 'top-0 right-10',
+                      'bottom-left': 'bottom-0 left-10',
+                      'center-right': 'top-1/2 -right-8 transform -translate-y-1/2',
+                      'top-left': 'top-0 left-10',
+                      'bottom-right': 'bottom-0 right-10',
+                      'center-left': 'top-1/2 -left-8 transform -translate-y-1/2'
+                    };
+
+                    // Animation variants
+                    const animVariants = {
+                      'top-right': { y: [0, -15, 0] },
+                      'bottom-left': { y: [0, 15, 0] },
+                      'center-right': { x: [0, 10, 0], y: [0, -5, 0] },
+                      'top-left': { y: [0, -15, 0] },
+                      'bottom-right': { y: [0, 15, 0] },
+                      'center-left': { x: [0, -10, 0], y: [0, -5, 0] }
+                    };
+
+                    if (item.type === 'profile') {
+                      return (
+                        <motion.div 
+                          key={idx}
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ 
+                            opacity: { duration: 0.3, delay: item.delay },
+                            scale: { duration: 0.3, delay: item.delay },
+                            default: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: item.delay }
+                          }}
+                          className={`absolute ${posClasses[item.pos]} p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-30 flex items-center gap-4 min-w-[220px]`}
+                        >
+                          <motion.div 
+                            animate={animVariants[item.pos]}
+                            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: item.delay }}
+                            className="flex items-center gap-4 w-full"
+                          >
+                            <div className="relative">
+                              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] p-[2px]">
+                                <div className="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                  <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=King3946&backgroundColor=b6e3f4" alt="King" className="w-full h-full object-cover" />
+                                </div>
+                              </div>
+                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FFD700] rounded-full flex items-center justify-center border-2 border-white dark:border-[#1E293B] shadow-sm">
+                                <GiCrown className="w-3 h-3 text-[#0F172A]" />
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-slate-500 dark:text-white font-bold uppercase tracking-wider mb-0.5">{item.role}</p>
+                              <p className="text-base font-bold text-slate-800 dark:text-white leading-tight">{item.name}</p>
+                              <div className="flex items-center mt-1">
+                                <div className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></div>
+                                <span className="text-[10px] font-medium text-green-600 dark:text-green-400">{item.status}</span>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      );
+                    }
+
+                    // Standard Stat Card
+                    const colorClasses = {
+                      green: 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400',
+                      red: 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400',
+                      blue: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
+                      yellow: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400',
+                      purple: 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                    };
+
+                    return (
+                      <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, x: item.pos.includes('right') ? 50 : -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ 
+                          opacity: { duration: 0.3, delay: item.delay },
+                          x: { duration: 0.3, delay: item.delay }
+                        }}
+                        className={`absolute ${posClasses[item.pos]} w-48 p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-20`}
+                      >
+                        <motion.div
+                          animate={animVariants[item.pos]}
+                          transition={{ duration: item.pos === 'top-right' ? 4 : 5, repeat: Infinity, ease: "easeInOut", delay: item.delay }}
+                          className="flex items-center gap-3"
+                        >
+                          <div className={`p-2 rounded-lg ${colorClasses[item.color] || colorClasses.green}`}>
+                            {React.createElement(item.icon, { className: "w-6 h-6" })}
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-white font-bold uppercase">{item.label}</p>
+                            <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{item.value}</p>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              </AnimatePresence>
 
               {/* Decorative Circle */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-slate-200 dark:border-white/5 rounded-full -z-10 animate-[spin_60s_linear_infinite]"></div>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] border border-dashed border-slate-300 dark:border-white/10 rounded-full -z-10 animate-[spin_40s_linear_infinite_reverse]"></div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
