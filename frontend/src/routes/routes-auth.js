@@ -4,61 +4,151 @@ import Homepage from "views/auth/Homepage";
 import NavbarSettings from "views/auth/NavbarSettings";
 import About from "views/auth/About";
 import Contact from "views/auth/Contact";
-import Features from "views/auth/Features";
-import Members from "views/members/Members";
-import Deposits from "views/deposits/Deposits";
-import Reports from "views/reports/Reports";
-// Icon Imports
+// Kingdom 3946 Icon Imports
 import {
     MdLock,
     MdSettings,
-    MdHome,
-    MdInfo,
-    MdEmail,
-    MdStarRate,
     MdPersonAdd,
-    MdFeatures,
-    MdAttachMoney,
-    MdRateReview,
-    MdArticle,
-    MdSupport,
-    MdSecurity,
-    MdBusiness,
+    MdEvent,
+    MdGavel,
 } from "react-icons/md";
 import { 
-    FaRocket, 
-    FaUsers, 
-    FaChartLine,
-    FaDollarSign,
-    FaQuoteLeft,
-    FaNewspaper,
-    FaQuestionCircle,
-    FaLightbulb
-} from "react-icons/fa";
+    GiCastle,
+    GiCrossedSwords,
+    GiScrollUnfurled,
+    GiCrown,
+    GiTwoCoins,
+} from "react-icons/gi";
+import {
+    FiGift,
+    FiYoutube,
+    FiBookOpen,
+    FiHeart,
+} from "react-icons/fi";
 
 const routes = [
-    // Landing Page - Main entry point
+    // 1. Landing Page - Main entry point (Homepage dengan hero banner medieval)
     {
-        name: "Beranda",
+        name: "Home",
         layout: "/auth",
         path: "homepage",
-        icon: <MdHome className="h-6 w-6" />,
+        icon: <GiCastle className="h-6 w-6" />,
         component: <Homepage />,
         showInNavbar: true,
         isDefault: true,
+        description: "Kingdom 3946 Homepage",
+    },
+
+    // 2. KvK (Kingdom vs Kingdom)
+    {
+        name: "KvK",
+        layout: "/auth",
+        path: "kvk",
+        icon: <GiCrossedSwords className="h-6 w-6" />,
+        component: <Homepage />, // Temporary, create KvK component later
+        showInNavbar: true,
+        description: "Kingdom vs Kingdom battles",
+    },
+
+    // 3. Event (Kalender event, rules, registration)
+    {
+        name: "Events",
+        layout: "/auth",
+        path: "events",
+        icon: <MdEvent className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Kingdom events and tournaments",
+    },
+
+    // 4. Giveaway (Active giveaways, participation forms)
+    {
+        name: "Giveaway",
+        layout: "/auth",
+        path: "giveaway",
+        icon: <FiGift className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Active giveaways and rewards",
+    },
+
+    // 5. Form (Member registration, alliance application)
+    {
+        name: "Forms",
+        layout: "/auth",
+        path: "forms",
+        icon: <GiScrollUnfurled className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Registration and application forms",
+    },
+
+    // 6. Donation (Info sistem donasi, leaderboard)
+    {
+        name: "Donation",
+        layout: "/auth",
+        path: "donation",
+        icon: <GiTwoCoins className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Donation system and leaderboard",
+    },
+
+    // 7. About Kingdom (History, organization, rules)
+    {
+        name: "About",
+        layout: "/auth",
+        path: "about",
+        icon: <GiCrown className="h-6 w-6" />,
+        component: <About />,
+        showInNavbar: true,
+        description: "About Kingdom 3946",
+    },
+
+    // 8. YouTube (Video gallery, tutorials, battle highlights)
+    {
+        name: "YouTube",
+        layout: "/auth",
+        path: "youtube",
+        icon: <FiYoutube className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Video gallery and tutorials",
+    },
+
+    // 9. Blog (Articles, strategy guides, community stories)
+    {
+        name: "Blog",
+        layout: "/auth",
+        path: "blog",
+        icon: <FiBookOpen className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Articles and strategy guides",
+    },
+
+    // 10. Laws (Aturan kingdom, code of conduct, FAQs)
+    {
+        name: "Laws",
+        layout: "/auth",
+        path: "laws",
+        icon: <MdGavel className="h-6 w-6" />,
+        component: <Homepage />, // Temporary
+        showInNavbar: true,
+        description: "Kingdom rules and regulations",
     },
 
     // Authentication
     {
-        name: "Masuk",
+        name: "Sign In",
         layout: "/auth",
         path: "sign-in",
         icon: <MdLock className="h-6 w-6" />,
         component: <SignIn />,
-        showInNavbar: true,
+        showInNavbar: false,
     },
     {
-        name: "Daftar",
+        name: "Sign Up",
         layout: "/auth",
         path: "sign-up",
         icon: <MdPersonAdd className="h-6 w-6" />,
@@ -66,66 +156,15 @@ const routes = [
         showInNavbar: false,
     },
 
-    // Project-specific sections (SF BANK / PRIMA)
-    {
-        name: "Anggota",
-        layout: "/auth",
-        path: "members",
-        icon: <FaUsers className="h-6 w-6" />,
-        component: <Members />,
-        showInNavbar: true,
-        description: "Daftar anggota / pemain dan informasi profil",
-    },
-    {
-        name: "Setoran",
-        layout: "/auth",
-        path: "deposits",
-        icon: <FaDollarSign className="h-6 w-6" />,
-        component: <Deposits />,
-        showInNavbar: true,
-        description: "Input dan laporan setoran mingguan",
-    },
-    
-    {
-        name: "Laporan",
-        layout: "/auth",
-        path: "reports",
-        icon: <FaChartLine className="h-6 w-6" />,
-        component: <Reports />,
-        showInNavbar: true,
-        description: "Laporan per minggu dan rentang minggu",
-    },
-
-    // Public / About / Docs
-    {
-        name: "Tentang",
-        layout: "/auth",
-        path: "about",
-        icon: <MdInfo className="h-6 w-6" />,
-        component: <About />,
-        showInNavbar: true,
-        description: "Tentang proyek dan panduan singkat",
-    },
-    // Documentation removed per request
-    {
-        name: "Kontak",
-        layout: "/auth",
-        path: "contact",
-        icon: <MdEmail className="h-6 w-6" />,
-        component: <Contact />,
-        showInNavbar: true,
-        description: "Hubungi pengembang / tim support",
-    },
-
     // Utility / Dev
     {
-        name: "Pengaturan Navbar",
+        name: "Navbar Settings",
         layout: "/auth",
         path: "navbar-settings",
         icon: <MdSettings className="h-6 w-6" />,
         component: <NavbarSettings />,
         showInNavbar: false,
-        description: "Konfigurasi tampilan navbar (dev)",
+        description: "Navbar configuration (dev)",
     },
 ];
 
@@ -135,11 +174,15 @@ export const getNavbarRoutes = () => {
 };
 
 export const getMainRoutes = () => {
-    return routes.filter(route => ['homepage', 'about', 'features', 'pricing', 'contact'].includes(route.path));
+    return routes.filter(route => ['homepage', 'kvk', 'events', 'about'].includes(route.path));
 };
 
 export const getAuthRoutes = () => {
     return routes.filter(route => ['sign-in', 'sign-up'].includes(route.path));
+};
+
+export const getKingdomRoutes = () => {
+    return routes.filter(route => ['kvk', 'events', 'giveaway', 'donation', 'forms', 'youtube', 'blog', 'laws'].includes(route.path));
 };
 
 export const getDefaultRoute = () => {

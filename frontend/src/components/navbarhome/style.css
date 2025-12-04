@@ -1,4 +1,16 @@
+/* Import Medieval Font - Cinzel */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
+
 :root {
+  /* Kingdom 3946 Medieval Color Scheme */
+  --primary-bg: #0F172A;         /* Deep Navy / Midnight Blue */
+  --primary-gold: #FFD700;       /* Classic Gold */
+  --antique-gold: #C5A059;       /* Antique Gold */
+  --blood-red: #880808;          /* Blood Red */
+  --text-light: #E2E8F0;         /* Off-White / Parchment Light */
+  --component-bg: #1E293B;       /* Slate Dark */
+  
+  /* Legacy colors (for compatibility) */
   --white: #ffffff;
   --blue-400: #60a5fa;
   --blue-500: #3b82f6;

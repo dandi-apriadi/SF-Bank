@@ -2,102 +2,135 @@
 applyTo: '**'
 ---
 
-# Development Instructions — MySQL Migration (SF BANK)
+# Development Instructions — Kingdom 3946 Web Application
 
-Ringkasan: file ini disesuaikan untuk merefleksikan rencana migrasi dari penyimpanan CSV ke MySQL (lihat `plan.txt` di root projek). Instruksi berisi pedoman konfigurasi database, skema awal, migrasi, import CSV, dan opsi pengembangan (docker, backup).
+Ringkasan: file ini berisi pedoman pengembangan aplikasi web Kingdom 3946 dengan tema medieval strategy game. Aplikasi ini mencakup sistem manajemen kingdom, KvK (Kingdom vs Kingdom), event management, donation tracking, dan fitur komunitas lainnya.
 
 **Core Goals:**
-- Migrasi data anggota dan setoran dari CSV ke MySQL.
-- Menyediakan `members` dan `deposits` melalui migration dan model.
-- Sediakan skrip import CSV dengan opsi `--dry-run` dan logging error.
+- Membangun platform web untuk Kingdom 3946 dengan tema medieval/megah
+- Menyediakan fitur admin untuk manajemen kingdom (users, events, KvK, donations, dll)
+- Menyediakan fitur publik untuk member dan pengunjung
+- Implementasi sistem role-based access control (RBAC)
+- Mobile-first approach (90% pengguna akses via mobile)
 
 **Pendekatan dan Tooling (Rekomendasi):**
-- ORM: `sequelize` + `sequelize-cli` (migrasi, seeders). Alternatif: `knex` + `objection.js`.
-- MySQL client: `mysql2`.
-- Koneksi: gunakan connection pooling dan env vars.
+- Database: MySQL dengan connection pooling
+- Backend: Node.js + Express
+- Frontend: React + Tailwind CSS
+- Notification: Discord Webhook integration
+- File Upload: Multer untuk media management
+- Authentication: JWT-based dengan role-based access control
 
 **Lokasi file penting:**
-- Konfigurasi DB: `backend/config/database.js` (atau `.ts`).
-- Migration: `backend/migrations/` (hasil dari `sequelize-cli`).
-- Models: `backend/models/`.
-- Seeders: `backend/seeders/`.
-- Import script: `backend/scripts/import_csv_to_mysql.js`.
-- Docker compose (dev): `docker-compose.yml` (di repo root atau `backend/`).
+- Konfigurasi DB: `backend/config/Database.js`
+- Controllers: `backend/controllers/` (organized by feature)
+- Models: `backend/models/`
+- Routes: `backend/routes/`
+- Middleware: `backend/middleware/AuthUser.js`
+- Scripts: `backend/scripts/` (setup, seeding, migrations)
+- Frontend Components: `frontend/src/components/`
+- Frontend Services: `frontend/src/services/`
 
 **Environment variables yang harus tersedia:**
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_POOL_MAX`, `DB_POOL_MIN`.
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+- `JWT_SECRET`, `JWT_EXPIRES_IN`
+- `DISCORD_WEBHOOK_URL` (untuk notifikasi aplikasi)
+- `NODE_ENV`, `PORT`
+- `NEXT_PUBLIC_API_URL` (frontend)
 
-**Skema Awal (ringkasan):**
-- `members`: `id`, `external_id` (optional), `name`, `role`, `joined_date`, `notes`, timestamps.
-- `deposits`: `id`, `deposit_uuid` (optional), `week` (TINYINT, 1..100), `member_id` (FK), `amount`, `date_entered`, `entered_by`, `note`, timestamps.
-- Index: `deposits(member_id)`, `deposits(week)`, `members(external_id)` bila digunakan.
+**Database Schema (Kingdom 3946):**
+- `users`: User accounts dengan role-based access (admin, member, visitor)
+- `events`: Kingdom events dengan jadwal, rules, rewards
+- `kvk`: Kingdom vs Kingdom battles, scores, rankings
+- `donations`: Tracking donasi member dengan leaderboard
+- `kdp`: Kingdom Defense Points tracking
+- `blacklist`: Database pemain bermasalah
+- `gallery`: Media uploads (photos, videos)
+- `blog`: Artikel dan news posts
+- `forms`: Dynamic forms dengan submissions
+- `audit_logs`: Activity logging untuk admin actions
 
 **Validasi & Integritas:**
-- Validasi range `week` (1..100) di aplikasi + DB constraint jika memungkinkan.
-- Gunakan transaksi saat melakukan operasi multi-step (mis. batch import).
+- Validasi input di aplikasi dengan error handling yang jelas
+- Gunakan transaksi untuk operasi multi-step
+- Audit trail: semua aksi admin harus tercatat (who, what, when)
+- Role-based access control pada setiap endpoint
 
-**Migrasi & Seed (contoh commands):**
+**Database Setup (contoh commands):**
 ```pwsh
 cd backend
-npm install sequelize sequelize-cli mysql2
-npx sequelize-cli init
-npx sequelize-cli db:migrate
-npx sequelize-cli db:seed:all
+npm install
+node scripts/createDatabase.js
+node scripts/databaseSetup.js
+node scripts/seed_polman_data.js
 ```
 
-Tambahkan script `package.json` di `backend` untuk mempermudah: `migrate`, `seed`.
+**Discord Integration**
+- Setup webhook untuk notifikasi real-time
+- Trigger notifikasi untuk: aplikasi member baru, KvK results, event registrations
+- Format pesan dengan embed untuk tampilan menarik
 
-**Import CSV → MySQL**
-- Letakkan script di `backend/scripts/import_csv_to_mysql.js`.
-- Fitur minimal: parse CSV, validasi per-baris, batch insert dalam transaksi, `--dry-run`, log ke `import_errors.log`.
+**Backup & Maintenance**
+- Script backup: `backup.sh` dan `rollback.sh` di root
+- Session cleanup: `backend/scripts/session_cleanup.sh`
+- Health monitoring: `backend/scripts/system_health_check.js`
 
-**Docker (dev) — rekomendasi singkat**
-- Sediakan `docker-compose.yml` berisi service `db` (MySQL:8), named volume untuk persistensi, dan environment vars contoh.
+**API Structure (Kingdom 3946)**
+- Auth & User Management:
+  - `POST /api/v1/auth/login`
+  - `POST /api/v1/auth/register`
+  - `GET /api/v1/users`
+  - `PUT /api/v1/users/:id`
+  - `DELETE /api/v1/users/:id`
 
-**Backup**
-- Skrip lokal: `scripts/backup_mysql.sh` (atau `.ps1` untuk Windows) yang menjalankan `mysqldump`/`mysqlpump`.
+- KvK Management:
+  - `GET /api/v1/kvk` (list KvK battles)
+  - `POST /api/v1/kvk` (create new KvK)
+  - `PUT /api/v1/kvk/:id/scores`
+  - `GET /api/v1/kvk/:id/rankings`
 
-**API perubahan (high level)**
-- Ganti operasi CSV/file I/O di controller dengan model/ORM queries.
-- Endpoints minimal:
-  - `GET /api/v1/members`
-  - `POST /api/v1/members`
-  - `PUT /api/v1/members/:id`
-  - `DELETE /api/v1/members/:id`
-  - `GET /api/v1/deposits?week=..&from=..&to=..`
-  - `POST /api/v1/deposits`
-  - `PUT /api/v1/deposits/:id`
+- Event Management:
+  - `GET /api/v1/events`
+  - `POST /api/v1/events`
+  - `POST /api/v1/events/:id/register`
+  - `GET /api/v1/events/:id/participants`
 
-**Roadmap (singkat)**
-1. Buat `backend/config/database.js` dan tambahkan scripts `migrate`/`seed` (0.5 hari).
-2. Setup `sequelize` + `sequelize-cli` + konfigurasi CLI (0.5 hari).
-3. Tulis migrations untuk `members` dan `deposits` + jalankan di dev (0.5 hari).
-4. Implement model layer dan fungsi CRUD (1 hari).
-5. Migrasi controller: ganti CSV I/O dengan ORM (1 hari).
-6. Buat import script CSV→MySQL dengan `--dry-run` (0.5 hari).
-7. Tambah seed data, tests sederhana, dan dokumentasi (0.5 hari).
+- Donation & KDP:
+  - `GET /api/v1/donations`
+  - `POST /api/v1/donations`
+  - `GET /api/v1/donations/leaderboard`
+  - `POST /api/v1/kdp` (input KDP data)
+  - `GET /api/v1/kdp/history`
+
+- Content Management:
+  - `GET /api/v1/blog`
+  - `POST /api/v1/blog`
+  - `GET /api/v1/gallery`
+  - `POST /api/v1/gallery/upload`
+  - `GET /api/v1/forms`
+  - `POST /api/v1/forms/:id/submit`
+
+**Development Roadmap**
+1. Setup theme & styling dengan medieval design system (1 hari)
+2. Implement authentication & role-based access control (1 hari)
+3. Build admin dashboard dengan 10 fitur management (3 hari)
+4. Build public pages dengan 10 fitur pengunjung (3 hari)
+5. Discord webhook integration untuk notifikasi (0.5 hari)
+6. Mobile optimization & responsive design (1 hari)
+7. Testing & bug fixing (1 hari)
 
 **Acceptance Criteria**
-- Migration membuat tabel `members` dan `deposits`.
-- API CRUD untuk anggota dan setoran terhubung ke MySQL.
-- Import CSV dapat memindahkan data lama ke MySQL dengan logging dan opsi dry-run.
-- Laporan rentang minggu dapat dihasilkan dari query MySQL.
+- Theme medieval teraplikasi dengan color scheme sesuai plan.txt
+- 10 fitur admin fully functional (User, Bank, Event, Gallery, Form, KvK, Donation, Blog, Blacklist, KDP)
+- 10 fitur publik accessible (Landing, KvK, Event, Giveaway, Form, Donation, About, YouTube, Blog, Laws)
+- Discord webhook mengirim notifikasi untuk event penting
+- Mobile-first responsive design
+- Role-based access control berfungsi dengan baik
+- Audit trail mencatat semua admin actions
 
-**Next Steps — pilih aksi yang Anda mau saya lakukan sekarang**
-- **[A]** Buat file `backend/config/database.js` dan skeleton konfigurasi `sequelize` + `package.json` script `migrate`/`seed`.
-- **[B]** Tulis migration dan model untuk `members` dan `deposits` + jalankan migrations di lingkungan dev (membutuhkan DB akses atau docker).
-- **[C]** Buat script `backend/scripts/import_csv_to_mysql.js` dengan opsi `--dry-run`.
-- **[D]** Buat contoh `docker-compose.yml` untuk MySQL development.
-
-Referensi: lihat `plan.txt` di root projek untuk deskripsi detil dan estimasi waktu.
+Referensi: lihat `plan.txt` di root projek untuk struktur menu lengkap.
 
 ---
-
-- **Visitasi**: External evaluation/site visit by accreditation team
-- **Kriteria Akreditasi**: Accreditation criteria (numbered standards)
-- **Borang**: Accreditation forms and documentation
-- **Eviden**: Evidence/supporting documents for accreditation
-- **Mutu Akademik**: Academic quality management
 
 ## API Guidelines
 
@@ -126,48 +159,29 @@ Referensi: lihat `plan.txt` di root projek untuk deskripsi detil dan estimasi wa
 
 ### Backend API Structure
 - **Base Path**: All API endpoints must start with `/api/v1/`
-- **Role-Based Routes**: Organize by user roles
+- **Feature-Based Routes**: Organize by kingdom features
   ```
-  /api/v1/auth/          # Authentication
-  /api/v1/customers/     # Customer endpoints (profiles, KYC)
-  /api/v1/accounts/      # Bank account endpoints (create, balances)
-  /api/v1/transactions/  # Transaction endpoints (deposits, transfers)
-  /api/v1/admin/         # Admin / management endpoints
+  /api/v1/auth/          # Authentication & authorization
+  /api/v1/users/         # User management (admin only)
+  /api/v1/kvk/           # Kingdom vs Kingdom battles
+  /api/v1/events/        # Event management
+  /api/v1/donations/     # Donation tracking
+  /api/v1/kdp/           # Kingdom Defense Points
+  /api/v1/blog/          # Blog & news
+  /api/v1/gallery/       # Media gallery
+  /api/v1/forms/         # Dynamic forms
+  /api/v1/blacklist/     # Blacklist management (admin only)
+  /api/v1/giveaway/      # Giveaway management
   ```
 - **RESTful**: Follow REST conventions
-- **Authentication**: JWT-based with role checking middleware
+- **Authentication**: JWT-based with role checking middleware (admin, member, visitor)
 - **Error Handling**: Consistent JSON error responses
+- **Discord Integration**: Webhook notifications for key events
 
-- **Business Context**: This project is a banking/financial application (SF BANK). Adjust data, UX, and compliance items accordingly.
-- **Compliance Notes**: Ensure handling of PII follows local regulations; add logging, consent, and data-retention policies as needed.
-- **Audit & Evidence**: Keep migration logs, import error logs, and DB migration history for audit and rollback purposes.
+- **Business Context**: This project is a Kingdom 3946 community management application for Rise of Kingdoms game. Focus on gaming community features, leaderboards, and social engagement.
+- **Audit Trail**: All admin actions must be logged (who, what, when) for accountability
+- **Role-Based Access**: Strict permission checking on all admin endpoints
 - **Testing**: Jest for unit tests, Cypress for E2E
-
-### Dummy Data Requirements
-- **Comprehensive**: Cover all user scenarios
-- **Realistic**: Use Indonesian academic context
-- **Consistent**: Maintain data relationships
-- **Variety**: Include different states (completed, pending, error)
-
-### Component Development
-- **Functional Components**: Use React functional components with hooks
-- **Props Interface**: Define TypeScript interfaces for all props
-- **Default Props**: Provide sensible defaults
-<!-- - **Error Boundaries**: Implement error handling -->
-
-### Form Handling
-- **Validation**: Client-side and server-side validation
-- **Loading States**: Show loading indicators
-- **Error Messages**: Clear, actionable error messages
-- **Auto-save**: Implement for long forms
-
-## Image Guidelines
-- **Image Source**: Use Unsplash.com for high-quality stock images
-- **Academic Context**: Choose images related to education, university, academic quality, modern campus
-- **Image Optimization**: Use Next.js Image component with proper sizing
-- **Alt Text**: Provide descriptive alt text for accessibility
-- **Responsive Images**: Use appropriate sizes for different breakpoints
-- **Loading**: Implement progressive loading and blur placeholders
 
 ## Security Guidelines
 - **Input Validation**: Sanitize all user inputs
@@ -177,11 +191,9 @@ Referensi: lihat `plan.txt` di root projek untuk deskripsi detil dan estimasi wa
 - **XSS Protection**: Implement content security policies
 
 ## Performance Guidelines
-- **Image Optimization**: Use Next.js Image component
 - **Code Splitting**: Implement dynamic imports
 - **Caching**: Implement appropriate caching strategies
 - **Bundle Size**: Monitor and optimize bundle size
-- **Core Web Vitals**: Maintain good performance metrics
 
 ## File Naming Conventions
 - **Components**: PascalCase (e.g., `UserDashboard.tsx`)
@@ -199,14 +211,56 @@ Referensi: lihat `plan.txt` di root projek untuk deskripsi detil dan estimasi wa
 ## Environment Configuration
 ```bash
 # Frontend (.env.local)
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_APP_NAME=SF BANK
+REACT_APP_API_URL=http://localhost:5000
+REACT_APP_NAME=Kingdom 3946
+REACT_APP_DISCORD_INVITE=your_discord_invite_link
 
 # Backend (.env)
 NODE_ENV=development
 PORT=5000
-DB_CONNECTION_STRING=your_db_connection
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_NAME=kingdom3946
 JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+DISCORD_WEBHOOK_URL=your_webhook_url
 ```
 
-Remember: Always prioritize user experience, code maintainability, and scalability in all development decisions.
+## Kingdom 3946 Specific Features
+
+### Admin Features (10 Fitur Admin)
+1. **User Management**: CRUD users, role assignment, activity logs
+2. **Bank Management**: Sistem perbankan kingdom (opsional untuk donasi)
+3. **Event Management**: Create, schedule, manage kingdom events
+4. **Gallery Management**: Upload, organize media (photos, videos)
+5. **Form Management**: Form builder, submissions, export data
+6. **KvK Management**: Kingdom vs Kingdom schedules, scores, rankings
+7. **Donation Management**: Track donations, leaderboard, history
+8. **Blog Management**: Articles, news, categories, SEO
+9. **Blacklist Manager**: Database pemain bermasalah, appeal system
+10. **Input Data KDP**: Manual KDP entry, import, validation, history
+
+### Public Features (10 Fitur Pengunjung)
+1. **Landing Page**: Homepage
+2. **KvK**: Jadwal, live scores, historical results, hall of fame
+3. **Event**: Kalender event, rules, registration, winners
+4. **Giveaway**: Active giveaways, participation forms, winners
+5. **Form**: Member registration, alliance application, feedback
+6. **Donation**: Info sistem donasi, leaderboard, progress
+7. **About Kingdom**: History, organization, rules, vision/mission
+8. **YouTube**: Video gallery, tutorials, battle highlights
+9. **Blog**: Articles, strategy guides, community stories
+10. **Laws**: Aturan kingdom, code of conduct, punishments, FAQs
+
+### Discord Integration
+- **Webhook Notifications**: Auto-notify Discord channel untuk:
+  - Aplikasi member baru
+  - KvK results update
+  - Event registrations
+  - New giveaway winners
+  - Important announcements
+- **Format**: Use Discord embeds dengan colors sesuai theme (gold, red)
+
+Remember: Always prioritize mobile user experience (90% pemain via HP) and ensure role-based security in all development decisions.
