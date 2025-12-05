@@ -6,6 +6,7 @@ export default function Reports() {
   useEffect(() => {
     AOS.init({ once: true, duration: 600 });
   }, []);
+  const allianceNames = ["Sacred Vanguard", "Sacred Legion", "Sacred Guardians"];
   // recreate the same dummy data used in Dashboard and Deposits so charts match
   // Increased to 50 members as requested
   const [members] = useState(() => {
@@ -19,10 +20,45 @@ export default function Reports() {
         stone: 2000000 + i * 80000,
         gold: 500000 + i * 50000,
         weeksPaid: Math.min(100, (i * 3) % 101),
+        alliance: allianceNames[(i - 1) % allianceNames.length],
       });
     }
     return arr;
   });
+
+  // Alliance snapshot (mirrors data style from Alliance/AllianceDetail pages)
+  const [alliances] = useState(() => [
+    {
+      id: 1,
+      name: "Sacred Vanguard",
+      tag: "SAC-1",
+      membersCount: 42,
+      food: 320000000,
+      wood: 260000000,
+      stone: 140000000,
+      gold: 72000000,
+    },
+    {
+      id: 2,
+      name: "Sacred Legion",
+      tag: "SAC-2",
+      membersCount: 38,
+      food: 280000000,
+      wood: 220000000,
+      stone: 110000000,
+      gold: 61000000,
+    },
+    {
+      id: 3,
+      name: "Sacred Guardians",
+      tag: "SAC-3",
+      membersCount: 35,
+      food: 240000000,
+      wood: 210000000,
+      stone: 100000000,
+      gold: 55000000,
+    },
+  ]);
 
   const [deposits] = useState(() => {
     const arr = [];
@@ -45,6 +81,11 @@ export default function Reports() {
     if (n === null || n === undefined) return "-";
     const num = Number(n) || 0;
     return num.toLocaleString("id-ID");
+  };
+
+  const formatPercent = (value) => {
+    if (value === null || value === undefined || Number.isNaN(value)) return "-";
+    return `${value.toFixed(1)}%`;
   };
 
   // Short formatter for millions/billions (1.2M, 2.5B)
@@ -127,6 +168,29 @@ export default function Reports() {
   const avgWeeks = filteredMembersBySearch.length ? Math.round(totalWeeksAcross / filteredMembersBySearch.length) : 0;
   const weeksProgress = Math.min(100, Math.round((avgWeeks / TOTAL_WEEKS) * 100));
 
+  // Alliance level aggregates
+  const allianceTotals = alliances.reduce(
+    (acc, a) => {
+      acc.food += a.food || 0;
+      acc.wood += a.wood || 0;
+      acc.stone += a.stone || 0;
+      acc.gold += a.gold || 0;
+      acc.members += a.membersCount || 0;
+      return acc;
+    },
+    { food: 0, wood: 0, stone: 0, gold: 0, members: 0 }
+  );
+  const allianceTotalResource = allianceTotals.food + allianceTotals.wood + allianceTotals.stone + allianceTotals.gold;
+  const avgAllianceMembers = alliances.length ? Math.round(allianceTotals.members / alliances.length) : 0;
+  const avgAllianceResource = alliances.length ? Math.round(allianceTotalResource / alliances.length) : 0;
+  const topAlliances = [...alliances]
+    .map((a) => ({
+      ...a,
+      total: (a.food || 0) + (a.wood || 0) + (a.stone || 0) + (a.gold || 0),
+      perMember: a.membersCount ? ((a.food + a.wood + a.stone + a.gold) / a.membersCount) : 0,
+    }))
+    .sort((a, b) => b.total - a.total);
+
   // compute totals per member from filtered deposits
   const memberMap = {};
   filteredDeposits.forEach((d) => {
@@ -160,7 +224,7 @@ export default function Reports() {
     ];
     const max = Math.max(...items.map((i) => i.value), 1);
     return (
-      <div className="bg-white rounded-2xl shadow p-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
         <h3 className="text-md font-semibold mb-3">Resource Breakdown (Deposits)</h3>
         <div className="space-y-3">
           {items.map((it) => {
@@ -184,18 +248,19 @@ export default function Reports() {
   const TopMembersChart = ({ items }) => {
     const max = Math.max(...items.map((i) => i.total), 1);
     return (
-      <div className="bg-white rounded-2xl shadow p-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
         <h3 className="text-md font-semibold mb-3">Top Members by Contribution</h3>
         <div className="space-y-3">
           {items.map((it, i) => {
             const pct = Math.round((it.total / max) * 100);
             const rankColor = i === 0 ? "bg-amber-400 text-amber-800" : i === 1 ? "bg-gray-200 text-gray-800" : i === 2 ? "bg-amber-200 text-amber-800" : "bg-indigo-50 text-indigo-700";
+            const allianceName = members.find((m) => m.name === it.name)?.alliance || "-";
             return (
               <div key={it.name} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold ${rankColor}`}>{i + 1}</div>
-                <div className="flex items-center gap-3 w-48">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 font-bold">{getInitials(it.name)}</div>
+                <div className="w-48">
                   <div className="text-sm font-medium text-gray-800 truncate">{it.name}</div>
+                  <div className="text-xs text-gray-500 truncate">{allianceName}</div>
                 </div>
                 <div className="flex-1">
                   <div className="relative h-3 bg-gray-100 rounded overflow-hidden">
@@ -215,46 +280,38 @@ export default function Reports() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <header className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold">Reports</h1>
-            <p className="text-sm text-gray-500 mt-1">Executive summary and downloadable data — updated with 50 members</p>
+    <div className="w-full h-full flex flex-col">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+        <header className="mb-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h1 className="text-3xl font-semibold">Reports</h1>
+              <p className="text-sm text-gray-500 mt-1">Executive summary with alliance & member contribution insights</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="bg-white border px-4 py-2 rounded text-gray-700">Preview</button>
-          </div>
-        </div>
-      </header>
+        </header>
 
       {/* Summary cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-        <div className="bg-white rounded-2xl shadow p-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="text-xs text-gray-500">Total Members</div>
           <div className="text-2xl font-bold mt-1">{members.length}</div>
           <div className="text-sm text-gray-500 mt-2">Active members in dataset</div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="text-xs text-gray-500">Total Collected</div>
           <div className="text-2xl font-bold text-amber-600 mt-1">{formatShort(totalCollected)}</div>
           <div className="text-sm text-gray-500 mt-2">Sum of all resources</div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="text-xs text-gray-500">Avg / Member</div>
           <div className="text-2xl font-bold mt-1">{formatShort(avgPerMember)}</div>
           <div className="text-sm text-gray-500 mt-2">Average contribution per member</div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-xs text-gray-500">Reporting Range</div>
-          <div className="text-2xl font-bold mt-1">Nov 2025</div>
-          <div className="text-sm text-gray-500 mt-2">Static demo range</div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow p-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="text-xs text-gray-500">Weeks (avg per member)</div>
           <div className="text-2xl font-bold text-gray-800 mt-1">{avgWeeks}/{TOTAL_WEEKS}</div>
           <div className="text-sm text-gray-600 mt-2">{weeksProgress}%</div>
@@ -265,9 +322,33 @@ export default function Reports() {
         </div>
       </section>
 
+      {/* Alliance insights */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div className="text-xs text-gray-500">Alliances</div>
+          <div className="text-2xl font-bold mt-1">{alliances.length}</div>
+          <div className="text-sm text-gray-500 mt-2">Active alliance groups</div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div className="text-xs text-gray-500">Avg Members / Alliance</div>
+          <div className="text-2xl font-bold mt-1">{avgAllianceMembers}</div>
+          <div className="text-sm text-gray-500 mt-2">Mean roster size</div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div className="text-xs text-gray-500">Total Alliance RSS</div>
+          <div className="text-2xl font-bold text-indigo-600 mt-1">{formatShort(allianceTotalResource)}</div>
+          <div className="text-sm text-gray-500 mt-2">Food + Wood + Stone + Gold</div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div className="text-xs text-gray-500">Avg RSS / Alliance</div>
+          <div className="text-2xl font-bold mt-1">{formatShort(avgAllianceResource)}</div>
+          <div className="text-sm text-gray-500 mt-2">Resource average per alliance</div>
+        </div>
+      </section>
+
       {/* Filters + charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="col-span-1 bg-white rounded-2xl shadow p-4">
+        <div className="col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <h3 className="text-md font-semibold mb-3">Filters</h3>
           <div className="space-y-3">
             <div>
@@ -309,21 +390,111 @@ export default function Reports() {
           </div>
         </div>
 
-        <div className="col-span-2 grid grid-cols-1 gap-4">
+        <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           <ResourceBarChart data={depositTotals} />
           <TopMembersChart items={topMembersChartItems} />
         </div>
       </div>
 
+      {/* Alliance performance */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Alliance Performance</h3>
+            <span className="text-sm text-gray-500">Sorted by total resources</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[880px]">
+              <thead className="bg-gray-100">
+                <tr className="text-xs text-gray-600">
+                  <th className="px-3 py-2 text-left">Alliance</th>
+                  <th className="px-3 py-2 text-center">Members</th>
+                  <th className="px-3 py-2 text-right">Total</th>
+                  <th className="px-3 py-2 text-right">Food</th>
+                  <th className="px-3 py-2 text-right">Wood</th>
+                  <th className="px-3 py-2 text-right">Stone</th>
+                  <th className="px-3 py-2 text-right">Gold</th>
+                  <th className="px-3 py-2 text-right">Per Member</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {topAlliances.map((a) => (
+                  <tr key={a.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-2">
+                      <div className="font-semibold text-gray-900">{a.name}</div>
+                      <div className="text-xs text-gray-500">{a.tag}</div>
+                    </td>
+                    <td className="px-3 py-2 text-center font-medium text-gray-800">{a.membersCount}</td>
+                    <td className="px-3 py-2 text-right font-semibold text-indigo-600">{formatShort(a.total)}</td>
+                    <td className="px-3 py-2 text-right">{formatShort(a.food)}</td>
+                    <td className="px-3 py-2 text-right">{formatShort(a.wood)}</td>
+                    <td className="px-3 py-2 text-right">{formatShort(a.stone)}</td>
+                    <td className="px-3 py-2 text-right">{formatShort(a.gold)}</td>
+                    <td className="px-3 py-2 text-right text-gray-700">{formatShort(a.perMember)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <h3 className="text-md font-semibold mb-3">Alliance Snapshot</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">Top Alliance Share</div>
+              <div className="text-base font-semibold text-indigo-600">
+                {topAlliances[0] ? formatPercent((topAlliances[0].total / Math.max(1, allianceTotalResource)) * 100) : "-"}
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">Top Alliance Per Member</div>
+              <div className="text-base font-semibold text-gray-900">
+                {topAlliances[0] ? formatShort(topAlliances[0].perMember) : "-"}
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">Alliance Avg per Member</div>
+              <div className="text-base font-semibold text-gray-900">{formatShort(allianceTotals.members ? allianceTotalResource / allianceTotals.members : 0)}</div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">Members Covered</div>
+              <div className="text-base font-semibold text-gray-900">{allianceTotals.members}</div>
+            </div>
+            <div className="mt-4 bg-gray-100 rounded-xl p-3">
+              <div className="text-xs text-gray-600 mb-1">Resource Mix</div>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-center justify-between">
+                  <span>Food</span>
+                  <span>{formatShort(allianceTotals.food)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Wood</span>
+                  <span>{formatShort(allianceTotals.wood)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Stone</span>
+                  <span>{formatShort(allianceTotals.stone)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Gold</span>
+                  <span>{formatShort(allianceTotals.gold)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Top members table */}
-      <div className="mt-6 bg-white rounded-2xl shadow p-4">
+      <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-hidden">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Top Members</h3>
           <div className="text-sm text-gray-500">Top 20 by contribution</div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed text-sm">
+          <table className="w-full table-fixed text-sm min-w-[960px]">
             <thead className="bg-gray-100">
                 <tr className="text-xs text-gray-600">
                   <th className="px-2 py-3 w-12 text-center">No</th>
@@ -343,9 +514,9 @@ export default function Reports() {
                   return (
                     <tr key={m.name} className="hover:bg-gray-50 even:bg-gray-50">
                       <td className="px-2 py-3 text-gray-700 w-12 text-center">{globalIndex}</td>
-                      <td className="px-4 py-3 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 font-bold">{getInitials(m.name)}</div>
+                      <td className="px-4 py-3">
                         <div className="font-medium text-gray-800">{m.name}</div>
+                        <div className="text-xs text-gray-500">{mem.alliance || "-"}</div>
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-amber-600">
                         <div className="text-sm font-semibold">{formatShort(m.total)}</div>
@@ -361,9 +532,7 @@ export default function Reports() {
             </tbody>
           </table>
         </div>
-      </div>
-        {/* Pagination for Top Members table */}
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
           <div className="text-sm text-gray-600">
             {topMembersFull.length === 0 ? (
               "No members"
@@ -372,13 +541,15 @@ export default function Reports() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setTopPage((p) => Math.max(1, p - 1))} disabled={topPage === 1} className="px-3 py-1 rounded border bg-white disabled:opacity-50">Prev</button>
+            <button onClick={() => setTopPage((p) => Math.max(1, p - 1))} disabled={topPage === 1} className="px-3 py-2 rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Prev</button>
             {Array.from({ length: topTotalPages }).map((_, i) => (
-              <button key={i} onClick={() => setTopPage(i + 1)} className={`px-3 py-1 rounded border ${topPage === i + 1 ? 'bg-indigo-600 text-white' : 'bg-white'}`}>{i + 1}</button>
+              <button key={i} onClick={() => setTopPage(i + 1)} className={`px-3 py-2 rounded-lg border text-sm font-medium ${topPage === i + 1 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white hover:bg-gray-50'}`}>{i + 1}</button>
             ))}
-            <button onClick={() => setTopPage((p) => Math.min(topTotalPages, p + 1))} disabled={topPage === topTotalPages} className="px-3 py-1 rounded border bg-white disabled:opacity-50">Next</button>
+            <button onClick={() => setTopPage((p) => Math.min(topTotalPages, p + 1))} disabled={topPage === topTotalPages} className="px-3 py-2 rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
           </div>
         </div>
+      </div>
+      </div>
     </div>
   );
 }

@@ -18,28 +18,31 @@ function UserManagement() {
   // Sample user data with admin role
   const [users, setUsers] = useState(() => {
     const arr = [];
-    const roles = ["R1", "R2", "R3", "R4", "R5", "Admin"];
+    const roles = ["Member", "Officer", "Leader", "Admin"];
     const statuses = ["Active", "Inactive"];
     for (let i = 1; i <= 30; i++) {
       const joined = new Date();
       joined.setDate(joined.getDate() - Math.floor(Math.random() * 365));
       arr.push({
         id: i,
-        user_id: `${1000 + i}`,
+        user_id: `USR-${1000 + i}`,
         name: `User ${i}`,
         email: `user${i}@kingdom.com`,
         role: roles[i % roles.length],
         status: i % 7 === 0 ? "Inactive" : "Active",
         joined_date: joined.toISOString().slice(0, 10),
         last_login: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        power: Math.floor(Math.random() * 50000000) + 10000000,
+        kills: Math.floor(Math.random() * 10000000) + 1000000,
       });
     }
-    return arr;
+    return arr.sort((a, b) => b.power - a.power);
   });
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   // Filtered users
   const filteredUsers = users.filter((user) => {
@@ -48,7 +51,8 @@ function UserManagement() {
       user.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchRole = roleFilter === "All" || user.role === roleFilter;
-    return matchSearch && matchRole;
+    const matchStatus = statusFilter === "All" || user.status === statusFilter;
+    return matchSearch && matchRole && matchStatus;
   });
 
   // Pagination
@@ -62,7 +66,7 @@ function UserManagement() {
   // Reset to page 1 when search/filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, roleFilter]);
+  }, [searchQuery, roleFilter, statusFilter]);
 
   // Right panel state for editing user
   const [showEditPanel, setShowEditPanel] = useState(false);
@@ -70,15 +74,10 @@ function UserManagement() {
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
-    role: "R1",
-  });
-
-  const [showCreatePanel, setShowCreatePanel] = useState(false);
-  const [createForm, setCreateForm] = useState({
-    user_id: "",
-    name: "",
-    email: "",
-    role: "R1",
+    role: "Member",
+    status: "Active",
+    power: "",
+    kills: "",
   });
 
   const openEditPanel = (user) => {
@@ -87,13 +86,11 @@ function UserManagement() {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
+      power: user.power.toString(),
+      kills: user.kills.toString(),
     });
     setShowEditPanel(true);
-  };
-
-  const openCreatePanel = () => {
-    setCreateForm({ user_id: "", name: "", email: "", role: "R1" });
-    setShowCreatePanel(true);
   };
 
   const closeEditPanel = () => {
@@ -103,27 +100,15 @@ function UserManagement() {
       name: "",
       email: "",
       role: "Member",
+      status: "Active",
+      power: "",
+      kills: "",
     });
-  };
-
-  const closeCreatePanel = () => {
-    setShowCreatePanel(false);
-    setCreateForm({ user_id: "", name: "", email: "", role: "R1" });
   };
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const isNumericId = (val) => /^[0-9]+$/.test(val);
-
-  const handleCreateInputChange = (e) => {
-    const { name, value } = e.target;
-    setCreateForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -144,41 +129,15 @@ function UserManagement() {
             name: editForm.name.trim(),
             email: editForm.email.trim(),
             role: editForm.role,
+            status: editForm.status,
+            power: parseInt(editForm.power) || 0,
+            kills: parseInt(editForm.kills) || 0,
           }
         : u
     ));
     
     alert(`User ${editForm.name} updated successfully!`);
     closeEditPanel();
-  };
-
-  const submitCreateForm = (e) => {
-    e.preventDefault();
-    if (!createForm.user_id.trim() || !createForm.name.trim() || !createForm.email.trim()) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    if (!isNumericId(createForm.user_id.trim())) {
-      alert("User ID must be numeric");
-      return;
-    }
-
-    const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1;
-    const newUser = {
-      id: nextId,
-      user_id: createForm.user_id.trim(),
-      name: createForm.name.trim(),
-      email: createForm.email.trim(),
-      role: createForm.role,
-      joined_date: new Date().toISOString().slice(0, 10),
-      last_login: new Date().toISOString(),
-    };
-
-    setUsers((prev) => [newUser, ...prev]);
-    alert(`User ${newUser.name} created successfully!`);
-    closeCreatePanel();
-    setCurrentPage(1);
   };
 
   // Delete user
@@ -192,6 +151,10 @@ function UserManagement() {
   };
 
   // Helper functions
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat("en-US").format(num);
+  };
+
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -212,26 +175,30 @@ function UserManagement() {
     switch (role) {
       case "Admin":
         return "bg-yellow-500 text-white";
-      case "R5":
+      case "Leader":
         return "bg-purple-500 text-white";
-      case "R4":
+      case "Officer":
         return "bg-blue-500 text-white";
-      case "R3":
-        return "bg-green-500 text-white";
-      case "R2":
-        return "bg-teal-500 text-white";
       default:
         return "bg-gray-500 text-white";
     }
   };
 
+  const getStatusBadgeColor = (status) => {
+    return status === "Active" 
+      ? "bg-green-500 text-white" 
+      : "bg-red-500 text-white";
+  };
+
   // Calculate statistics
   const stats = {
     total: users.length,
+    active: users.filter(u => u.status === "Active").length,
+    inactive: users.filter(u => u.status === "Inactive").length,
     admins: users.filter(u => u.role === "Admin").length,
-    r5: users.filter(u => u.role === "R5").length,
-    r4: users.filter(u => u.role === "R4").length,
-    r3: users.filter(u => u.role === "R3").length,
+    leaders: users.filter(u => u.role === "Leader").length,
+    officers: users.filter(u => u.role === "Officer").length,
+    members: users.filter(u => u.role === "Member").length,
   };
 
   return (
@@ -239,26 +206,13 @@ function UserManagement() {
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 text-gray-800 dark:text-gray-100">
         
         {/* Header */}
-        <header className="mb-6 flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
-              User Management
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              Manage kingdom users - view details, edit roles, and track activity
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => openCreatePanel()}
-              className="bg-indigo-600 dark:bg-indigo-700 hover:bg-indigo-700 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-md dark:shadow-slate-900/50 flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Add User
-            </button>
-          </div>
+        <header className="mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+            User Management
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Manage kingdom users - view details, edit roles, and track activity
+          </p>
         </header>
 
         {/* Statistics Cards */}
@@ -274,6 +228,17 @@ function UserManagement() {
             </div>
           </div>
 
+          {/* Active Users */}
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 shadow-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100 text-sm font-medium">Active</p>
+                <p className="text-3xl font-bold mt-1">{stats.active}</p>
+              </div>
+              <FiActivity className="text-4xl text-green-200" />
+            </div>
+          </div>
+
           {/* Admins */}
           <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-4 shadow-lg text-white">
             <div className="flex items-center justify-between">
@@ -285,32 +250,21 @@ function UserManagement() {
             </div>
           </div>
 
-          {/* R5 */}
+          {/* Leaders */}
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">R5</p>
-                <p className="text-3xl font-bold mt-1">{stats.r5}</p>
+                <p className="text-purple-100 text-sm font-medium">Leaders</p>
+                <p className="text-3xl font-bold mt-1">{stats.leaders}</p>
               </div>
               <FiShield className="text-4xl text-purple-200" />
-            </div>
-          </div>
-
-          {/* R4 */}
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 shadow-lg text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">R4</p>
-                <p className="text-3xl font-bold mt-1">{stats.r4}</p>
-              </div>
-              <FiActivity className="text-4xl text-green-200" />
             </div>
           </div>
         </div>
 
         {/* Search and Filter */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-2xl dark:shadow-slate-900/60 p-4 mb-6 border border-gray-100 dark:border-slate-700">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="md:col-span-1">
               <div className="relative">
@@ -334,11 +288,22 @@ function UserManagement() {
               >
                 <option value="All">All Roles</option>
                 <option value="Admin">Admin</option>
-                <option value="R5">R5</option>
-                <option value="R4">R4</option>
-                <option value="R3">R3</option>
-                <option value="R2">R2</option>
-                <option value="R1">R1</option>
+                <option value="Leader">Leader</option>
+                <option value="Officer">Officer</option>
+                <option value="Member">Member</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+              >
+                <option value="All">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
             </div>
           </div>
@@ -353,6 +318,9 @@ function UserManagement() {
                   <th className="px-4 py-3 text-left">User</th>
                   <th className="px-4 py-3 text-left">Email</th>
                   <th className="px-4 py-3 text-center">Role</th>
+                  <th className="px-4 py-3 text-center">Status</th>
+                  <th className="px-4 py-3 text-right">Power</th>
+                  <th className="px-4 py-3 text-right">Kills</th>
                   <th className="px-4 py-3 text-center">Last Login</th>
                   <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
@@ -361,17 +329,21 @@ function UserManagement() {
                 {paginatedUsers.map((user) => (
                   <tr
                     key={user.id}
-                    className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
-                    onClick={() => openEditPanel(user)}
+                    className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     {/* User */}
                     <td className="px-4 py-3">
-                      <div className="flex flex-col">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {user.name}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                          {user.name.charAt(0)}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {user.user_id}
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {user.name}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {user.user_id}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -391,6 +363,23 @@ function UserManagement() {
                       </span>
                     </td>
 
+                    {/* Status */}
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(user.status)}`}>
+                        {user.status}
+                      </span>
+                    </td>
+
+                    {/* Power */}
+                    <td className="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
+                      {formatNumber(user.power)}
+                    </td>
+
+                    {/* Kills */}
+                    <td className="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
+                      {formatNumber(user.kills)}
+                    </td>
+
                     {/* Last Login */}
                     <td className="px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-400">
                       {formatDateTime(user.last_login)}
@@ -400,14 +389,14 @@ function UserManagement() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          onClick={(e) => { e.stopPropagation(); openEditPanel(user); }}
+                          onClick={() => openEditPanel(user)}
                           className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors"
                           title="Edit user"
                         >
                           <FiEdit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={(e) => { e.stopPropagation(); deleteUser(user.id); }}
+                          onClick={() => deleteUser(user.id)}
                           className="p-2 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors"
                           title="Delete user"
                         >
@@ -518,10 +507,10 @@ function UserManagement() {
                 </div>
               </div>
 
-              {/* Role Section */}
+              {/* Role & Status Section */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Role
+                  Role & Status
                 </h3>
 
                 {/* Role */}
@@ -535,16 +524,65 @@ function UserManagement() {
                     onChange={handleEditInputChange}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
+                    <option value="Member">Member</option>
+                    <option value="Officer">Officer</option>
+                    <option value="Leader">Leader</option>
                     <option value="Admin">Admin</option>
-                    <option value="R5">R5</option>
-                    <option value="R4">R4</option>
-                    <option value="R3">R3</option>
-                    <option value="R2">R2</option>
-                    <option value="R1">R1</option>
                   </select>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Admin role has full access to all features
                   </p>
+                </div>
+
+                {/* Status */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Account Status
+                  </label>
+                  <select
+                    name="status"
+                    value={editForm.status}
+                    onChange={handleEditInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Statistics Section */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Game Statistics
+                </h3>
+
+                {/* Power */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Power
+                  </label>
+                  <input
+                    type="number"
+                    name="power"
+                    value={editForm.power}
+                    onChange={handleEditInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                {/* Kills */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Kills
+                  </label>
+                  <input
+                    type="number"
+                    name="kills"
+                    value={editForm.kills}
+                    onChange={handleEditInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
                 </div>
               </div>
 
@@ -562,113 +600,6 @@ function UserManagement() {
                   className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-lg"
                 >
                   Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
-        </>
-      )}
-
-      {/* Right Side Create Panel */}
-      {showCreatePanel && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
-            onClick={closeCreatePanel}
-          />
-
-          <div className="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white dark:bg-slate-800 shadow-2xl z-50 overflow-y-auto animate-slide-in-right">
-            <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 shadow-lg z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold">Add User</h2>
-                  <p className="text-indigo-100 text-sm mt-1">Create a new user record</p>
-                </div>
-                <button
-                  onClick={closeCreatePanel}
-                  className="p-2 rounded-lg hover:bg-white/20 transition-colors"
-                >
-                  <FiX className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={submitCreateForm} className="p-6 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Information</h3>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User ID *</label>
-                  <input
-                    type="number"
-                    name="user_id"
-                    value={createForm.user_id}
-                    onChange={handleCreateInputChange}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., 2001"
-                    required
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={createForm.name}
-                    onChange={handleCreateInputChange}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={createForm.email}
-                    onChange={handleCreateInputChange}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Role</h3>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User Role</label>
-                  <select
-                    name="role"
-                    value={createForm.role}
-                    onChange={handleCreateInputChange}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="R5">R5</option>
-                    <option value="R4">R4</option>
-                    <option value="R3">R3</option>
-                    <option value="R2">R2</option>
-                    <option value="R1">R1</option>
-                  </select>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Admin role has full access to all features</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={closeCreatePanel}
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-lg"
-                >
-                  Create User
                 </button>
               </div>
             </form>
