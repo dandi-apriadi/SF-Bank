@@ -1,0 +1,112 @@
+# --- SF BANK Database Design (Admin Views) ---
+
+## Table: users
+- id (PK, INT, AUTO_INCREMENT)
+- user_id (VARCHAR, UNIQUE)
+- name (VARCHAR)
+- email (VARCHAR, UNIQUE)
+- role (ENUM: 'Admin','R1','R2','R3','R4','R5')
+- alliance_id (FK, INT, references alliances.id)
+- status (ENUM: 'Active','Inactive')
+- joined_date (DATE)
+- last_login (DATETIME)
+- created_at (TIMESTAMP)
+- updated_at (TIMESTAMP)
+
+## Table: alliances
+- id (PK, INT, AUTO_INCREMENT)
+- name (VARCHAR, UNIQUE)
+- tag (VARCHAR)
+- leader (VARCHAR)
+- members_count (INT)
+- description (TEXT)
+- bank_id (VARCHAR, UNIQUE, nullable)
+- bank_name (VARCHAR, nullable)
+- created_at (TIMESTAMP)
+- updated_at (TIMESTAMP)
+
+## Table: alliance_resources
+- id (PK, INT, AUTO_INCREMENT)
+- alliance_id (FK, INT, references alliances.id)
+- food (BIGINT)
+- wood (BIGINT)
+- stone (BIGINT)
+- gold (BIGINT)
+- total_rss (BIGINT)
+- weeks_donated (INT)
+- updated_at (TIMESTAMP)
+
+## Table: member_contributions
+- id (PK, INT, AUTO_INCREMENT)
+- member_id (FK, INT, references users.id)
+- alliance_id (FK, INT, references alliances.id)
+- week (INT)
+- date (DATE)
+- food (BIGINT)
+- wood (BIGINT)
+- stone (BIGINT)
+- gold (BIGINT)
+- total_rss (BIGINT)
+- last_contribution (DATETIME)
+- created_at (TIMESTAMP)
+
+## Table: alliance_bank
+- id (PK, INT, AUTO_INCREMENT)
+- alliance_id (FK, INT, references alliances.id)
+- bank_id (VARCHAR, UNIQUE)
+- bank_name (VARCHAR)
+- created_at (TIMESTAMP)
+
+## Table: audit_logs (AUDIT TRAIL - Mencatat semua aktivitas admin)
+- id (PK, INT, AUTO_INCREMENT)
+- user_id (FK, INT, references users.id) - User yang melakukan aksi
+- action (ENUM: 'CREATE','UPDATE','DELETE') - Jenis aksi
+- target_type (ENUM: 'user','alliance','bank','resource') - Tipe data yang diubah
+- target_id (INT) - ID data yang diubah
+- details (TEXT) - Detail perubahan
+- ip_address (VARCHAR) - IP address user
+- user_agent (VARCHAR) - Browser/client info
+- timestamp (DATETIME, DEFAULT CURRENT_TIMESTAMP) - Waktu aksi
+- INDEX (user_id)
+- INDEX (action)
+- INDEX (target_type, target_id)
+- INDEX (timestamp)
+
+# --- RELATIONS ---
+# users.alliance_id -> alliances.id
+# alliances.id -> alliance_resources.alliance_id
+# member_contributions.member_id -> users.id
+# member_contributions.alliance_id -> alliances.id
+# alliance_bank.alliance_id -> alliances.id
+# audit_logs.user_id -> users.id
+
+# --- SQL CREATE STATEMENTS ---
+
+## Create audit_logs table:
+```sql
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  action ENUM('CREATE', 'UPDATE', 'DELETE') NOT NULL,
+  target_type ENUM('user', 'alliance', 'bank', 'resource') NOT NULL,
+  target_id INT NOT NULL,
+  details LONGTEXT,
+  ip_address VARCHAR(45),
+  user_agent VARCHAR(500),
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_user (user_id),
+  INDEX idx_action (action),
+  INDEX idx_target (target_type, target_id),
+  INDEX idx_timestamp (timestamp)
+);
+```
+
+# --- NOTES ---
+# - Role-based access: users.role
+# - Alliance member count: alliances.members_count (denormalized, update via trigger or app logic)
+# - Resource aggregation: alliance_resources, member_contributions
+# - Audit trail: audit_logs mencatat SEMUA aktivitas admin (CREATE/UPDATE/DELETE)
+# - All resource fields use BIGINT for large numbers
+# - Audit logs memiliki index untuk performa query cepat pada filter user, action, target, timestamp
+# - Retention policy: Opsional, hapus logs > 90 hari via scheduled task

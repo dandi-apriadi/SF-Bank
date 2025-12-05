@@ -178,7 +178,7 @@ export default function Dashboard() {
   const weeksProgress = Math.min(100, Math.round((avgWeeks / TOTAL_WEEKS) * 100));
 
   return (
-    <div key={`dashboard-${isDarkMode}`} className="w-full h-full flex flex-col">
+    <div key={`dashboard-${isDarkMode}`} className="w-full min-h-full flex flex-col bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         <header className="mb-6">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Admin Dashboard</h1>

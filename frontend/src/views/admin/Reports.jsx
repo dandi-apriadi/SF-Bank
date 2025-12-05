@@ -3,6 +3,31 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 export default function Reports() {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+      subtree: false
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     AOS.init({ once: true, duration: 600 });
   }, []);
@@ -280,7 +305,7 @@ export default function Reports() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full min-h-full flex flex-col bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         <header className="mb-6">
           <div className="flex items-center justify-between flex-wrap gap-3">

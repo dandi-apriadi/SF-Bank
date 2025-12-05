@@ -6,6 +6,7 @@ import {
   FiUpload,
   FiBarChart2,
   FiFileText,
+  FiActivity,
 } from "react-icons/fi";
 import { GiCastle } from "react-icons/gi";
 
@@ -15,6 +16,7 @@ import Reports from "views/admin/Reports";
 import UserManagement from "views/admin/UserManagement";
 import Alliance from "views/admin/Alliance";
 import AllianceDetail from "views/admin/AllianceDetail";
+import AuditLogs from "views/admin/AuditLogs";
 
 // Routes aligned with SacredBank plan
 const routes = [
@@ -57,6 +59,14 @@ const routes = [
     path: "alliance/:id",
     component: <AllianceDetail />,
     invisible: true, // Don't show in sidebar
+  },
+
+  {
+    name: "Audit Logs",
+    layout: "/admin",
+    path: "audit-logs",
+    icon: <FiActivity className="h-6 w-6" />,
+    component: <AuditLogs />,
   },
 ];
 

@@ -137,11 +137,12 @@ export default function Admin(props) {
   document.documentElement.dir = "ltr";
 
   return (
-    <div key={`admin-layout-${isDarkMode}`} className="flex h-full w-full bg-white dark:bg-slate-950 transition-colors duration-300">
+    <div key={`admin-layout-${isDarkMode}`} className="flex h-screen w-screen bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
       <Sidebar open={open} onClose={() => setOpen(false)} />
-      <div className="h-full w-full bg-white dark:bg-slate-950 transition-colors duration-300">
+      <div className="h-screen w-full transition-colors duration-300 flex flex-col" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
         <main
-          className="h-screen flex flex-col flex-1 transition-all xl:ml-[313px] bg-white dark:bg-slate-950"
+          className="h-screen flex flex-col flex-1 transition-all xl:ml-[313px]"
+          style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}
         >
           <Navbar
             onOpenSidenav={() => setOpen(true)}
@@ -150,7 +151,7 @@ export default function Admin(props) {
             secondary={getActiveNavbar(routes)}
             {...rest}
           />
-          <div className="flex-1 flex flex-col overflow-y-auto bg-white dark:bg-slate-950 transition-colors duration-300">
+          <div className="flex-1 flex flex-col overflow-y-auto transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
             {institution.isLoading && <LoadingOverlay text="Memuat metrik institusi..." />}
             <ErrorBoundary>
               <div className="flex-1 w-full">

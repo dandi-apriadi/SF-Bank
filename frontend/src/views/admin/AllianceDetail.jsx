@@ -433,7 +433,7 @@ export default function AllianceDetail() {
   };
 
   return (
-    <div key={`alliance-detail-${isDarkMode}`} className="w-full h-full flex flex-col">
+    <div key={`alliance-detail-${isDarkMode}`} className="w-full min-h-full flex flex-col bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 text-gray-800 dark:text-gray-100">
         {/* Back button + Header */}
         <div className="mb-6">
