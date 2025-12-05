@@ -62,7 +62,7 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center h-6 pt-1">
           <Link to={user ? "/admin/dashboard" : "/auth/sign-in"} className="text-sm font-normal text-navy-700 hover:underline flex items-center">
-            SF BANK
+            SacredBank
           </Link>
           <span className="mx-1 text-sm text-navy-700">/</span>
           <span className="text-sm font-normal capitalize text-navy-700">
@@ -214,7 +214,7 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
                   className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <RiLogoutBoxRLine className="mr-2 h-[16px] w-[16px]" />
-                  {isLoading ? 'Logging out...' : 'Keluar'}
+                  {isLoading ? 'Logging out...' : 'Logout'}
                 </button>
               </div>
             </div>

@@ -103,15 +103,15 @@ const Sidebar = ({ open, onClose }) => {
             <div className="h-16 w-16 mb-2 rounded-full overflow-hidden border-2 border-white shadow-md">
               <img
                 src={BETON_LOGO_URL}
-                alt="SF BANK Logo"
+                alt="SacredBank Logo"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="mt-1 bg-black/20 backdrop-blur-sm px-4 py-1 rounded-lg">
               <h1 className="font-poppins text-[24px] font-bold text-white leading-tight tracking-wide drop-shadow-md">
-                SF BANK
+                SacredBank
               </h1>
-              <p className="text-xs text-white/80 mt-1">Aplikasi Manajemen Perbankan</p>
+              <p className="text-xs text-white/80 mt-1">Banking Management Application</p>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ const Sidebar = ({ open, onClose }) => {
       {/* Navigation Links */}
       <nav className="flex-1 px-3 pt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-navy-600 scrollbar-track-transparent">
         <div className="mb-3 px-4">
-          <h3 className="text-xs uppercase font-medium text-gray-500 dark:text-gray-400">Menu Utama</h3>
+          <h3 className="text-xs uppercase font-medium text-gray-500 dark:text-gray-400">Main Menu</h3>
         </div>
         <ul className="w-full space-y-1.5 pb-4">
           {Array.isArray(routes) && routes.length > 0 ? (
@@ -157,8 +157,8 @@ const Sidebar = ({ open, onClose }) => {
       {/* Footer with version info */}
       <div className="px-6 py-4 mt-auto">
           <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-            SF BANK v1.0.0
-            <p className="mt-1 text-xs">© 2025 SF BANK</p>
+            SacredBank v1.0.0
+            <p className="mt-1 text-xs">© 2025 SacredBank</p>
           </div>
       </div>
     </div>

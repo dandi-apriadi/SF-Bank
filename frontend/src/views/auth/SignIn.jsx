@@ -13,7 +13,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'SF BANK';
+  const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'SacredBank';
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const SignIn = () => {
   );
 
   useEffect(() => {
-    document.title = `Masuk - ${APP_NAME} | Portal SF BANK`;
+    document.title = `Sign In - ${APP_NAME} | SacredBank Portal`;
     
     return () => {
       dispatch(reset());
@@ -77,7 +77,7 @@ const SignIn = () => {
         icon: 'warning',
         iconColor: '#f59e0b',
         title: 'Email Tidak Valid',
-        text: 'Harap masukkan alamat email yang valid',
+        text: 'Please enter a valid email address',
         timer: 2000,
         timerProgressBar: true,
         confirmButtonColor: '#3b82f6',

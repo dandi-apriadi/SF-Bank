@@ -190,7 +190,7 @@ const SignInNavbar = () => {
                            transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 <FiLogIn className="w-4 h-4 mr-2 group-hover:translate-x-0.5 transition-transform" />
-                <span>Masuk Sistem</span>
+                <span>Sign In System</span>
               </Link>
 
               {/* Mobile menu button */}
@@ -297,7 +297,7 @@ const SignInNavbar = () => {
                            flex items-center justify-center gap-3 transform hover:scale-105"
               >
                 <FiLogIn className="w-5 h-5" />
-                <span>Masuk ke Sistem</span>
+                <span>Sign In to System</span>
               </Link>
             </div>
           </div>
@@ -348,7 +348,7 @@ const SignInNavbar = () => {
               <div className="absolute inset-0 rounded-lg bg-blue-50 scale-0 group-hover:scale-100 transition-transform duration-200"></div>
               <FiLogIn className="w-5 h-5 relative z-10" />
             </div>
-            <span className="text-xs font-medium">Masuk</span>
+            <span className="text-xs font-medium">Sign In</span>
           </Link>
         </div>
       </div>

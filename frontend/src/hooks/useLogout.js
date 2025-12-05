@@ -12,9 +12,9 @@ export const useLogout = () => {
     const {
       showConfirmation = true,
       confirmTitle = 'Konfirmasi Logout',
-      confirmText = 'Apakah Anda yakin ingin keluar dari sistem?',
+      confirmText = 'Are you sure you want to logout from the system?',
       successTitle = 'Logout Berhasil!',
-      successText = 'Anda telah berhasil keluar dari sistem',
+      successText = 'You have successfully logged out from the system',
       redirectTo = '/auth/signin'
     } = options;
 
@@ -29,7 +29,7 @@ export const useLogout = () => {
         showCancelButton: true,
         confirmButtonColor: '#dc2626',
         cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Keluar',
+        confirmButtonText: 'Yes, Logout',
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {

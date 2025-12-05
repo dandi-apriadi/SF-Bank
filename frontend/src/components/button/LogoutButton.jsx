@@ -19,12 +19,12 @@ const LogoutButton = ({
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: 'Konfirmasi Logout',
-      text: 'Apakah Anda yakin ingin keluar dari sistem?',
+      text: 'Are you sure you want to logout from the system?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Ya, Keluar',
+      confirmButtonText: 'Yes, Logout',
       cancelButtonText: 'Batal',
       reverseButtons: true,
       customClass: {
@@ -62,7 +62,7 @@ const LogoutButton = ({
           
           await Swal.fire({
             title: 'Logout Berhasil!',
-            text: 'Anda telah berhasil keluar dari sistem',
+            text: 'You have successfully logged out from the system',
             icon: 'success',
             timer: 2000,
             showConfirmButton: false,

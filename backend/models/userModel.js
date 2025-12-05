@@ -28,7 +28,7 @@ const User = db.define('users', {
         type: DataTypes.ENUM('admin', 'staff', 'auditor'),
         allowNull: false,
         defaultValue: 'staff',
-        comment: 'User role for SF BANK (admin, staff, auditor)'
+        comment: 'User role for SacredBank (admin, staff, auditor)'
     },
     email: {
         type: DataTypes.STRING(191),
@@ -54,7 +54,7 @@ const User = db.define('users', {
         },
         comment: 'Phone number for contact'
     },
-    // For SF BANK we keep contact, profile and account status fields.
+    // For SacredBank we keep contact, profile and account status fields.
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

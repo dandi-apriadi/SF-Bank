@@ -186,7 +186,7 @@ const NavbarSettings = () => {
               
               <div className="flex space-x-4">
                 <button className={`${getTextClasses()} hover:text-blue-600 font-medium`}>
-                  Masuk
+                  Sign In
                 </button>
                 <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                   Daftar
