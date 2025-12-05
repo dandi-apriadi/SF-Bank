@@ -17,7 +17,7 @@ const YouTube = () => {
   const videos = [
     {
       id: 1,
-      title: "KvK Season 9 - Epic Final Battle | Kingdom 3946 Victory",
+      title: "KvK Season 9 - Epic Final Battle | Sacred3946 Victory",
       description: "Watch our kingdom's triumphant victory in the Season 9 KvK finals. Intense 3-hour battle with strategic gameplay!",
       category: 'battles',
       videoId: 'dQw4w9WgXcQ', // Placeholder YouTube video ID
@@ -65,7 +65,7 @@ const YouTube = () => {
     },
     {
       id: 5,
-      title: "Kingdom 3946 Base Tour - Top Players",
+      title: "Sacred3946 Base Tour - Top Players",
       description: "Exclusive tour of our top 10 players' bases. City layouts, troop compositions, and building strategies.",
       category: 'kingdom',
       videoId: 'dQw4w9WgXcQ',
@@ -102,7 +102,7 @@ const YouTube = () => {
     {
       id: 8,
       title: "Kingdom Anniversary Celebration Stream",
-      description: "2-hour live stream celebrating Kingdom 3946's 2nd anniversary! Giveaways, Q&A, and special guests.",
+      description: "2-hour live stream celebrating Sacred3946's 2nd anniversary! Giveaways, Q&A, and special guests.",
       category: 'highlights',
       videoId: 'dQw4w9WgXcQ',
       thumbnail: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600',
@@ -133,7 +133,7 @@ const YouTube = () => {
             </div>
           </div>
           <h1 className="text-5xl font-bold text-[#FFD700] mb-4 tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
-            Kingdom 3946 Videos
+            Sacred3946 Videos
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
             Battles, tutorials, highlights, and kingdom content from our community

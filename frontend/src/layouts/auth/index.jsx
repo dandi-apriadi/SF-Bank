@@ -31,7 +31,7 @@ export default function Auth() {
 
     if (currentRoute) {
       setPage(currentRoute.name);
-      document.title = currentRoute.name + " - Kingdom 3946 | Rise of Kingdoms Community";
+      document.title = currentRoute.name + " - Sacred3946 | Rise of Kingdoms Community";
     }
   }, [location.pathname]);
 
@@ -50,7 +50,7 @@ export default function Auth() {
   document.documentElement.dir = "ltr";
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0a0e27] dark:via-[#0f1332] dark:to-[#0a0e27] transition-colors duration-300">
-      {/* Kingdom 3946 Navbar */}
+      {/* Sacred3946 Navbar */}
       <Navbar />
       
       {/* Main Content Area with Modern Background */}

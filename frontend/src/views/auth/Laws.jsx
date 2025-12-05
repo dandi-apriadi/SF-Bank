@@ -188,7 +188,7 @@ const Laws = () => {
             Kingdom Laws
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
-            Official rules, regulations, and code of conduct for Kingdom 3946
+            Official rules, regulations, and code of conduct for Sacred3946
           </p>
         </div>
 
@@ -199,7 +199,7 @@ const Laws = () => {
             <h3 className="text-xl font-bold text-[#880808] mb-2">IMPORTANT</h3>
             <p className="text-[#E2E8F0]/80">
               All kingdom members are expected to read and follow these rules. Ignorance of the rules is not an excuse for violations. 
-              By remaining in Kingdom 3946, you agree to abide by these regulations.
+              By remaining in Sacred3946, you agree to abide by these regulations.
             </p>
           </div>
         </div>

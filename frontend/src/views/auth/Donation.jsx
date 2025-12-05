@@ -67,7 +67,7 @@ const Donation = () => {
             </div>
           </div>
           <h1 className="text-5xl font-bold text-[#FFD700] mb-4 tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
-            Support Kingdom 3946
+            Support Sacred3946
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
             Help us maintain and improve our kingdom community with your generous support

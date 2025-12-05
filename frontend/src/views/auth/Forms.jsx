@@ -100,7 +100,7 @@ const Forms = () => {
                 {formType === 'feedback' && 'Feedback & Suggestions'}
               </h2>
               <p className="text-[#E2E8F0]/70 text-sm">
-                {formType === 'application' && 'Join Kingdom 3946 and fight with us!'}
+                {formType === 'application' && 'Join Sacred3946 and fight with us!'}
                 {formType === 'alliance' && 'Request to join one of our alliances'}
                 {formType === 'feedback' && 'Share your thoughts with our leadership'}
               </p>
@@ -171,9 +171,9 @@ const Forms = () => {
                   className="w-full bg-[#0F172A]/60 border-2 border-[#C5A059]/30 rounded-lg px-4 py-3 text-[#E2E8F0] focus:border-[#FFD700] focus:outline-none transition-all"
                 >
                   <option value="">Select an alliance</option>
-                  <option value="main">Main Alliance - 3946</option>
-                  <option value="academy">Academy - 3946A</option>
-                  <option value="farm">Farm Alliance - 3946F</option>
+                  <option value="main">Main Alliance - Sacred</option>
+                  <option value="academy">Academy - SacredA</option>
+                  <option value="farm">Farm Alliance - SacredF</option>
                 </select>
               </div>
             )}

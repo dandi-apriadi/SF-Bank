@@ -30,7 +30,7 @@ const KvK = () => {
       id: 1,
       season: "Season 7",
       date: "November 20-26, 2025",
-      winner: "Kingdom 3946",
+      winner: "Sacred3946",
       score: "1,248,500",
       rank: 1
     },
@@ -38,7 +38,7 @@ const KvK = () => {
       id: 2,
       season: "Season 6",
       date: "October 15-21, 2025",
-      winner: "Kingdom 3946",
+      winner: "Sacred3946",
       score: "1,156,230",
       rank: 2
     }
@@ -58,7 +58,7 @@ const KvK = () => {
             Kingdom vs Kingdom
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
-            Epic battles between kingdoms. Prove your might and claim victory for Kingdom 3946!
+            Epic battles between kingdoms. Prove your might and claim victory for Sacred3946!
           </p>
         </div>
 
@@ -168,7 +168,7 @@ const KvK = () => {
               <h2 className="text-3xl font-bold text-[#FFD700]" style={{ fontFamily: 'Cinzel, serif' }}>
                 Hall of Fame
               </h2>
-              <p className="text-[#E2E8F0]/70 mt-2">Top warriors of Kingdom 3946</p>
+              <p className="text-[#E2E8F0]/70 mt-2">Top warriors of Sacred3946</p>
             </div>
             <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((rank) => (

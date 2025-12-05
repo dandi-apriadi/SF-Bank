@@ -166,3 +166,68 @@ input:checked.defaultCheckbox::before {
     line-height: 0.9rem;
   }
 }
+
+@keyframes slideStripes {
+  0% {
+    background-position: 0, 0;
+  }
+  100% {
+    background-position: 160px, 0;
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 3s linear infinite;
+}
+
+/* Modern Creative Background Animations */
+@keyframes flowingWaves {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes meshGradient {
+  0% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}
+
+@keyframes floatingBlobs {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+  50% {
+    transform: translate(-30px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(10px, 30px) scale(1.05);
+  }
+}
+
+/* Features Section - Creative Background Theme */
+.features-creative-bg {
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 215, 0, 0.05) 50%, transparent 100%);
+}

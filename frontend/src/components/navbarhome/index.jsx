@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getMe } from "../../store/slices/authSlice";
 import { getNavbarRoutes } from "../../routes/routes-auth";
 import "./style.css";
+import Logo from '../../assets/img/auth/logo.png';
 
 const Navbar = ({ forceTransparent = false }) => {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const Navbar = ({ forceTransparent = false }) => {
     return location.pathname === `/auth/${path}`;
   };
 
-  // Icon mapping for Kingdom 3946 menu items
+  // Icon mapping for Sacred3946 menu items
   const getMenuIcon = (path) => {
     const iconMap = {
       'homepage': GiCastle,
@@ -146,13 +147,13 @@ const Navbar = ({ forceTransparent = false }) => {
             {/* Brand */}
             <Link to="/auth/homepage" className="flex items-center group">
               <div className="relative mr-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-                  <GiCastle className="h-6 w-6 text-[#0F172A]" />
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden p-0">
+                  <img src={Logo} alt="Sacred3946" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold tracking-wider text-slate-900 dark:text-white" style={{ fontFamily: 'Cinzel, serif' }}>
-                  KINGDOM 3946
+                  SACRED3946
                 </span>
                 <span className="text-[10px] font-bold tracking-[0.2em] text-[#C5A059] dark:bg-gradient-to-r dark:from-[#FFD700] dark:to-[#FDB931] dark:bg-clip-text dark:text-transparent uppercase">
                   Rise of Kingdoms
@@ -176,7 +177,7 @@ const Navbar = ({ forceTransparent = false }) => {
                   >
                     <span className={
                       isActive
-                        ? 'text-slate-900 dark:bg-gradient-to-r dark:from-[#FFD700] dark:to-[#FDB931] dark:bg-clip-text dark:text-transparent'
+                        ? 'text-slate-900 dark:text-[#FFD700]'
                         : 'text-slate-600 dark:text-yellow-600 group-hover:text-slate-900 dark:group-hover:text-[#FFD700]'
                     }>
                       {route.name}
@@ -197,7 +198,7 @@ const Navbar = ({ forceTransparent = false }) => {
                 >
                   <span className={
                     activeDropdown === 'more'
-                      ? 'text-slate-900 dark:bg-gradient-to-r dark:from-[#FFD700] dark:to-[#FDB931] dark:bg-clip-text dark:text-transparent'
+                      ? 'text-slate-900 dark:text-[#FFD700]'
                       : 'text-slate-600 dark:text-yellow-600 group-hover:text-slate-900 dark:group-hover:text-[#FFD700]'
                   }>More</span>
                   <svg className={`w-4 h-4 ml-1 transition-transform ${activeDropdown === 'more' ? 'rotate-180 text-slate-900 dark:text-[#FFD700]' : 'text-slate-600 dark:text-yellow-600 group-hover:text-slate-900 dark:group-hover:text-[#FFD700]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,7 +224,7 @@ const Navbar = ({ forceTransparent = false }) => {
                             <IconComponent className="w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-[#C5A059] dark:group-hover:text-[#FFD700]" />
                           </div>
                           <div>
-                            <span className="block text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:bg-gradient-to-r dark:group-hover:from-[#FFD700] dark:group-hover:to-[#FDB931] dark:group-hover:bg-clip-text dark:group-hover:text-transparent">
+                            <span className="block text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-[#FFD700]">
                               {route.name}
                             </span>
                           </div>
@@ -238,7 +239,7 @@ const Navbar = ({ forceTransparent = false }) => {
 
               {/* Discord Icon */}
               <a
-                href="https://discord.gg/kingdom3946" 
+                href="https://discord.gg/Q3yAJ5P5" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg text-[#5865F2] hover:bg-[#5865F2]/10 transition-colors mr-2"
@@ -306,12 +307,12 @@ const Navbar = ({ forceTransparent = false }) => {
             <div className="p-6 border-b border-slate-100 dark:border-white/5">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center shadow-lg mr-3">
-                    <GiCastle className="h-6 w-6 text-[#0F172A]" />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg mr-3 overflow-hidden p-0">
+                    <img src={Logo} alt="Sacred3946" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <span className="block text-lg font-bold text-slate-900 dark:text-white" style={{ fontFamily: 'Cinzel, serif' }}>
-                      KINGDOM 3946
+                      SACRED3946
                     </span>
                     <span className="text-[10px] font-bold tracking-wider text-[#C5A059] dark:text-[#FFD700] uppercase">
                       Community
@@ -362,8 +363,8 @@ const Navbar = ({ forceTransparent = false }) => {
                     <div>
                       <span className={`block font-bold text-sm ${
                         isActive
-                          ? 'text-slate-900 dark:bg-gradient-to-r dark:from-[#FFD700] dark:to-[#FDB931] dark:bg-clip-text dark:text-transparent'
-                          : 'text-slate-600 dark:text-yellow-600 group-hover:text-slate-900 dark:group-hover:bg-gradient-to-r dark:group-hover:from-[#FFD700] dark:group-hover:to-[#FDB931] dark:group-hover:bg-clip-text dark:group-hover:text-transparent'
+                          ? 'text-slate-900 dark:text-[#FFD700]'
+                          : 'text-slate-600 dark:text-yellow-600 group-hover:text-slate-900 dark:group-hover:text-[#FFD700]'
                       }`}>{route.name}</span>
                       <span className="text-xs opacity-70 text-slate-500 dark:text-slate-400">{route.description || 'View page'}</span>
                     </div>
@@ -374,7 +375,7 @@ const Navbar = ({ forceTransparent = false }) => {
 
             <div className="p-6 border-t border-slate-100 dark:border-white/5">
               <div className="flex items-center justify-center space-x-6 text-slate-400">
-                <a href="https://discord.gg/kingdom3946" target="_blank" rel="noopener noreferrer" className="hover:text-[#5865F2] transition-colors"><FaDiscord className="w-5 h-5" /></a>
+                <a href="https://discord.gg/Q3yAJ5P5" target="_blank" rel="noopener noreferrer" className="hover:text-[#5865F2] transition-colors"><FaDiscord className="w-5 h-5" /></a>
                 <a href="#" className="hover:text-[#C5A059] transition-colors"><FiYoutube className="w-5 h-5" /></a>
                 <a href="#" className="hover:text-[#C5A059] transition-colors"><FiGift className="w-5 h-5" /></a>
                 <a href="#" className="hover:text-[#C5A059] transition-colors"><GiCrown className="w-5 h-5" /></a>

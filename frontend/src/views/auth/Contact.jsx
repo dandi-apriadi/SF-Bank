@@ -40,7 +40,7 @@ const Contact = () => {
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-[#1E293B]/80 backdrop-blur-md rounded-xl p-6 border-2 border-[#C5A059]/30 text-center">
             <FiMail className="w-12 h-12 text-[#FFD700] mx-auto mb-2" />
-            <p className="text-[#E2E8F0] font-semibold">Discord: kingdom3946</p>
+            <p className="text-[#E2E8F0] font-semibold">Discord: sacred3946</p>
             <p className="text-[#E2E8F0]/60 text-sm">Primary channel for announcements and support</p>
           </div>
           <div className="bg-[#1E293B]/80 backdrop-blur-md rounded-xl p-6 border-2 border-[#C5A059]/30 text-center">

@@ -10,7 +10,7 @@ const About = () => {
   ];
 
   const timeline = [
-    { year: '2023', title: 'Founding of Kingdom 3946', desc: 'Established with core values of honor and teamwork.' },
+    { year: '2023', title: 'Founding of Sacred3946', desc: 'Established with core values of honor and teamwork.' },
     { year: '2024', title: 'First KvK Victory', desc: 'Achieved a decisive win through superior coordination.' },
     { year: '2025', title: 'Community Expansion', desc: 'Grew to 45K+ subscribers and multiple thriving alliances.' }
   ];
@@ -26,7 +26,7 @@ const About = () => {
             </div>
           </div>
           <h1 className="text-5xl font-bold text-[#FFD700] mb-4 tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
-            About Kingdom 3946
+            About Sacred3946
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
             A medieval-themed community united by strategy, honor, and camaraderie.

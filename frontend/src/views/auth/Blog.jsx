@@ -41,7 +41,7 @@ const Blog = () => {
     },
     {
       id: 3,
-      title: "Kingdom 3946 Anniversary Event Recap",
+      title: "Sacred3946 Anniversary Event Recap",
       excerpt: "Amazing turnout at our 2nd anniversary celebration! Event highlights, winners, and thank you to all participants.",
       category: 'events',
       author: "EventManager_Luna",
@@ -53,7 +53,7 @@ const Blog = () => {
     {
       id: 4,
       title: "January 2024 Kingdom Updates & Changes",
-      excerpt: "New rules, leadership updates, and upcoming features for Kingdom 3946. Important information for all members.",
+      excerpt: "New rules, leadership updates, and upcoming features for Sacred3946. Important information for all members.",
       category: 'updates',
       author: "King_Arthur",
       date: "2024-01-08",
@@ -132,7 +132,7 @@ const Blog = () => {
             Kingdom Chronicles
           </h1>
           <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
-            Guides, updates, and stories from Kingdom 3946
+            Guides, updates, and stories from Sacred3946
           </p>
         </div>
 

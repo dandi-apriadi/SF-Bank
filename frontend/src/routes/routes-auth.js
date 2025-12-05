@@ -4,7 +4,7 @@ import Homepage from "views/auth/Homepage";
 import NavbarSettings from "views/auth/NavbarSettings";
 import About from "views/auth/About";
 import Contact from "views/auth/Contact";
-// Kingdom 3946 Icon Imports
+// Sacred3946 Icon Imports
 import {
     MdLock,
     MdSettings,
@@ -36,7 +36,7 @@ const routes = [
         component: <Homepage />,
         showInNavbar: true,
         isDefault: true,
-        description: "Kingdom 3946 Homepage",
+        description: "Sacred3946 Homepage",
     },
 
     // 2. KvK (Kingdom vs Kingdom)
@@ -102,7 +102,7 @@ const routes = [
         icon: <GiCrown className="h-6 w-6" />,
         component: <About />,
         showInNavbar: true,
-        description: "About Kingdom 3946",
+        description: "About Sacred3946",
     },
 
     // 8. YouTube (Video gallery, tutorials, battle highlights)

@@ -30,7 +30,8 @@ import {
   FiChevronRight
 } from 'react-icons/fi';
 import Navbar from '../../components/navbarhome';
-
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+import Logo from '../../assets/img/auth/logo.png';
 const Homepage = () => {
   const [stats, setStats] = useState({
     members: 150,
@@ -40,7 +41,7 @@ const Homepage = () => {
   });
 
   useEffect(() => {
-    document.title = "Kingdom 3946 - Rise of Kingdoms Community";
+    document.title = "Sacred3946 - Rise of Kingdoms Community";
   }, []);
 
   // Slider State
@@ -54,10 +55,14 @@ const Homepage = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
+  const SacredLogoIcon = ({ className }) => (
+    <img src={SacredLogo} alt="Sacred Forces" className={`${className} object-contain`} />
+  );
+
   const heroSlides = [
     {
       id: 'overview',
-      title: 'KINGDOM 3946',
+      title: 'SACRED3946',
       subtitle: 'The Sovereign Territory',
       icon: GiCastle,
       mainContent: (
@@ -92,7 +97,7 @@ const Homepage = () => {
         },
         { 
           type: 'profile', 
-          name: 'King 3946', 
+          name: 'King Sacred', 
           role: 'Reigning King', 
           status: 'Online',
           pos: 'center-right',
@@ -104,7 +109,7 @@ const Homepage = () => {
       id: 'alliances',
       title: 'TOP ALLIANCES',
       subtitle: 'Our Strongest Forces',
-      icon: GiSwordsEmblem,
+      icon: SacredLogoIcon,
       floating: [
         { 
           type: 'stat', 
@@ -449,14 +454,15 @@ const Homepage = () => {
               {/* 2. Large Floating Background Icons */}
               <div className="absolute top-[-5%] left-[-5%] w-[500px] h-[500px] flex items-center justify-center -z-10 pointer-events-none">
                 <motion.div 
-                  className="text-[#FFD700]/10 dark:text-[#FFD700]/5"
+                  className="w-full h-full flex items-center justify-center rounded-full overflow-hidden"
                   animate={{ 
-                    scale: [1, 1.1, 1],
-                    opacity: [0.3, 0.6, 0.3]
+                    scale: [1, 1.05, 1],
+                    opacity: [1, 1, 0.5],
+                    filter: ["drop-shadow(0 0 20px rgba(255, 215, 0, 0.1))", "drop-shadow(0 0 40px rgba(255, 215, 0, 0.2))", "drop-shadow(0 0 20px rgba(255, 215, 0, 0.1))"]
                   }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <GiSwordsEmblem className="w-96 h-96" />
+                  <img src={SacredLogo} alt="Sacred Forces" className="w-full h-full object-cover opacity-50" />
                 </motion.div>
               </div>
 
@@ -469,7 +475,7 @@ const Homepage = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFD700] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FFD700]"></span>
                 </span>
-                <span className="text-slate-600 dark:text-blue-200 font-bold text-xs tracking-[0.2em] uppercase">Official 3946 Community Portal</span>
+                <span className="text-slate-600 dark:text-blue-200 font-bold text-xs tracking-[0.2em] uppercase">Official Sacred3946 Community Portal</span>
               </motion.div>
 
               {/* Main Title */}
@@ -488,7 +494,7 @@ const Homepage = () => {
                 variants={fadeInUp}
                 className="text-lg md:text-xl text-slate-600 dark:text-white mb-10 max-w-xl leading-relaxed font-medium"
               >
-                Join the elite forces of Kingdom 3946. Experience the pinnacle of strategy, 
+                Join the elite forces of Sacred3946. Experience the pinnacle of strategy, 
                 unity, and conquest in the ultimate Rise of Kingdoms community.
               </motion.p>
 
@@ -573,9 +579,13 @@ const Homepage = () => {
                       <motion.div 
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="w-32 h-32 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-3xl flex items-center justify-center shadow-lg mb-8 relative group-hover:scale-105 transition-transform duration-500"
+                        className="w-32 h-32 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-3xl flex items-center justify-center shadow-lg mb-8 relative group-hover:scale-105 transition-transform duration-500 overflow-hidden"
                       >
-                        {React.createElement(heroSlides[currentSlide].icon, { className: "w-20 h-20 text-[#0F172A]" })}
+                        {currentSlide === 1 ? (
+                          <img src={Logo} alt="Logo" className="w-24 h-24 object-contain" />
+                        ) : (
+                          React.createElement(heroSlides[currentSlide].icon, { className: "w-20 h-20 text-[#0F172A]" })
+                        )}
                         <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg -z-10"></div>
                         <div className="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </motion.div>
@@ -666,7 +676,7 @@ const Homepage = () => {
                             <div className="relative">
                               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] p-[2px]">
                                 <div className="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                  <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=King3946&backgroundColor=b6e3f4" alt="King" className="w-full h-full object-cover" />
+                                  <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=KingSacred&backgroundColor=b6e3f4" alt="King" className="w-full h-full object-cover" />
                                 </div>
                               </div>
                               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FFD700] rounded-full flex items-center justify-center border-2 border-white dark:border-[#1E293B] shadow-sm">
@@ -734,8 +744,188 @@ const Homepage = () => {
       </section>
 
       {/* Features Section - Kingdom Services */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative py-20 px-6 overflow-hidden">
+        {/* Modern Creative Background */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Animated Mesh Gradient Background */}
+          <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <filter id="blur">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
+              </filter>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FFD700" />
+                <stop offset="50%" stopColor="#C5A059" />
+                <stop offset="100%" stopColor="#FFD700" />
+              </linearGradient>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grad1)" opacity="0.1" />
+            
+            {/* Animated Flowing Waves */}
+            <path d="M0,50 Q250,0 500,50 T1000,50" stroke="#FFD700" strokeWidth="2" fill="none" opacity="0.3" filter="url(#blur)" />
+            <path d="M0,150 Q300,100 600,150 T1200,150" stroke="#C5A059" strokeWidth="2" fill="none" opacity="0.2" filter="url(#blur)" />
+            <path d="M0,250 Q200,200 400,250 T800,250" stroke="#FFD700" strokeWidth="2" fill="none" opacity="0.15" filter="url(#blur)" />
+          </svg>
+          
+          {/* Organic Blob Shapes - Flowing */}
+          <motion.div 
+            className="absolute top-[-20%] right-[-15%] w-[500px] h-[500px] rounded-full opacity-30 dark:opacity-20"
+            style={{
+              background: 'radial-gradient(circle at 30% 30%, #FFD700, transparent)',
+              filter: 'blur(80px)',
+            }}
+            animate={{
+              x: [0, 30, -20, 0],
+              y: [0, -30, 20, 0],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          <motion.div 
+            className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full opacity-25 dark:opacity-15"
+            style={{
+              background: 'radial-gradient(circle at 70% 70%, #C5A059, transparent)',
+              filter: 'blur(100px)',
+            }}
+            animate={{
+              x: [0, -40, 20, 0],
+              y: [0, 40, -30, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          
+          <motion.div 
+            className="absolute top-1/3 left-1/4 w-[400px] h-[400px] rounded-full opacity-20 dark:opacity-10"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, #FFD700, transparent)',
+              filter: 'blur(90px)',
+            }}
+            animate={{
+              x: [0, 20, -30, 0],
+              y: [0, 30, -20, 0],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          
+          {/* Geometric Pattern Overlay - Subtle Hexagons */}
+          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+               style={{
+                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L45 15 L45 45 L30 60 L15 45 L15 15 Z' fill='none' stroke='%23FFD700' stroke-width='1'/%3E%3C/svg%3E")`,
+                 backgroundSize: '60px 60px'
+               }}>
+          </div>
+          
+          {/* Animated Floating Particles */}
+          <motion.div
+            className="absolute inset-0 opacity-40"
+            style={{
+              background: `radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1), transparent 50%),
+                          radial-gradient(circle at 80% 30%, rgba(197, 160, 89, 0.1), transparent 50%),
+                          radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.08), transparent 50%)`,
+              filter: 'blur(60px)',
+            }}
+            animate={{
+              background: [
+                `radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1), transparent 50%),
+                 radial-gradient(circle at 80% 30%, rgba(197, 160, 89, 0.1), transparent 50%),
+                 radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.08), transparent 50%)`,
+                `radial-gradient(circle at 30% 60%, rgba(255, 215, 0, 0.12), transparent 50%),
+                 radial-gradient(circle at 70% 40%, rgba(197, 160, 89, 0.12), transparent 50%),
+                 radial-gradient(circle at 50% 70%, rgba(255, 215, 0, 0.1), transparent 50%)`,
+                `radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1), transparent 50%),
+                 radial-gradient(circle at 80% 30%, rgba(197, 160, 89, 0.1), transparent 50%),
+                 radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.08), transparent 50%)`
+              ]
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          {/* Rotating Gradient Ring */}
+          <motion.div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: '800px',
+              height: '800px',
+              borderRadius: '50%',
+              border: '2px solid transparent',
+              backgroundImage: 'conic-gradient(from 0deg, #FFD700, #C5A059, #FFD700)',
+              backgroundClip: 'border-box',
+              WebkitMaskImage: 'linear-gradient(#fff 0 0)',
+              WebkitMaskClip: 'padding-box',
+              opacity: 0.08,
+              zIndex: 0
+            }}
+            animate={{
+              rotate: [0, 360]
+            }}
+            transition={{
+              duration: 60,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          
+          {/* Counter-rotating Gradient Ring */}
+          <motion.div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: '600px',
+              height: '600px',
+              borderRadius: '50%',
+              border: '2px solid transparent',
+              backgroundImage: 'conic-gradient(from 180deg, #C5A059, #FFD700, #C5A059)',
+              backgroundClip: 'border-box',
+              WebkitMaskImage: 'linear-gradient(#fff 0 0)',
+              WebkitMaskClip: 'padding-box',
+              opacity: 0.06,
+              zIndex: 0
+            }}
+            animate={{
+              rotate: [0, -360]
+            }}
+            transition={{
+              duration: 80,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          
+          {/* Accent Lines - Modern Design */}
+          <motion.div
+            className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08]"
+            style={{
+              backgroundImage: `linear-gradient(90deg, transparent 0%, #FFD700 50%, transparent 100%)`
+            }}
+            animate={{
+              backgroundPosition: ['0% 0%', '100% 0%'],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div 
             className="text-center mb-16"
             initial="hidden"
@@ -743,13 +933,13 @@ const Homepage = () => {
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeInUp}
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-xl mb-6 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-xl mb-6 shadow-lg shadow-[#FFD700]/20">
               <GiWingedSword className="w-8 h-8 text-[#0F172A]" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-800 dark:text-[#E2E8F0] mb-4 tracking-tight" style={{ fontFamily: 'Cinzel, serif' }}>
-              Kingdom <span className="text-[#C5A059] dark:text-[#FFD700]">Features</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-800 dark:text-white mb-4 tracking-tight" style={{ fontFamily: 'Cinzel, serif' }}>
+              Kingdom <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C5A059] via-[#FFD700] to-[#C5A059] animate-gradient">Features</span>
             </h2>
-            <p className="text-lg text-slate-600 dark:text-[#E2E8F0]/70 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 dark:text-blue-100/70 max-w-2xl mx-auto font-medium">
               Discover all the powerful tools and features available for our kingdom members
             </p>
           </motion.div>
@@ -768,20 +958,33 @@ const Homepage = () => {
               >
                 <Link 
                   to={feature.link}
-                  className="group block h-full bg-white dark:bg-[#1E293B] rounded-2xl p-8 shadow-lg border-2 border-slate-200 dark:border-[#C5A059]/30 hover:border-[#C5A059] dark:hover:border-[#FFD700]/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl dark:hover:shadow-[0_0_30px_rgba(197,160,89,0.2)]"
+                  className="group relative block h-full bg-white/80 dark:bg-[#1E293B]/60 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-slate-200 dark:border-[#FFD700]/20 hover:border-[#FFD700] dark:hover:border-[#FFD700] transition-all duration-500 hover:-translate-y-2 overflow-hidden"
                 >
-                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <feature.icon className="w-8 h-8 text-white" />
+                  {/* Card Pattern Overlay */}
+                  <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.1] group-hover:opacity-[0.1] dark:group-hover:opacity-[0.15] transition-opacity duration-500 pointer-events-none" 
+                       style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '16px 16px' }}>
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-800 dark:text-[#E2E8F0] mb-3 group-hover:text-[#C5A059] dark:group-hover:text-[#FFD700] transition-colors tracking-wide">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-[#E2E8F0]/70 mb-4 leading-relaxed">
-                    {feature.description}
-                  </p>
-                  <div className="flex items-center text-[#C5A059] dark:text-[#FFD700] font-semibold group-hover:translate-x-2 transition-transform">
-                    <span className="tracking-wide">Explore</span>
-                    <FiArrowRight className="ml-2 w-5 h-5" />
+                  
+                  {/* Hover Gradient Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/0 via-transparent to-[#FFD700]/0 group-hover:from-[#FFD700]/5 group-hover:to-[#C5A059]/5 transition-all duration-500"></div>
+
+                  <div className="relative z-10">
+                    <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-3 group-hover:text-[#C5A059] dark:group-hover:text-[#FFD700] transition-colors tracking-wide" style={{ fontFamily: 'Cinzel, serif' }}>
+                      {feature.title}
+                    </h3>
+                    
+                    <p className="text-slate-600 dark:text-blue-100/70 mb-6 leading-relaxed">
+                      {feature.description}
+                    </p>
+                    
+                    <div className="flex items-center text-[#C5A059] dark:text-[#FFD700] font-bold group-hover:translate-x-2 transition-transform">
+                      <span className="tracking-wide uppercase text-sm">Explore Feature</span>
+                      <FiArrowRight className="ml-2 w-5 h-5" />
+                    </div>
                   </div>
                 </Link>
               </motion.div>
@@ -847,7 +1050,7 @@ const Homepage = () => {
                 Ready to Join the Kingdom?
               </h2>
               <p className="text-lg md:text-xl text-[#0F172A]/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Become part of Kingdom 3946 and experience the ultimate Rise of Kingdoms community. 
+                Become part of Sacred3946 and experience the ultimate Rise of Kingdoms community. 
                 United we stand, divided we fall!
               </p>
               <Link 
@@ -872,7 +1075,7 @@ const Homepage = () => {
             </div>
             <div className="text-left">
               <h3 className="text-xl font-bold text-slate-800 dark:text-[#FFD700] tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
-                KINGDOM 3946
+                SACRED3946
               </h3>
               <p className="text-sm text-slate-600 dark:text-[#C5A059]">Rise of Kingdoms</p>
             </div>
@@ -881,7 +1084,7 @@ const Homepage = () => {
             United We Conquer • Together We Prosper
           </p>
           <p className="text-sm text-slate-500 dark:text-[#E2E8F0]/50">
-            © 2024 Kingdom 3946. All rights reserved.
+            © 2024 Sacred3946. All rights reserved.
           </p>
         </div>
       </footer>
