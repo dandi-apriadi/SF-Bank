@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from 'framer-motion';
 import { loginUser, reset } from "../../store/slices/authSlice";
-import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff, FiUsers, FiAward, FiShield, FiBarChart, FiTarget } from "react-icons/fi";
-import { MdAssessment, MdVerifiedUser, MdAnalytics } from "react-icons/md";
-import { GiCastle, GiCrossedSwords } from "react-icons/gi";
-import Checkbox from "components/checkbox";
+import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
+import { GiCastle, GiCrown, GiSwordsEmblem } from "react-icons/gi";
 import Swal from 'sweetalert2';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -128,223 +128,340 @@ const SignIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 flex">
-      {/* Left Panel - Professional Academic Visual */}
-      <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden">
-        {/* Background with overlay */}
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1986&q=80" 
-            alt="Epic fantasy landscape representing kingdoms and battles" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/95 via-blue-800/90 to-gray-900/95"></div>
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white">
-          {/* Header */}
-          <div>
-            <Link to="/auth/homepage" className="flex items-center mb-8 hover:opacity-80 transition-opacity duration-200">
-                <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
-                <GiCastle className="h-8 w-8 text-yellow-200" />
-              </div>
-              <div className="ml-4">
-                <h1 className="text-3xl font-bold">SF BANK</h1>
-                <p className="text-blue-200 text-sm">Portal Internal & Layanan Perbankan</p>
-              </div>
-            </Link>
-          </div>
-          
-          {/* Main Content */}
-          <div className="flex-1 flex flex-col justify-center space-y-12">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold mb-6 leading-tight">
-                Bangun Kerajaan Anda
-                <span className="text-yellow-300 block">Rise of Kingdoms — Pimpin Kerajaan</span>
+    <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A] overflow-hidden">
+      {/* Optimized Static Background - Better Performance */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Simple SVG Pattern */}
+        <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="signin-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFD700" />
+              <stop offset="50%" stopColor="#C5A059" />
+              <stop offset="100%" stopColor="#FFD700" />
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#signin-grad)" opacity="0.08" />
+        </svg>
+
+        {/* Static Glow Effects */}
+        <div
+          className="absolute top-[-15%] right-[-10%] w-[420px] h-[420px] rounded-full opacity-20 dark:opacity-12"
+          style={{ 
+            background: 'radial-gradient(circle at 30% 30%, #FFD700, transparent)', 
+            filter: 'blur(40px)',
+            transform: 'translateZ(0)',
+            contain: 'layout style paint'
+          }}
+        />
+        <div
+          className="absolute bottom-[-18%] left-[-12%] w-[460px] h-[460px] rounded-full opacity-18 dark:opacity-10"
+          style={{ 
+            background: 'radial-gradient(circle at 70% 70%, #C5A059, transparent)', 
+            filter: 'blur(40px)',
+            transform: 'translateZ(0)',
+            contain: 'layout style paint'
+          }}
+        />
+
+        {/* Hexagon Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L45 15 L45 45 L30 60 L15 45 L15 15 Z' fill='none' stroke='%23FFD700' stroke-width='1'/%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}
+        ></div>
+
+        {/* Static Gradient Overlay */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ 
+            width: '680px', 
+            height: '680px', 
+            borderRadius: '50%', 
+            background: 'radial-gradient(circle, transparent 40%, rgba(255,215,0,0.06) 70%, transparent 100%)', 
+            opacity: 0.5,
+            transform: 'translateZ(0)'
+          }}
+        />
+      </div>
+
+      <div className="relative min-h-screen flex items-center z-10">
+        <div className="w-full max-w-7xl mx-auto px-6 py-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Welcome Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center lg:text-left"
+            >
+              <motion.div 
+                className="flex justify-center lg:justify-start mb-8"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="relative w-32 h-32 rounded-full flex items-center justify-center hover:scale-105 transition-transform duration-300" style={{ transform: 'translateZ(0)' }}>
+                  <img src={SacredLogo} alt="Sacred Forces" className="w-32 h-32 rounded-full object-contain drop-shadow-2xl" />
+                </div>
+              </motion.div>
+              
+              <motion.h1 
+                className="text-6xl lg:text-7xl font-bold text-[#FFD700] mb-4 tracking-wider uppercase" 
+                style={{ fontFamily: 'Cinzel, serif' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+              >
+                Welcome Back
+              </motion.h1>
+              <motion.h2
+                className="text-3xl lg:text-4xl font-bold text-[#E2E8F0] mb-6"
+                style={{ fontFamily: 'Cinzel, serif' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                To Sacred3946
+              </motion.h2>
+              <motion.p 
+                className="text-xl text-[#E2E8F0]/70 mb-8 max-w-lg mx-auto lg:mx-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                Sign in to access your kingdom dashboard and manage your empire in Rise of Kingdoms.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#FFD700]/20 flex items-center justify-center">
+                    <GiCrown className="w-6 h-6 text-[#FFD700]" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[#FFD700] font-bold">Kingdom Management</p>
+                    <p className="text-[#E2E8F0]/60 text-sm">Control your empire</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#FFD700]/20 flex items-center justify-center">
+                    <GiSwordsEmblem className="w-6 h-6 text-[#FFD700]" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[#FFD700] font-bold">Battle Strategy</p>
+                    <p className="text-[#E2E8F0]/60 text-sm">Plan your victories</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#FFD700]/20 flex items-center justify-center">
+                    <FiShield className="w-6 h-6 text-[#FFD700]" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[#FFD700] font-bold">Secure Access</p>
+                    <p className="text-[#E2E8F0]/60 text-sm">Protected portal</p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Side - Sign In Form */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto"
+            >
+              {/* Sign In Form Container */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="relative bg-[#1E293B]/95 rounded-2xl p-8 border-2 border-[#C5A059]/40 shadow-lg overflow-hidden"
+                style={{ transform: 'translateZ(0)', contain: 'layout style paint' }}
+              >
+          {/* Form header glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/5 via-transparent to-[#C5A059]/5 opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+
+          {/* Form Header */}
+          <motion.div 
+            className="flex items-center mb-6 pb-5 border-b-2 border-[#FFD700]/30 relative z-10"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="text-3xl mr-3">🔐</div>
+            <div>
+              <h2 className="text-2xl font-bold text-[#FFD700]" style={{ fontFamily: 'Cinzel, serif' }}>
+                Kingdom Login
               </h2>
-              <p className="text-xl text-yellow-100 max-w-2xl mx-auto leading-relaxed">
-                Masuki dunia epik, rekrut komandan, dan perluas wilayah Anda melalui strategi dan aliansi.
+              <p className="text-[#E2E8F0]/70 text-sm mt-1">
+                Enter your credentials to continue
               </p>
             </div>
-            
-            {/* Role Cards */}
-              <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
-                <GiCrossedSwords className="h-8 w-8 text-red-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Komandan</h3>
-                <p className="text-yellow-200 text-sm">Pimpin pasukan dan kuasai medan perang</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
-                <FiUsers className="h-8 w-8 text-cyan-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Gubernur</h3>
-                <p className="text-yellow-200 text-sm">Kelola sumber daya dan kembangkan kota Anda</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all duration-300">
-                <FiAward className="h-8 w-8 text-purple-300 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Pemimpin Aliansi</h3>
-                <p className="text-yellow-200 text-sm">Koordinasi aliansi dan raih kemenangan bersama</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Footer */}
-          <div className="text-blue-200 text-sm">
-            © 2025 SF BANK - Portal Perbankan Internal
-          </div>
-        </div>
-      </div>
-      
-      {/* Right Panel - Sign In Form */}
-      <div className="w-full lg:w-2/5 flex items-center justify-center p-8 lg:p-12">
-  <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden mb-8 text-center">
-            <Link to="/auth/homepage" className="inline-block hover:opacity-80 transition-opacity duration-200">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-2xl mb-4 shadow-lg">
-                <GiCastle className="h-8 w-8 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-800">SF BANK</h1>
-              <p className="text-gray-600 text-sm">Tema: Rise of Kingdoms — Visual</p>
-            </Link>
-          </div>
-          
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h2>
-            <p className="text-gray-600">Masuk ke akun Anda untuk mengakses portal SF BANK</p>
-          </div>
-          
+          </motion.div>
+
           {/* Sign In Form */}
-          <form onSubmit={handleAuth} className="space-y-6">
+          <form onSubmit={handleAuth} className="space-y-5 relative z-10">
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Alamat Email
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <label className="flex text-[#E2E8F0] font-bold mb-2 items-center">
+                <FiMail className="w-4 h-4 mr-2 text-[#FFD700]" />
+                Email Address <span className="text-[#FF6B6B] ml-1">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-[#0F172A]/60 border-2 border-[#C5A059]/30 rounded-xl px-4 py-3 text-[#E2E8F0] placeholder-[#E2E8F0]/40 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-all"
+                placeholder="your.email@example.com"
+              />
+            </motion.div>
+
+            {/* Password Field */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <label className="flex text-[#E2E8F0] font-bold mb-2 items-center">
+                <FiLock className="w-4 h-4 mr-2 text-[#FFD700]" />
+                Password <span className="text-[#FF6B6B] ml-1">*</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FiMail className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-700 
-                             placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                             transition-all duration-200 hover:border-gray-300"
-                  placeholder="user@sfbank.co.id"
-                />
-              </div>
-            </div>
-            
-            {/* Password Field */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                  Kata Sandi
-                </label>
-                <Link 
-                  to="/auth/forgot-password" 
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  Lupa kata sandi?
-                </Link>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-12 pr-12 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-700 
-                             placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                             transition-all duration-200 hover:border-gray-300"
-                  placeholder="••••••••••••"
+                  required
+                  className="w-full bg-[#0F172A]/60 border-2 border-[#C5A059]/30 rounded-xl px-4 py-3 pr-12 text-[#E2E8F0] placeholder-[#E2E8F0]/40 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-all"
+                  placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#E2E8F0]/60 hover:text-[#FFD700] transition-colors"
                 >
-                  {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                  {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
-            
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <div className="flex items-center">
+            </motion.div>
+
+            {/* Remember Me & Forgot Password */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex items-center justify-between"
+            >
+              <label className="flex items-center cursor-pointer">
                 <input
-                  id="remember-me"
-                  name="remember-me"
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
+                  className="w-4 h-4 rounded border-[#C5A059]/30 bg-[#0F172A]/60 text-[#FFD700] focus:ring-[#FFD700] focus:ring-offset-0"
                 />
-                <label htmlFor="remember-me" className="ml-3 text-sm text-gray-600">
-                  Ingat saya selama 30 hari
-                </label>
-              </div>
-            </div>
-            
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-4 px-4 border border-transparent 
-                           text-base font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700
-                           hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                           focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                <span className="ml-2 text-sm text-[#E2E8F0]/80">Remember me</span>
+              </label>
+              <Link 
+                to="/auth/forgot-password" 
+                className="text-sm text-[#FFD700] hover:text-[#C5A059] transition-colors font-medium"
               >
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <div className="h-full flex items-center justify-center w-6">
-                    {isLoading ? (
-                      <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent" />
-                    ) : (
-                      <FiArrowRight className="h-5 w-5 text-blue-200 group-hover:text-white transition-colors duration-200" />
-                    )}
-                  </div>
-                </span>
-                {isLoading ? "Memproses masuk..." : "Masuk ke Sistem"}
-              </button>
-            </div>
-            
-            {/* Divider removed per request */}
-            
-            {/* Google SSO removed */}
-            
-            {/* Contact Admin link removed per request */}
-          </form>
-          
-          {/* Info panel removed per request */}
+                Forgot Password?
+              </Link>
+            </motion.div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-            <p className="mb-2">© 2025 SF BANK - Portal Perbankan Internal</p>
-            <div className="space-x-4">
-              <Link to="/auth/terms" className="text-blue-600 hover:text-blue-700 transition-colors">
-                Syarat & Ketentuan
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-[#0F172A] font-bold py-4 rounded-xl hover:shadow-xl hover:shadow-[#FFD700]/40 transition-all flex items-center justify-center group text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#0F172A] border-t-transparent mr-3" />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <FiShield className="w-5 h-5 mr-2" />
+                  Sign In to Kingdom
+                  <FiArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          {/* Divider */}
+          <motion.div 
+            className="relative my-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+          >
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#C5A059]/30"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-[#1E293B] text-[#E2E8F0]/60">New to Sacred3946?</span>
+            </div>
+          </motion.div>
+
+          {/* Sign Up Link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="text-center relative z-10"
+          >
+            <Link
+              to="/auth/forms"
+              className="inline-flex items-center px-6 py-3 border-2 border-[#FFD700]/60 text-[#FFD700] font-bold rounded-xl hover:bg-[#FFD700]/10 transition-all"
+            >
+              <GiSwordsEmblem className="w-5 h-5 mr-2" />
+              Join Kingdom
+            </Link>
+          </motion.div>
+
+          {/* Footer Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1 }}
+            className="mt-8 text-center text-sm text-[#E2E8F0]/60"
+          >
+            <div className="flex items-center justify-center gap-4">
+              <Link to="/auth/homepage" className="hover:text-[#FFD700] transition-colors">
+                ← Back to Home
               </Link>
-              <span>&middot;</span>
-              <Link to="/auth/privacy" className="text-blue-600 hover:text-blue-700 transition-colors">
-                Kebijakan Privasi
+              <span>•</span>
+              <Link to="/auth/about" className="hover:text-[#FFD700] transition-colors">
+                About Kingdom
               </Link>
             </div>
+            <p className="mt-4 text-xs">
+              © 2025 Sacred3946 - Rise of Kingdoms Community
+            </p>
+          </motion.div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>

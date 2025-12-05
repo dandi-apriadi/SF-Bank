@@ -4,6 +4,11 @@ import Homepage from "views/auth/Homepage";
 import NavbarSettings from "views/auth/NavbarSettings";
 import About from "views/auth/About";
 import Contact from "views/auth/Contact";
+import Laws from "views/auth/Laws";
+import Forms from "views/auth/Forms";
+import JoinKingdom from "views/auth/JoinKingdom";
+import Giveaway from "views/auth/Giveaway";
+import KvK from "views/auth/KvK";
 // Sacred3946 Icon Imports
 import {
     MdLock,
@@ -45,7 +50,7 @@ const routes = [
         layout: "/auth",
         path: "kvk",
         icon: <GiCrossedSwords className="h-6 w-6" />,
-        component: <Homepage />, // Temporary, create KvK component later
+        component: <KvK />,
         showInNavbar: true,
         description: "Kingdom vs Kingdom battles",
     },
@@ -67,7 +72,7 @@ const routes = [
         layout: "/auth",
         path: "giveaway",
         icon: <FiGift className="h-6 w-6" />,
-        component: <Homepage />, // Temporary
+        component: <Giveaway />,
         showInNavbar: true,
         description: "Active giveaways and rewards",
     },
@@ -78,9 +83,20 @@ const routes = [
         layout: "/auth",
         path: "forms",
         icon: <GiScrollUnfurled className="h-6 w-6" />,
-        component: <Homepage />, // Temporary
+        component: <Forms />,
         showInNavbar: true,
         description: "Registration and application forms",
+    },
+
+    // 5b. Join Kingdom (Dedicated join/CTA page)
+    {
+        name: "Join Kingdom",
+        layout: "/auth",
+        path: "join-kingdom",
+        icon: <GiScrollUnfurled className="h-6 w-6" />,
+        component: <JoinKingdom />,
+        showInNavbar: true,
+        description: "Join Sacred3946 alliance",
     },
 
     // 6. Donation (Info sistem donasi, leaderboard)
@@ -133,7 +149,7 @@ const routes = [
         layout: "/auth",
         path: "laws",
         icon: <MdGavel className="h-6 w-6" />,
-        component: <Homepage />, // Temporary
+        component: <Laws />,
         showInNavbar: true,
         description: "Kingdom rules and regulations",
     },
@@ -182,7 +198,7 @@ export const getAuthRoutes = () => {
 };
 
 export const getKingdomRoutes = () => {
-    return routes.filter(route => ['kvk', 'events', 'giveaway', 'donation', 'forms', 'youtube', 'blog', 'laws'].includes(route.path));
+    return routes.filter(route => ['kvk', 'events', 'giveaway', 'donation', 'forms', 'join-kingdom', 'youtube', 'blog', 'laws'].includes(route.path));
 };
 
 export const getDefaultRoute = () => {

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { FiAlignJustify } from "react-icons/fi";
 import { BsArrowBarUp } from "react-icons/bs";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
 // Notification dropdown removed per request
 // removed campus icon import (not used)
 import Dropdown from "components/dropdown";
@@ -11,10 +12,32 @@ import { useLogout } from "hooks/useLogout";
 
 const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
   const [brandText, setBrandText] = useState(initialBrandText);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check if dark mode preference is saved in localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode');
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
+      // Check system preference
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   const dispatch = useDispatch();
   const { microPage, user } = useSelector((state) => state.auth);
   // Notifications removed
   const { logout, isLoading } = useLogout();
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
 
   // Update brandText when microPage changes
   useEffect(() => {
@@ -24,6 +47,10 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
   // Handle logout using custom hook
   const handleLogout = () => {
     logout();
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   // Removed notifications fetch effect
@@ -50,9 +77,22 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
       {/* Right Side - Controls & User Interface */}
       <div className="flex items-center gap-1 sm:gap-2">
 
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-lightPrimary dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 transition-all"
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {isDarkMode ? (
+            <MdLightMode className="h-5 w-5 text-yellow-500" />
+          ) : (
+            <MdDarkMode className="h-5 w-5 text-slate-700" />
+          )}
+        </button>
+
         {/* Mobile Menu Toggle */}
         <button
-          className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-lightPrimary text-gray-600 xl:hidden border border-gray-200"
+          className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-lightPrimary dark:bg-slate-700 text-gray-600 dark:text-gray-300 xl:hidden border border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-600 transition-all"
           onClick={onOpenSidenav}
         >
           <FiAlignJustify className="h-5 w-5" />
@@ -62,13 +102,13 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
         <button
           onClick={handleLogout}
           disabled={isLoading}
-          className="flex h-[40px] w-[40px] items-center justify-center rounded-full hover:bg-red-50 border border-red-200 xl:hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-[40px] w-[40px] items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-800 xl:hidden transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           title="Logout"
         >
           <RiLogoutBoxRLine className={`h-5 w-5 transition-colors ${
             isLoading 
               ? 'text-gray-400' 
-              : 'text-red-500'
+              : 'text-red-500 dark:text-red-500'
           }`} />
         </button>
 
@@ -77,13 +117,13 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
           <button
             onClick={handleLogout}
             disabled={isLoading}
-            className="flex h-[40px] w-[40px] items-center justify-center rounded-full hover:bg-red-50 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex h-[40px] w-[40px] items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             title="Logout"
           >
             <RiLogoutBoxRLine className={`h-5 w-5 transition-colors ${
               isLoading 
                 ? 'text-gray-400' 
-                : 'text-red-500 hover:text-red-600'
+                : 'text-red-500 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400'
             }`} />
           </button>
         </div>
@@ -93,29 +133,29 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
         {/* Profile Dropdown */}
         <Dropdown
           button={
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-blue-500 bg-blue-50 hover:shadow-md transition-all ml-1">
-              <p className="text-base font-bold text-blue-500">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:shadow-md dark:hover:shadow-blue-900/50 transition-all ml-1">
+              <p className="text-base font-bold text-blue-500 dark:text-blue-400">
                 {user?.fullname ? user.fullname.charAt(0).toUpperCase() : "U"}
               </p>
             </button>
           }
           children={
-            <div className="flex w-56 flex-col justify-start rounded-[16px] bg-white bg-cover bg-no-repeat shadow-xl border border-gray-200">
+            <div className="flex w-56 flex-col justify-start rounded-[16px] bg-white dark:bg-slate-800 bg-cover bg-no-repeat shadow-xl dark:shadow-slate-900/50 border border-gray-200 dark:border-slate-700">
               {/* User Info */}
               <div className="p-4">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-navy-700">
+                  <p className="text-sm font-bold text-navy-700 dark:text-white">
                     👋 Halo, {user?.fullname || "User"}
                   </p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-gray-600">{user?.role || "User"}</p>
+                <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-400">{user?.role || "User"}</p>
               </div>
-              <div className="h-px w-full bg-gray-200" />
+              <div className="h-px w-full bg-gray-200 dark:bg-slate-700" />
 
               {/* Menu Items */}
               <div className="flex flex-col p-3">
-                <Link to={user ? "/admin/profile" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors">
-                  <span className="mr-2 text-gray-600">
+                <Link to={user ? "/admin/profile" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                  <span className="mr-2 text-gray-600 dark:text-gray-400">
                     <svg
                       width="16"
                       height="16"
@@ -137,8 +177,8 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
                   </span>
                   Profil Saya
                 </Link>
-                <Link to={user ? "/admin/settings" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 mt-1 text-sm text-gray-800 hover:bg-gray-100 transition-colors">
-                  <span className="mr-2 text-gray-600">
+                <Link to={user ? "/admin/settings" : "/auth/sign-in"} className="flex items-center rounded-lg px-3 py-2 mt-1 text-sm text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                  <span className="mr-2 text-gray-600 dark:text-gray-400">
                     <svg
                       width="16"
                       height="16"
@@ -164,14 +204,14 @@ const Navbar = ({ onOpenSidenav, brandText: initialBrandText }) => {
                 </Link>
               </div>
 
-              <div className="h-px w-full bg-gray-200" />
+              <div className="h-px w-full bg-gray-200 dark:bg-slate-700" />
 
               {/* Sign Out */}
               <div className="p-3">
                 <button
                   onClick={handleLogout}
                   disabled={isLoading}
-                  className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <RiLogoutBoxRLine className="mr-2 h-[16px] w-[16px]" />
                   {isLoading ? 'Logging out...' : 'Keluar'}

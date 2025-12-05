@@ -18,6 +18,12 @@ export default function Admin(props) {
   const [currentRoute, setCurrentRoute] = React.useState("Main Dashboard");
   const { isError, user } = useSelector((state => state.auth));
   const [page, setPage] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
   const appName = process.env.REACT_APP_APP_NAME || 'PRIMA';
 
   const navigate = useNavigate();
@@ -69,6 +75,27 @@ export default function Admin(props) {
     getActiveRoute(routes);
   }, [location.pathname]);
 
+  // Listen to dark mode changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+
+    // Initial check
+    checkDarkMode();
+
+    // Create observer for dark mode changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'],
+      subtree: false
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const getActiveRoute = (routes) => {
     let activeRoute = "Main Dashboard";
     for (let i = 0; i < routes.length; i++) {
@@ -110,23 +137,23 @@ export default function Admin(props) {
   document.documentElement.dir = "ltr";
 
   return (
-    <div className="flex h-full w-full">
+    <div key={`admin-layout-${isDarkMode}`} className="flex h-full w-full bg-white dark:bg-slate-950 transition-colors duration-300">
       <Sidebar open={open} onClose={() => setOpen(false)} />
-      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
+      <div className="h-full w-full bg-white dark:bg-slate-950 transition-colors duration-300">
         <main
-          className={`mx-3 h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}
+          className="h-screen flex flex-col flex-1 transition-all xl:ml-[313px] bg-white dark:bg-slate-950"
         >
-          <div className="h-full relative">
+          <Navbar
+            onOpenSidenav={() => setOpen(true)}
+            logoText={appName}
+            brandText={currentRoute}
+            secondary={getActiveNavbar(routes)}
+            {...rest}
+          />
+          <div className="flex-1 flex flex-col overflow-y-auto bg-white dark:bg-slate-950 transition-colors duration-300">
             {institution.isLoading && <LoadingOverlay text="Memuat metrik institusi..." />}
-            <Navbar
-              onOpenSidenav={() => setOpen(true)}
-              logoText={appName}
-              brandText={currentRoute}
-              secondary={getActiveNavbar(routes)}
-              {...rest}
-            />
             <ErrorBoundary>
-              <div className="pt-5 mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+              <div className="flex-1 w-full">
                 <Routes>
                   {getRoutes(routes)}
                   <Route
@@ -136,9 +163,7 @@ export default function Admin(props) {
                 </Routes>
               </div>
             </ErrorBoundary>
-            <div className="p-3">
-              <Footer />
-            </div>
+            <Footer />
           </div>
         </main>
       </div>

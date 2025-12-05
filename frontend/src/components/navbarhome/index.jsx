@@ -256,10 +256,19 @@ const Navbar = ({ forceTransparent = false }) => {
                 {isDark ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
               </button>
 
+              {/* Login Button */}
+              <Link
+                to="/auth/sign-in"
+                className="ml-4 px-5 py-2.5 border-2 border-[#C5A059] dark:border-[#FFD700] text-[#0F172A] dark:text-[#FFD700] text-sm font-bold rounded-xl hover:bg-[#C5A059]/10 dark:hover:bg-[#FFD700]/10 transition-all duration-300 flex items-center"
+              >
+                <FiLogIn className="w-4 h-4 mr-2" />
+                Login
+              </Link>
+
               {/* Join Button */}
               <Link
                 to="/auth/forms"
-                className="ml-4 px-6 py-2.5 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center"
+                className="px-6 py-2.5 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center"
               >
                 <GiSwordsEmblem className="w-4 h-4 mr-2" />
                 Join Kingdom
@@ -330,10 +339,19 @@ const Navbar = ({ forceTransparent = false }) => {
               <Link
                 to="/auth/forms"
                 onClick={handleMobileMenuClose}
-                className="w-full py-3 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] font-bold rounded-xl shadow-lg flex items-center justify-center"
+                className="w-full py-3 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] font-bold rounded-xl shadow-lg flex items-center justify-center mb-3"
               >
                 <GiSwordsEmblem className="w-5 h-5 mr-2" />
                 Join Kingdom
+              </Link>
+
+              <Link
+                to="/auth/sign-in"
+                onClick={handleMobileMenuClose}
+                className="w-full py-3 border-2 border-[#C5A059] dark:border-[#FFD700] text-[#C5A059] dark:text-[#FFD700] font-bold rounded-xl flex items-center justify-center"
+              >
+                <FiLogIn className="w-5 h-5 mr-2" />
+                Login
               </Link>
             </div>
 

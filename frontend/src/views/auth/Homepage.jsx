@@ -30,7 +30,7 @@ import {
   FiChevronRight
 } from 'react-icons/fi';
 import Navbar from '../../components/navbarhome';
-import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+import SacredLogo from '../../assets/img/sacred-forces-logo.png';
 import Logo from '../../assets/img/auth/logo.png';
 const Homepage = () => {
   const [stats, setStats] = useState({
@@ -414,7 +414,7 @@ const Homepage = () => {
 
   // Quick Links
   const quickLinks = [
-    { icon: GiScrollUnfurled, title: "Join Kingdom", link: "/auth/forms", desc: "Apply now" },
+    { icon: GiScrollUnfurled, title: "Join Kingdom", link: "/auth/join-kingdom", desc: "Apply now" },
     { icon: GiShield, title: "Kingdom Laws", link: "/auth/laws", desc: "Read rules" },
     { icon: GiCrown, title: "About Us", link: "/auth/about", desc: "Our story" }
   ];
@@ -432,8 +432,8 @@ const Homepage = () => {
                style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '24px 24px' }}>
           </div>
 
-          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#FFD700]/10 dark:bg-blue-500/20 rounded-full blur-[100px] animate-pulse"></div>
-          <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-[#C5A059]/10 dark:bg-indigo-500/10 rounded-full blur-[120px]" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#FFD700]/10 dark:bg-blue-500/15 rounded-full opacity-40" style={{ filter: 'blur(40px)', transform: 'translateZ(0)', contain: 'layout style paint' }}></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#C5A059]/10 dark:bg-indigo-500/8 rounded-full opacity-35" style={{ filter: 'blur(40px)', transform: 'translateZ(0)', contain: 'layout style paint' }}></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
@@ -467,10 +467,10 @@ const Homepage = () => {
               </div>
 
               {/* 3. Vivid Gradient Orbs */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-[#FFD700]/10 to-transparent rounded-full blur-[80px] -z-30"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-r from-[#FFD700]/10 to-transparent rounded-full opacity-50 -z-30" style={{ filter: 'blur(40px)', transform: 'translateZ(0)' }}></div>
 
               {/* Status Badge */}
-              <motion.div variants={fadeInUp} className="inline-flex items-center px-4 py-2 rounded-full bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md mb-8 shadow-sm">
+              <motion.div variants={fadeInUp} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 dark:bg-[#1E293B]/90 border border-slate-200 dark:border-white/10 mb-8 shadow-sm">
                 <span className="relative flex h-3 w-3 mr-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFD700] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FFD700]"></span>
@@ -513,7 +513,7 @@ const Homepage = () => {
 
                 <Link 
                   to="/auth/about"
-                  className="group px-8 py-4 bg-white/50 dark:bg-white/5 text-slate-700 dark:text-white font-bold rounded-xl border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 backdrop-blur-sm flex items-center justify-center"
+                  className="group px-8 py-4 bg-white/70 dark:bg-[#1E293B]/90 text-slate-700 dark:text-white font-bold rounded-xl border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 flex items-center justify-center"
                 >
                   <span className="mr-3">Explore Kingdom</span>
                   <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -604,7 +604,7 @@ const Homepage = () => {
                     <div className="absolute bottom-0 left-0 right-0 h-24 flex items-center justify-between px-8 z-30 bg-gradient-to-t from-white/50 dark:from-[#0F172A]/50 to-transparent pb-6">
                       <button 
                         onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                        className="p-2 rounded-full bg-white/20 hover:bg-[#FFD700] dark:bg-white/5 dark:hover:bg-[#FFD700] backdrop-blur-md border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
+                        className="p-2 rounded-full bg-white/70 hover:bg-[#FFD700] dark:bg-[#1E293B]/90 dark:hover:bg-[#FFD700] border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
                       >
                         <FiChevronLeft className="w-5 h-5" />
                       </button>
@@ -626,7 +626,7 @@ const Homepage = () => {
 
                       <button 
                         onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                        className="p-2 rounded-full bg-white/20 hover:bg-[#FFD700] dark:bg-white/5 dark:hover:bg-[#FFD700] backdrop-blur-md border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
+                        className="p-2 rounded-full bg-white/70 hover:bg-[#FFD700] dark:bg-[#1E293B]/90 dark:hover:bg-[#FFD700] border border-white/20 text-slate-600 dark:text-white hover:text-[#0F172A] transition-all duration-300 hover:scale-110 group/btn"
                       >
                         <FiChevronRight className="w-5 h-5" />
                       </button>
@@ -666,7 +666,8 @@ const Homepage = () => {
                             scale: { duration: 0.3, delay: item.delay },
                             default: { duration: 8, repeat: Infinity, ease: "easeInOut", delay: item.delay }
                           }}
-                          className={`absolute ${posClasses[item.pos]} p-4 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-30 flex items-center gap-4 min-w-[220px]`}
+                          className={`absolute ${posClasses[item.pos]} p-4 bg-white/85 dark:bg-[#1E293B]/90 rounded-2xl border border-white/50 dark:border-white/10 shadow-xl z-30 flex items-center gap-4 min-w-[220px]`}
+                          style={{ transform: 'translateZ(0)', contain: 'layout style paint' }}
                         >
                           <motion.div 
                             animate={animVariants[item.pos]}
@@ -687,7 +688,7 @@ const Homepage = () => {
                               <p className="text-[10px] text-slate-500 dark:text-white font-bold uppercase tracking-wider mb-0.5">{item.role}</p>
                               <p className="text-base font-bold text-slate-800 dark:text-white leading-tight">{item.name}</p>
                               <div className="flex items-center mt-1">
-                                <div className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></div>
+                                <div className="w-2 h-2 rounded-full bg-green-500 mr-1.5"></div>
                                 <span className="text-[10px] font-medium text-green-600 dark:text-green-400">{item.status}</span>
                               </div>
                             </div>
@@ -958,7 +959,8 @@ const Homepage = () => {
               >
                 <Link 
                   to={feature.link}
-                  className="group relative block h-full bg-white/80 dark:bg-[#1E293B]/60 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-slate-200 dark:border-[#FFD700]/20 hover:border-[#FFD700] dark:hover:border-[#FFD700] transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+                  className="group relative block h-full bg-white/85 dark:bg-[#1E293B]/90 rounded-2xl p-8 shadow-xl border border-slate-200 dark:border-[#FFD700]/20 hover:border-[#FFD700] dark:hover:border-[#FFD700] transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+                  style={{ transform: 'translateZ(0)', contain: 'layout style paint' }}
                 >
                   {/* Card Pattern Overlay */}
                   <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.1] group-hover:opacity-[0.1] dark:group-hover:opacity-[0.15] transition-opacity duration-500 pointer-events-none" 
@@ -994,8 +996,39 @@ const Homepage = () => {
       </section>
 
       {/* Quick Links Section */}
-      <section className="py-16 px-6 bg-gradient-to-r from-slate-100 via-white to-slate-100 dark:from-[#1E293B] dark:via-[#0F172A] dark:to-[#1E293B] border-y-2 border-slate-200 dark:border-[#C5A059]/30">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative py-18 px-6 overflow-hidden">
+        {/* Background Accents */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/10 via-transparent to-[#C5A059]/10 dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A]"></div>
+          <div className="absolute -top-24 -left-32 w-[420px] h-[420px] bg-[#FFD700]/15 dark:bg-[#FFD700]/8 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-0 right-[-20%] w-[520px] h-[520px] bg-[#C5A059]/12 dark:bg-[#C5A059]/10 rounded-full blur-[140px]"></div>
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{ width: '800px', height: '800px', borderRadius: '50%', border: '1.5px solid rgba(255,215,0,0.12)', opacity: 0.4 }}
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
+          />
+          <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.07]"
+               style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '18px 18px' }}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C5A059] dark:text-[#FFD700]">Navigate the realm</p>
+              <h3 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mt-2" style={{ fontFamily: 'Cinzel, serif' }}>
+                Quick Access
+              </h3>
+              <p className="text-slate-600 dark:text-blue-100/70 mt-3 max-w-xl">
+                Jump straight into the core pillars of Sacred3946 — join our ranks, learn our laws, and explore our story.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-blue-100/70">
+              <div className="w-3 h-3 rounded-full bg-[#FFD700] shadow-[0_0_12px_rgba(255,215,0,0.6)]"></div>
+              <span>Trusted pathways for new and returning members</span>
+            </div>
+          </div>
+
           <motion.div 
             className="grid md:grid-cols-3 gap-6"
             initial="hidden"
@@ -1007,18 +1040,37 @@ const Homepage = () => {
               <motion.div key={index} variants={scaleIn}>
                 <Link 
                   to={link.link}
-                  className="group flex items-center bg-white dark:bg-[#1E293B] rounded-xl p-6 shadow-lg border-2 border-slate-200 dark:border-[#C5A059]/30 hover:border-[#C5A059] dark:hover:border-[#FFD700]/50 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:hover:shadow-[0_0_20px_rgba(197,160,89,0.2)]"
+                  className="group relative flex items-start gap-4 bg-white/70 dark:bg-[#0F172A]/60 backdrop-blur-3xl rounded-2xl p-6 shadow-[0_12px_30px_rgba(0,0,0,0.08)] border border-white/50 dark:border-[#FFD700]/15 hover:border-[#FFD700] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(255,215,0,0.2),0_0_40px_rgba(197,160,89,0.15)] overflow-hidden"
                 >
-                  <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#C5A059] rounded-lg flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform">
-                    <link.icon className="w-7 h-7 text-[#0F172A]" />
+                  {/* Accent left glow */}
+                  <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#FFD700] via-[#C5A059] to-[#FFD700] opacity-40 group-hover:opacity-100 group-hover:w-1.5 transition-all duration-500 shadow-[0_0_15px_rgba(255,215,0,0.6)] z-10"></div>
+                  
+                  {/* Hover sheen */}
+                  <div className="pointer-events-none absolute -inset-20 bg-gradient-to-r from-transparent via-white/12 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"></div>
+                  
+                  {/* Top accent glow */}
+                  <div className="pointer-events-none absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+                  
+                  {/* Rotating gradient overlay */}
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 bg-gradient-to-br from-[#FFD700]/8 via-[#C5A059]/4 to-[#FFD700]/8 z-0"></div>
+
+                  <div className="relative flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[#FFD700] via-[#C5A059] to-[#FFD700] text-[#0F172A] shadow-lg overflow-hidden z-20">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/20"></div>
+                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[inset_0_0_15px_rgba(255,255,255,0.3)]"></div>
+                    <link.icon className="relative w-7 h-7" />
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-bold text-slate-800 dark:text-[#E2E8F0] mb-1 group-hover:text-[#C5A059] dark:group-hover:text-[#FFD700] transition-colors tracking-wide">
+                  <div className="flex-1 z-20">
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1 tracking-wide" style={{ fontFamily: 'Cinzel, serif' }}>
                       {link.title}
                     </h4>
-                    <p className="text-sm text-slate-600 dark:text-[#E2E8F0]/70">{link.desc}</p>
+                    <p className="text-sm text-slate-600 dark:text-blue-100/70 leading-relaxed">
+                      {link.desc}
+                    </p>
+                    <div className="mt-3 inline-flex items-center text-sm font-semibold text-[#C5A059] dark:text-[#FFD700] gap-2 group-hover:translate-x-2 transition-all duration-300">
+                      <span>Go now</span>
+                      <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    </div>
                   </div>
-                  <FiArrowRight className="w-5 h-5 text-[#C5A059] dark:text-[#FFD700] group-hover:translate-x-2 transition-transform" />
                 </Link>
               </motion.div>
             ))}

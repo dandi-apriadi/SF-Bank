@@ -9,6 +9,7 @@ const FULL_WIDTH_PAGES = [
   'Events',         // Kingdom Events
   'Giveaway',       // Giveaways
   'Forms',          // Registration Forms
+  'Join Kingdom',   // Join CTA Page
   'Donation',       // Donation System
   'About',          // About Kingdom
   'YouTube',        // Video Gallery
@@ -53,13 +54,14 @@ export default function Auth() {
       {/* Sacred3946 Navbar */}
       <Navbar />
       
-      {/* Main Content Area with Modern Background */}
+      {/* Main Content Area with Optimized Background */}
       <div className="relative min-h-screen w-full">
-        {/* Neon Blue Glow Effects - Dark Mode Only */}
+        {/* Optimized Static Glow Effects - Dark Mode Only */}
         <div className="fixed inset-0 pointer-events-none dark:block hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-[32rem] h-[32rem] bg-cyan-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/15 rounded-full opacity-40"
+               style={{ filter: 'blur(60px)', transform: 'translateZ(0)', contain: 'layout style paint' }}></div>
+          <div className="absolute bottom-0 right-1/4 w-[28rem] h-[28rem] bg-cyan-500/12 rounded-full opacity-35"
+               style={{ filter: 'blur(60px)', transform: 'translateZ(0)', contain: 'layout style paint' }}></div>
         </div>
 
         {/* Modern Striped Pattern Overlay */}
