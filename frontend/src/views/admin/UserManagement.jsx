@@ -16,6 +16,7 @@ function UserManagement() {
   }, []);
 
   // Sample user data with admin role
+  const allianceNames = ["Sacred Vanguard", "Sacred Legion", "Sacred Guardians"];
   const [users, setUsers] = useState(() => {
     const arr = [];
     const roles = ["R1", "R2", "R3", "R4", "R5", "Admin"];
@@ -29,6 +30,7 @@ function UserManagement() {
         name: `User ${i}`,
         email: `user${i}@kingdom.com`,
         role: roles[i % roles.length],
+        alliance: allianceNames[(i - 1) % allianceNames.length],
         status: i % 7 === 0 ? "Inactive" : "Active",
         joined_date: joined.toISOString().slice(0, 10),
         last_login: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -487,6 +489,26 @@ function UserManagement() {
                   User Information
                 </h3>
                 
+                {/* User ID (read-only) */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    User ID
+                  </label>
+                  <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 font-mono">
+                    {selectedUser?.user_id}
+                  </div>
+                </div>
+
+                {/* Alliance (read-only) */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Alliance
+                  </label>
+                  <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400">
+                    {selectedUser?.alliance || "-"}
+                  </div>
+                </div>
+
                 {/* Name */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

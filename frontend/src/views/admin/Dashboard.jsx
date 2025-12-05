@@ -10,6 +10,8 @@ export default function Dashboard() {
     return false;
   });
 
+  const allianceNames = ["Sacred Vanguard", "Sacred Legion", "Sacred Guardians"];
+
   useEffect(() => {
     AOS.init({ once: true, duration: 600 });
   }, []);
@@ -59,10 +61,44 @@ export default function Dashboard() {
         stone: 2000000 + i * 80000,
         gold: 500000 + i * 50000,
         weeksPaid: Math.min(100, (i * 3) % 101),
+        alliance: allianceNames[(i - 1) % allianceNames.length],
       });
     }
     return arr;
   });
+
+  const [alliances] = useState(() => [
+    {
+      id: 1,
+      name: "Sacred Vanguard",
+      tag: "SAC-1",
+      membersCount: 42,
+      food: 320000000,
+      wood: 260000000,
+      stone: 140000000,
+      gold: 72000000,
+    },
+    {
+      id: 2,
+      name: "Sacred Legion",
+      tag: "SAC-2",
+      membersCount: 38,
+      food: 280000000,
+      wood: 220000000,
+      stone: 110000000,
+      gold: 61000000,
+    },
+    {
+      id: 3,
+      name: "Sacred Guardians",
+      tag: "SAC-3",
+      membersCount: 35,
+      food: 240000000,
+      wood: 210000000,
+      stone: 100000000,
+      gold: 55000000,
+    },
+  ]);
 
   // pagination for members table
   const [page, setPage] = useState(1);
@@ -82,6 +118,21 @@ export default function Dashboard() {
     },
     { members: 0, food: 0, wood: 0, stone: 0, gold: 0, weeks: 0 }
   );
+
+  const allianceTotals = alliances.reduce(
+    (acc, a) => {
+      acc.food += a.food || 0;
+      acc.wood += a.wood || 0;
+      acc.stone += a.stone || 0;
+      acc.gold += a.gold || 0;
+      acc.members += a.membersCount || 0;
+      return acc;
+    },
+    { food: 0, wood: 0, stone: 0, gold: 0, members: 0 }
+  );
+  const allianceTotalResource = allianceTotals.food + allianceTotals.wood + allianceTotals.stone + allianceTotals.gold;
+  const avgAllianceMembers = alliances.length ? Math.round(allianceTotals.members / alliances.length) : 0;
+  const avgAllianceResource = alliances.length ? Math.round(allianceTotalResource / alliances.length) : 0;
 
   // Format numbers using Indonesian thousands separator.
   // Example: 10000000 -> "10.000.000"
@@ -136,7 +187,7 @@ export default function Dashboard() {
 
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {/* Card: Members */}
-        <div data-aos="fade-up" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-lg font-semibold">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM8 11c1.657 0 3-1.343 3-3S9.657 5 8 5 5 6.343 5 8s1.343 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05C16.9 13.68 18 14.78 18 16.5V19h6v-2.5C24 14.17 19.33 13 17 13z" />
@@ -151,7 +202,7 @@ export default function Dashboard() {
         </div>
 
         {/* resource cards */}
-        <div data-aos="fade-up" data-aos-delay="40" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" data-aos-delay="40" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="w-12 h-12 rounded-full bg-green-400 dark:bg-green-900/40 flex items-center justify-center text-green-700 dark:text-green-300 font-semibold">F</div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Food</div>
@@ -160,7 +211,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div data-aos="fade-up" data-aos-delay="80" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" data-aos-delay="80" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center text-yellow-700 dark:text-yellow-300 font-semibold">W</div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Wood</div>
@@ -169,7 +220,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div data-aos="fade-up" data-aos-delay="120" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" data-aos-delay="120" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="w-12 h-12 rounded-full bg-green-500 dark:bg-green-900/40 flex items-center justify-center text-slate-700 dark:text-green-300 font-semibold">S</div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Stone</div>
@@ -178,7 +229,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div data-aos="fade-up" data-aos-delay="160" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" data-aos-delay="160" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-700 dark:text-amber-300 font-semibold">G</div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Gold</div>
@@ -188,7 +239,7 @@ export default function Dashboard() {
         </div>
 
         {/* Weeks card with progress */}
-        <div data-aos="fade-up" data-aos-delay="200" className="bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" data-aos-delay="200" className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs text-gray-400 dark:text-gray-500">Weeks (avg per member)</div>
@@ -203,8 +254,26 @@ export default function Dashboard() {
         </div>
       </section>
 
+      <section className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Alliances</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{alliances.length}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Active alliance groups</div>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Total Alliance RSS</div>
+          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">{formatShort(allianceTotalResource)}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Food + Wood + Stone + Gold</div>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Avg Members / Alliance</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{avgAllianceMembers}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Resource avg per alliance: {formatShort(avgAllianceResource)}</div>
+        </div>
+      </section>
+
       <section className="mt-6">
-        <div data-aos="fade-up" className="bg-white dark:bg-slate-800 rounded-2xl shadow dark:shadow-slate-900/60 p-4 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div data-aos="fade-up" className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Member Contributions</h2>
             <div className="text-sm text-gray-500 dark:text-gray-400">Showing {members.length} members</div>
@@ -229,11 +298,9 @@ export default function Dashboard() {
                   {pagedMembers.map((m, idx) => (
                     <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
                       <td className="px-2 py-3 text-gray-700 dark:text-gray-400 w-12 text-center">{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                      <td className="px-4 py-3 flex items-center">
-                        <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center mr-3 font-semibold">
-                          {getInitials(m.name)}
-                        </div>
+                      <td className="px-4 py-3">
                         <div className="font-medium text-gray-800 dark:text-gray-200">{m.name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{m.alliance}</div>
                       </td>
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-400">{formatShort(m.food)}</td>
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-400">{formatShort(m.wood)}</td>
@@ -254,9 +321,9 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="mr-3 text-xs text-gray-500 dark:text-gray-400">No. {(page - 1) * PAGE_SIZE + idx + 1}</div>
-                    <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mr-3 font-semibold">{getInitials(m.name)}</div>
                     <div>
                       <div className="font-medium text-gray-800 dark:text-gray-200">{m.name}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{m.alliance}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Weeks: {(m.weeksPaid || 0)}/{TOTAL_WEEKS}</div>
                     </div>
                   </div>

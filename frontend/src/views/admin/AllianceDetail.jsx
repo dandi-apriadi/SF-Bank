@@ -48,7 +48,7 @@ export default function AllianceDetail() {
   }, []);
 
   // Dummy alliance data (in real app, fetch from API using id)
-  const [alliance] = useState(() => {
+  const [alliance, setAlliance] = useState(() => {
     const tags = ["SF-A", "SF-B", "SF-C", "SF-D", "SF-E"];
     const food = Math.floor(Math.random() * 50000000) + 10000000;
     const wood = Math.floor(Math.random() * 40000000) + 8000000;
@@ -60,6 +60,8 @@ export default function AllianceDetail() {
       name: `Alliance ${id}`,
       tag: tags[parseInt(id) % tags.length],
       leader: `Leader ${id}`,
+      bank_id: `BNK-${1000 + parseInt(id)}`,
+      bank_name: `Bank Alliance ${id}`,
       members_count: Math.floor(Math.random() * 50) + 10,
       food: food,
       wood: wood,
@@ -314,6 +316,122 @@ export default function AllianceDetail() {
     closeCalculator();
   };
 
+  // Add member to alliance state
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState(() => {
+    // Dummy users without alliance
+    const arr = [];
+    for (let i = 1; i <= 15; i++) {
+      arr.push({
+        id: i + 100,
+        user_id: `${2000 + i}`,
+        name: `Available User ${i}`,
+        email: `availableuser${i}@kingdom.com`,
+        alliance: null,
+      });
+    }
+    return arr;
+  });
+  const [selectedUsersToAdd, setSelectedUsersToAdd] = useState([]);
+  const [addMemberSearch, setAddMemberSearch] = useState("");
+
+  const openAddMemberModal = () => {
+    setShowAddMemberModal(true);
+    setSelectedUsersToAdd([]);
+    setAddMemberSearch("");
+  };
+
+  const closeAddMemberModal = () => {
+    setShowAddMemberModal(false);
+    setSelectedUsersToAdd([]);
+    setAddMemberSearch("");
+  };
+
+  const toggleUserSelection = (userId) => {
+    setSelectedUsersToAdd((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
+
+  const addSelectedMembers = () => {
+    if (selectedUsersToAdd.length === 0) {
+      alert("Please select at least one user");
+      return;
+    }
+    // In real app, call API to add members to alliance
+    console.log("Adding users to alliance:", selectedUsersToAdd);
+    alert(`Successfully added ${selectedUsersToAdd.length} member(s) to ${alliance.name}`);
+    // Remove added users from available list
+    setAvailableUsers((prev) => prev.filter((u) => !selectedUsersToAdd.includes(u.id)));
+    closeAddMemberModal();
+  };
+
+  const filteredAvailableUsers = availableUsers.filter(
+    (user) =>
+      user.name.toLowerCase().includes(addMemberSearch.toLowerCase()) ||
+      user.user_id.toLowerCase().includes(addMemberSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(addMemberSearch.toLowerCase())
+  );
+
+  // Edit alliance state
+  const [showEditAllianceModal, setShowEditAllianceModal] = useState(false);
+  const [editAllianceForm, setEditAllianceForm] = useState({
+    name: "",
+    leader: "",
+    bank_id: "",
+    bank_name: "",
+    description: "",
+  });
+
+  const openEditAllianceModal = () => {
+    setEditAllianceForm({
+      name: alliance.name,
+      leader: alliance.leader,
+      bank_id: alliance.bank_id,
+      bank_name: alliance.bank_name,
+      description: alliance.description,
+    });
+    setShowEditAllianceModal(true);
+  };
+
+  const closeEditAllianceModal = () => {
+    setShowEditAllianceModal(false);
+    setEditAllianceForm({
+      name: "",
+      leader: "",
+      bank_id: "",
+      bank_name: "",
+      description: "",
+    });
+  };
+
+  const handleEditAllianceChange = (e) => {
+    const { name, value } = e.target;
+    setEditAllianceForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const submitEditAlliance = (e) => {
+    e.preventDefault();
+    if (!editAllianceForm.name.trim() || !editAllianceForm.leader.trim()) {
+      alert("Alliance name and leader are required");
+      return;
+    }
+    // Update alliance
+    setAlliance((prev) => ({
+      ...prev,
+      name: editAllianceForm.name.trim(),
+      leader: editAllianceForm.leader.trim(),
+      bank_id: editAllianceForm.bank_id.trim(),
+      bank_name: editAllianceForm.bank_name.trim(),
+      description: editAllianceForm.description.trim(),
+    }));
+    alert(`Alliance details updated successfully`);
+    closeEditAllianceModal();
+  };
+
   return (
     <div key={`alliance-detail-${isDarkMode}`} className="w-full h-full flex flex-col">
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 text-gray-800 dark:text-gray-100">
@@ -335,6 +453,26 @@ export default function AllianceDetail() {
                 {alliance.name}
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Alliance details, resources, and member contributions</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={openEditAllianceModal}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg shadow-md transition-colors flex items-center gap-2 text-sm font-medium"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                Edit Alliance
+              </button>
+              <button
+                onClick={openAddMemberModal}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-colors flex items-center gap-2 text-sm font-medium"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                </svg>
+                Add Member
+              </button>
             </div>
           </div>
         </div>
@@ -361,6 +499,18 @@ export default function AllianceDetail() {
                 <span className="text-gray-600 dark:text-gray-400">Weeks:</span>
                 <span className="font-semibold text-purple-600 dark:text-purple-400">{alliance.weeks_donated}/100</span>
               </div>
+              {alliance.bank_id && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Bank ID:</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{alliance.bank_id}</span>
+                </div>
+              )}
+              {alliance.bank_name && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Bank Name:</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{alliance.bank_name}</span>
+                </div>
+              )}
               {alliance.description && (
                 <div className="pt-2 mt-2 border-t border-gray-200 dark:border-slate-700">
                   <p className="text-xs text-gray-600 dark:text-gray-400">{alliance.description}</p>
@@ -971,6 +1121,286 @@ export default function AllianceDetail() {
                   Apply ({calculatorEntries.length})
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Member Modal */}
+        {showAddMemberModal && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+              onClick={closeAddMemberModal}
+            />
+
+            {/* Modal */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
+                {/* Modal Header */}
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold">Add Members to Alliance</h2>
+                      <p className="text-indigo-100 text-sm mt-1">
+                        Select users without alliance to join {alliance.name}
+                      </p>
+                    </div>
+                    <button
+                      onClick={closeAddMemberModal}
+                      className="p-2 rounded-lg hover:bg-white/20 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+                  {/* Search Bar */}
+                  <div className="mb-4">
+                    <div className="relative">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                      </svg>
+                      <input
+                        type="text"
+                        placeholder="Search users by name, ID, or email..."
+                        value={addMemberSearch}
+                        onChange={(e) => setAddMemberSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Selected Count */}
+                  {selectedUsersToAdd.length > 0 && (
+                    <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
+                        {selectedUsersToAdd.length} user(s) selected
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Available Users List */}
+                  <div className="space-y-2">
+                    {filteredAvailableUsers.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p className="font-medium">No available users found</p>
+                        <p className="text-sm mt-1">All users are already in an alliance</p>
+                      </div>
+                    ) : (
+                      filteredAvailableUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          onClick={() => toggleUserSelection(user.id)}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            selectedUsersToAdd.includes(user.id)
+                              ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:border-indigo-500"
+                              : "border-gray-200 dark:border-slate-600 hover:border-indigo-300 dark:hover:border-indigo-700 bg-white dark:bg-slate-700"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900/40 dark:to-indigo-800/40 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm">
+                                {user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900 dark:text-white">{user.name}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{user.email}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-500">ID: {user.user_id}</div>
+                              </div>
+                            </div>
+                            <div>
+                              {selectedUsersToAdd.includes(user.id) ? (
+                                <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <div className="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-slate-600"></div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-6 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={closeAddMemberModal}
+                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={addSelectedMembers}
+                      disabled={selectedUsersToAdd.length === 0}
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                    >
+                      Add {selectedUsersToAdd.length > 0 ? `(${selectedUsersToAdd.length})` : "Members"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Edit Alliance Modal */}
+        {showEditAllianceModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden mx-4"
+              data-aos="zoom-in"
+            >
+              <form onSubmit={submitEditAlliance}>
+                {/* Modal Header */}
+                <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                      Edit Alliance Details
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={closeEditAllianceModal}
+                      className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+                  <div className="space-y-5">
+                    <div>
+                      <label htmlFor="edit-alliance-name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Alliance Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-alliance-name"
+                        name="name"
+                        value={editAllianceForm.name}
+                        onChange={handleEditAllianceChange}
+                        required
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+                        placeholder="Enter alliance name"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-alliance-leader" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Alliance Leader <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-alliance-leader"
+                        name="leader"
+                        value={editAllianceForm.leader}
+                        onChange={handleEditAllianceChange}
+                        required
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+                        placeholder="Enter leader name"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div>
+                        <label htmlFor="edit-bank-id" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          Bank ID
+                        </label>
+                        <input
+                          type="text"
+                          id="edit-bank-id"
+                          name="bank_id"
+                          value={editAllianceForm.bank_id}
+                          onChange={handleEditAllianceChange}
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+                          placeholder="e.g., BNK-1001"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="edit-bank-name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          Bank Name
+                        </label>
+                        <input
+                          type="text"
+                          id="edit-bank-name"
+                          name="bank_name"
+                          value={editAllianceForm.bank_name}
+                          onChange={handleEditAllianceChange}
+                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+                          placeholder="e.g., Bank Alliance 1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-alliance-description" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Description
+                      </label>
+                      <textarea
+                        id="edit-alliance-description"
+                        name="description"
+                        value={editAllianceForm.description}
+                        onChange={handleEditAllianceChange}
+                        rows={4}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all resize-none"
+                        placeholder="Enter alliance description"
+                      />
+                    </div>
+
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <div className="text-sm text-blue-800 dark:text-blue-300">
+                          <p className="font-semibold mb-1">Note:</p>
+                          <p>Alliance tag and resource values are managed separately and cannot be edited here.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-6 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700">
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={closeEditAllianceModal}
+                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         )}

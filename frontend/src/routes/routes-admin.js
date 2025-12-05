@@ -6,18 +6,15 @@ import {
   FiUpload,
   FiBarChart2,
   FiFileText,
-  FiSettings,
 } from "react-icons/fi";
 import { GiCastle } from "react-icons/gi";
 
 // Admin views (SacredBank)
 import Dashboard from "views/admin/Dashboard";
-import Deposits from "views/admin/Deposits";
 import Reports from "views/admin/Reports";
 import UserManagement from "views/admin/UserManagement";
 import Alliance from "views/admin/Alliance";
 import AllianceDetail from "views/admin/AllianceDetail";
-import Settings from "views/admin/Settings";
 
 // Routes aligned with SacredBank plan
 const routes = [
@@ -29,14 +26,6 @@ const routes = [
     component: <Dashboard />,
   },
 
-
-  {
-    name: "Deposits",
-    layout: "/admin",
-    path: "deposits",
-    icon: <FiDollarSign className="h-6 w-6" />,
-    component: <Deposits />,
-  },
 
   {
     name: "Reports",
@@ -68,14 +57,6 @@ const routes = [
     path: "alliance/:id",
     component: <AllianceDetail />,
     invisible: true, // Don't show in sidebar
-  },
-
-  {
-    name: "Settings",
-    layout: "/admin",
-    path: "settings",
-    icon: <FiSettings className="h-6 w-6" />,
-    component: <Settings />,
   },
 ];
 
