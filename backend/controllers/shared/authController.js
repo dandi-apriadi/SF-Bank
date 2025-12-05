@@ -8,8 +8,8 @@ export const login = async (req, res) => {
     console.log("Login attempt for email:", req.body.email);
 
     try {
-        // Dynamic import of User model
-        const { User } = await import("../../models/userModel.js");
+        // Dynamic import of User model from SF BANK models
+        const { User } = await import("../../models/index.js");
         
         if (!req.body.email) {
             console.error("Login error: Email is missing in request");
@@ -73,8 +73,8 @@ export const login = async (req, res) => {
             // Session debug and save
             console.log("Session before:", req.session ? "Exists" : "Missing");
             
-            // Ensure session is saved properly
-            req.session.user_id = user.user_id;
+            // Ensure session is saved properly (use id as primary key)
+            req.session.user_id = user.id;
             
             // Force session save for production reliability
             await new Promise((resolve, reject) => {
@@ -127,13 +127,13 @@ export const login = async (req, res) => {
 // Register (simple user creation)
 export const register = async (req, res) => {
     try {
-        const { fullname, email, password, role = 'staff', phone } = req.body || {};
-        if (!fullname || !email || !password) {
-            return res.status(400).json({ msg: "fullname, email, dan password wajib diisi" });
+        const { name, email, password, role = 'R5', user_id, alliance_id } = req.body || {};
+        if (!name || !email || !password) {
+            return res.status(400).json({ msg: "name, email, dan password wajib diisi" });
         }
 
-        // Dynamic import
-        const { User } = await import("../../models/userModel.js");
+        // Dynamic import from SF BANK models
+        const { User } = await import("../../models/index.js");
         const existing = await User.findOne({ where: { email } });
         if (existing) {
             return res.status(409).json({ msg: "Email sudah terdaftar" });
@@ -141,15 +141,18 @@ export const register = async (req, res) => {
 
         // Create user (password hashed by model hook)
         const newUser = await User.create({
-            fullname,
+            user_id: user_id || `USR${Date.now()}`,
+            name,
             email,
             password,
             role,
-            phone
+            alliance_id,
+            status: 'Active',
+            joined_date: new Date()
         });
 
         // Start session directly after registration
-        req.session.user_id = newUser.user_id;
+        req.session.user_id = newUser.id;
         await new Promise((resolve, reject) => {
             req.session.save(err => err ? reject(err) : resolve());
         });
@@ -175,8 +178,8 @@ export const Me = async (req, res) => {
             nodeEnv: process.env.NODE_ENV
         });
         
-        // Dynamic import of User model
-        const { User } = await import("../../models/userModel.js");
+        // Dynamic import of User model from SF BANK models
+        const { User } = await import("../../models/index.js");
         
         if (!req.session || !req.session.user_id) {
             console.log("Session validation failed:", {
@@ -194,17 +197,19 @@ export const Me = async (req, res) => {
         }
         const user = await User.findOne({
             attributes: [
+                'id',
                 'user_id',
-                'fullname',
+                'name',
                 'email',
                 'role',
-                'phone',
-                'profile_picture',
+                'alliance_id',
+                'status',
+                'joined_date',
                 'created_at',
                 'updated_at'
             ],
             where: {
-                user_id: req.session.user_id
+                id: req.session.user_id
             }
         });
 

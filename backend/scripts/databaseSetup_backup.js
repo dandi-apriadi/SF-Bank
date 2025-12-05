@@ -26,64 +26,37 @@ const setupDatabase = async () => {
         } = await import('../models/index.js');
         console.log('✅ Models loaded successfully.\n');
 
-        // Check if old users table exists and needs migration
-        const qi = db.getQueryInterface();
-        const tables = await qi.showAllTables();
-        
-        if (tables.includes('users')) {
-            console.log('⚠️  Old users table detected. Checking structure...');
-            try {
-                const usersDesc = await qi.describeTable('users');
-                
-                // Check if it's old structure (no alliance_id)
-                if (!usersDesc.alliance_id) {
-                    console.log('⚠️  Old users table structure detected!');
-                    console.log('   Options:');
-                    console.log('   1. Backup and drop old users table');
-                    console.log('   2. Run: node scripts/migrateUsersTable.js');
-                    console.log('   3. Manually drop: DROP TABLE users;');
-                    console.log('\n   For now, renaming old table to users_backup...\n');
-                    
-                    // Rename old table
-                    await db.query('RENAME TABLE users TO users_backup');
-                    console.log('✅ Old users table backed up to users_backup\n');
-                }
-            } catch (err) {
-                console.warn('⚠️  Could not check users table structure:', err.message);
-            }
-        }
-
-        // Create tables in dependency order with alter: true to update existing tables
+        // Create tables in dependency order
         console.log('🏗️  Creating tables in dependency order...\n');
 
         // Step 1: Create alliances table (no dependencies)
         console.log('1️⃣  Creating alliances table...');
-        await Alliance.sync({ alter: true });
+        await Alliance.sync({ force: false });
         console.log('   ✅ alliances table ready\n');
         
         // Step 2: Create alliance_resources table (depends on alliances)
         console.log('2️⃣  Creating alliance_resources table...');
-        await AllianceResource.sync({ alter: true });
+        await AllianceResource.sync({ force: false });
         console.log('   ✅ alliance_resources table ready\n');
         
         // Step 3: Create alliance_bank table (depends on alliances)
         console.log('3️⃣  Creating alliance_bank table...');
-        await AllianceBank.sync({ alter: true });
+        await AllianceBank.sync({ force: false });
         console.log('   ✅ alliance_bank table ready\n');
         
         // Step 4: Create users table (depends on alliances)
         console.log('4️⃣  Creating users table...');
-        await User.sync({ alter: true });
+        await User.sync({ force: false });
         console.log('   ✅ users table ready\n');
         
         // Step 5: Create member_contributions table (depends on users and alliances)
         console.log('5️⃣  Creating member_contributions table...');
-        await MemberContribution.sync({ alter: true });
+        await MemberContribution.sync({ force: false });
         console.log('   ✅ member_contributions table ready\n');
         
         // Step 6: Create audit_logs table (depends on users)
         console.log('6️⃣  Creating audit_logs table...');
-        await AuditLog.sync({ alter: true });
+        await AuditLog.sync({ force: false });
         console.log('   ✅ audit_logs table ready\n');
         
         console.log('✨ All SF BANK tables created successfully!');
@@ -94,11 +67,6 @@ const setupDatabase = async () => {
         console.log('   - users');
         console.log('   - member_contributions');
         console.log('   - audit_logs');
-        
-        if (tables.includes('users_backup')) {
-            console.log('\n⚠️  Note: Old users table backed up as users_backup');
-            console.log('   Review and delete when migration is confirmed.');
-        }
         
         return true;
         
