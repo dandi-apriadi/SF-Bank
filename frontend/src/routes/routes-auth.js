@@ -9,6 +9,8 @@ import Forms from "views/auth/Forms";
 import JoinKingdom from "views/auth/JoinKingdom";
 import Giveaway from "views/auth/Giveaway";
 import KvK from "views/auth/KvK";
+import Bank from "views/auth/Bank";
+import Donation from "views/auth/Donation";
 // Sacred3946 Icon Imports
 import {
     MdLock,
@@ -55,7 +57,18 @@ const routes = [
         description: "Kingdom vs Kingdom battles",
     },
 
-    // 3. Event (Kalender event, rules, registration)
+    // 3. Bank (Kingdom treasury and donations)
+    {
+        name: "Bank",
+        layout: "/auth",
+        path: "bank",
+        icon: <GiTwoCoins className="h-6 w-6" />,
+        component: <Bank />,
+        showInNavbar: true,
+        description: "Kingdom treasury and donation management",
+    },
+
+    // 4. Event (Kalender event, rules, registration)
     {
         name: "Events",
         layout: "/auth",
@@ -66,7 +79,7 @@ const routes = [
         description: "Kingdom events and tournaments",
     },
 
-    // 4. Giveaway (Active giveaways, participation forms)
+    // 5. Giveaway (Active giveaways, participation forms)
     {
         name: "Giveaway",
         layout: "/auth",
@@ -77,7 +90,7 @@ const routes = [
         description: "Active giveaways and rewards",
     },
 
-    // 5. Form (Member registration, alliance application)
+    // 6. Form (Member registration, alliance application)
     {
         name: "Forms",
         layout: "/auth",
@@ -88,7 +101,7 @@ const routes = [
         description: "Registration and application forms",
     },
 
-    // 5b. Join Kingdom (Dedicated join/CTA page)
+    // 7. Join Kingdom (Dedicated join/CTA page)
     {
         name: "Join Kingdom",
         layout: "/auth",
@@ -105,7 +118,7 @@ const routes = [
         layout: "/auth",
         path: "donation",
         icon: <GiTwoCoins className="h-6 w-6" />,
-        component: <Homepage />, // Temporary
+        component: <Donation />,
         showInNavbar: true,
         description: "Donation system and leaderboard",
     },

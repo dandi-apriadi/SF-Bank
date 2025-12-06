@@ -65,90 +65,147 @@ const Giveaway = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-24 pb-32">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A] pt-24 pb-32 overflow-hidden">
+      {/* Optimized Static Background - Better Performance */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Simple SVG Pattern - No Blur Filter */}
+        <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="giveaway-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFD700" />
+              <stop offset="50%" stopColor="#C5A059" />
+              <stop offset="100%" stopColor="#FFD700" />
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#giveaway-grad)" opacity="0.08" />
+        </svg>
+
+        {/* Static Glow Effects - No Animation */}
+        <div
+          className="absolute top-[-15%] right-[-10%] w-[420px] h-[420px] rounded-full opacity-20 dark:opacity-12"
+          style={{ 
+            background: 'radial-gradient(circle at 30% 30%, #FFD700, transparent)', 
+            filter: 'blur(40px)',
+            transform: 'translateZ(0)',
+            contain: 'layout style paint'
+          }}
+        />
+        <div
+          className="absolute bottom-[-18%] left-[-12%] w-[460px] h-[460px] rounded-full opacity-18 dark:opacity-10"
+          style={{ 
+            background: 'radial-gradient(circle at 70% 70%, #C5A059, transparent)', 
+            filter: 'blur(40px)',
+            transform: 'translateZ(0)',
+            contain: 'layout style paint'
+          }}
+        />
+
+        {/* Hexagon Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L45 15 L45 45 L30 60 L15 45 L15 15 Z' fill='none' stroke='%23FFD700' stroke-width='1'/%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}
+        ></div>
+
+        {/* Static Gradient Overlay - No Rotation */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ 
+            width: '680px', 
+            height: '680px', 
+            borderRadius: '50%', 
+            background: 'radial-gradient(circle, transparent 40%, rgba(255,215,0,0.06) 70%, transparent 100%)', 
+            opacity: 0.5,
+            transform: 'translateZ(0)'
+          }}
+        />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6 z-10">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center shadow-2xl border-4 border-[#FFD700]/30 animate-pulse">
-              <FiGift className="w-12 h-12 text-[#0F172A]" />
+        <div className="text-center mb-16">
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center shadow-2xl border-4 border-[#FFD700]/30 animate-pulse">
+              <FiGift className="w-14 h-14 text-[#0F172A]" />
             </div>
           </div>
-          <h1 className="text-5xl font-bold text-[#FFD700] mb-4 tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
+          <h1 className="text-5xl md:text-6xl font-black text-[#FFD700] mb-6 tracking-wider uppercase drop-shadow-lg" style={{ fontFamily: 'Cinzel, serif' }}>
             Kingdom Giveaways
           </h1>
-          <p className="text-xl text-[#E2E8F0]/70 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-[#E2E8F0]/90 max-w-3xl mx-auto leading-relaxed font-medium">
             Participate in our giveaways and win amazing rewards for your kingdom!
           </p>
         </div>
 
         {/* Active Giveaways */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-[#FFD700] mb-6" style={{ fontFamily: 'Cinzel, serif' }}>
+        <div className="mb-16">
+          <h2 className="text-3xl md:text-4xl font-black text-[#FFD700] mb-8 tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
             Active Giveaways
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {giveaways.filter(g => g.status === 'active').map((giveaway) => (
-              <div key={giveaway.id} className="bg-[#1E293B]/80 backdrop-blur-md rounded-xl p-6 border-2 border-[#C5A059]/30 hover:border-[#FFD700]/50 transition-all shadow-lg group">
+              <div key={giveaway.id} className="bg-gradient-to-br from-[#1E293B]/95 to-[#0F172A]/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#C5A059]/40 hover:border-[#FFD700]/60 transition-all shadow-xl hover:shadow-2xl hover:shadow-[#FFD700]/20 group hover:scale-105 duration-300">
                 {/* Icon */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700]/20 to-[#C5A059]/20 flex items-center justify-center border-2 border-[#FFD700]/30 group-hover:scale-110 transition-transform">
-                    <GiDiamondTrophy className="w-10 h-10 text-[#FFD700]" />
+                <div className="flex justify-center mb-6">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FFD700]/20 to-[#C5A059]/20 flex items-center justify-center border-2 border-[#FFD700]/40 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <GiDiamondTrophy className="w-12 h-12 text-[#FFD700]" />
                   </div>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-[#FFD700] mb-2 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
+                <h3 className="text-xl md:text-2xl font-black text-[#FFD700] mb-3 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
                   {giveaway.title}
                 </h3>
-                <p className="text-[#E2E8F0]/70 text-sm text-center mb-4">{giveaway.description}</p>
+                <p className="text-[#E2E8F0]/80 text-sm md:text-base text-center mb-6 font-medium">{giveaway.description}</p>
 
                 {/* Prize */}
-                <div className="bg-[#0F172A]/60 rounded-lg p-3 mb-4 border border-[#FFD700]/20">
+                <div className="bg-gradient-to-r from-[#0F172A] to-[#1E293B] rounded-xl p-4 mb-6 border-2 border-[#FFD700]/30 shadow-lg">
                   <div className="flex items-center justify-center">
-                    <GiTrophyCup className="w-5 h-5 text-[#FFD700] mr-2" />
-                    <span className="text-[#FFD700] font-bold text-sm">{giveaway.prize}</span>
+                    <GiTrophyCup className="w-6 h-6 text-[#FFD700] mr-3" />
+                    <span className="text-[#FFD700] font-black text-sm md:text-base">{giveaway.prize}</span>
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-[#E2E8F0] text-sm">
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-between text-[#E2E8F0] text-sm md:text-base">
                     <div className="flex items-center">
-                      <MdPeople className="w-4 h-4 mr-2 text-[#C5A059]" />
-                      <span>Entries</span>
+                      <MdPeople className="w-5 h-5 mr-2 text-[#C5A059]" />
+                      <span className="font-semibold">Entries</span>
                     </div>
-                    <span className="font-bold">{giveaway.entries.toLocaleString()}</span>
+                    <span className="font-black text-white">{giveaway.entries.toLocaleString()}</span>
                   </div>
-                  <div className="flex items-center justify-between text-[#E2E8F0] text-sm">
+                  <div className="flex items-center justify-between text-[#E2E8F0] text-sm md:text-base">
                     <div className="flex items-center">
-                      <MdTimer className="w-4 h-4 mr-2 text-[#C5A059]" />
-                      <span>Ends in</span>
+                      <MdTimer className="w-5 h-5 mr-2 text-[#C5A059]" />
+                      <span className="font-semibold">Ends in</span>
                     </div>
-                    <span className="font-bold text-[#FFD700]">{giveaway.endsIn}</span>
+                    <span className="font-black text-[#FFD700]">{giveaway.endsIn}</span>
                   </div>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mb-4">
-                  <div className="w-full bg-[#0F172A]/60 rounded-full h-2 overflow-hidden">
+                <div className="mb-6">
+                  <div className="w-full bg-[#0F172A] rounded-full h-3 overflow-hidden border border-[#C5A059]/30">
                     <div 
-                      className="bg-gradient-to-r from-[#FFD700] to-[#C5A059] h-full rounded-full transition-all"
+                      className="bg-gradient-to-r from-[#FFD700] to-[#C5A059] h-full rounded-full transition-all shadow-lg"
                       style={{ width: `${(giveaway.entries / giveaway.maxEntries) * 100}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-[#E2E8F0]/60 mt-1 text-center">
+                  <p className="text-xs md:text-sm text-[#E2E8F0]/80 mt-2 text-center font-semibold">
                     {Math.round((giveaway.entries / giveaway.maxEntries) * 100)}% full
                   </p>
                 </div>
 
                 {/* Requirements */}
-                <p className="text-xs text-[#E2E8F0]/60 text-center mb-4 italic">
+                <p className="text-xs md:text-sm text-[#E2E8F0]/70 text-center mb-6 italic font-medium">
                   {giveaway.requirements}
                 </p>
 
                 {/* Enter Button */}
-                <button className="w-full bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-[#0F172A] font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-[#FFD700]/50 transition-all">
+                <button className="w-full bg-gradient-to-r from-[#FFD700] to-[#C5A059] text-[#0F172A] font-black text-base md:text-lg py-4 rounded-xl hover:shadow-2xl hover:shadow-[#FFD700]/50 transition-all hover:scale-105 border-2 border-[#FFD700]/30 uppercase tracking-wide">
                   Enter Giveaway
                 </button>
               </div>
@@ -157,27 +214,27 @@ const Giveaway = () => {
         </div>
 
         {/* Recent Winners */}
-        <div className="bg-[#1E293B]/80 backdrop-blur-md rounded-xl p-8 border-2 border-[#C5A059]/30 shadow-lg">
-          <div className="flex items-center justify-center mb-6">
-            <GiPartyPopper className="w-10 h-10 text-[#FFD700] mr-3" />
-            <h2 className="text-3xl font-bold text-[#FFD700]" style={{ fontFamily: 'Cinzel, serif' }}>
+        <div className="bg-gradient-to-br from-[#1E293B]/95 to-[#0F172A]/90 backdrop-blur-xl rounded-3xl p-10 border-2 border-[#C5A059]/40 shadow-2xl mb-16">
+          <div className="flex items-center justify-center mb-8">
+            <GiPartyPopper className="w-12 h-12 text-[#FFD700] mr-4 animate-pulse" />
+            <h2 className="text-3xl md:text-4xl font-black text-[#FFD700] tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
               Recent Winners
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-6">
             {recentWinners.map((winner, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-[#0F172A]/60 rounded-lg border border-[#C5A059]/20 hover:border-[#FFD700]/30 transition-all">
+              <div key={index} className="flex items-center justify-between p-6 bg-gradient-to-r from-[#0F172A] to-[#1E293B] rounded-2xl border-2 border-[#C5A059]/30 hover:border-[#FFD700]/50 transition-all hover:scale-105 shadow-lg">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center mr-3">
-                    <FiUser className="w-5 h-5 text-[#0F172A]" />
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FFD700] to-[#C5A059] flex items-center justify-center mr-4 shadow-xl">
+                    <FiUser className="w-7 h-7 text-[#0F172A]" />
                   </div>
                   <div>
-                    <p className="font-bold text-[#E2E8F0]">{winner.name}</p>
-                    <p className="text-sm text-[#E2E8F0]/60">{winner.date}</p>
+                    <p className="font-black text-white text-base md:text-lg">{winner.name}</p>
+                    <p className="text-sm md:text-base text-[#E2E8F0]/70 font-medium">{winner.date}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#FFD700] text-sm">{winner.prize}</p>
+                  <p className="font-black text-[#FFD700] text-sm md:text-base">{winner.prize}</p>
                 </div>
               </div>
             ))}
@@ -185,31 +242,31 @@ const Giveaway = () => {
         </div>
 
         {/* How to Participate */}
-        <div className="mt-12 bg-gradient-to-r from-[#1E293B]/80 to-[#0F172A]/80 backdrop-blur-md rounded-xl p-8 border-2 border-[#C5A059]/30">
-          <h3 className="text-2xl font-bold text-[#FFD700] mb-4 text-center" style={{ fontFamily: 'Cinzel, serif' }}>
+        <div className="bg-gradient-to-br from-[#1E293B]/95 to-[#0F172A]/90 backdrop-blur-xl rounded-3xl p-10 border-2 border-[#C5A059]/40 shadow-2xl">
+          <h3 className="text-3xl md:text-4xl font-black text-[#FFD700] mb-10 text-center tracking-wider uppercase" style={{ fontFamily: 'Cinzel, serif' }}>
             How to Participate
           </h3>
-          <div className="grid md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="w-12 h-12 rounded-full bg-[#FFD700]/20 border-2 border-[#FFD700] flex items-center justify-center mx-auto mb-3">
-                <span className="text-[#FFD700] font-bold text-xl">1</span>
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div className="group hover:scale-105 transition-all">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700]/20 to-[#C5A059]/20 border-4 border-[#FFD700] flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 transition-all">
+                <span className="text-[#FFD700] font-black text-2xl">1</span>
               </div>
-              <h4 className="font-bold text-[#E2E8F0] mb-2">Choose Giveaway</h4>
-              <p className="text-[#E2E8F0]/70 text-sm">Select a giveaway you want to enter</p>
+              <h4 className="font-black text-white text-lg md:text-xl mb-3">Choose Giveaway</h4>
+              <p className="text-[#E2E8F0]/80 text-sm md:text-base font-medium">Select a giveaway you want to enter</p>
             </div>
-            <div>
-              <div className="w-12 h-12 rounded-full bg-[#FFD700]/20 border-2 border-[#FFD700] flex items-center justify-center mx-auto mb-3">
-                <span className="text-[#FFD700] font-bold text-xl">2</span>
+            <div className="group hover:scale-105 transition-all">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700]/20 to-[#C5A059]/20 border-4 border-[#FFD700] flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 transition-all">
+                <span className="text-[#FFD700] font-black text-2xl">2</span>
               </div>
-              <h4 className="font-bold text-[#E2E8F0] mb-2">Click Enter</h4>
-              <p className="text-[#E2E8F0]/70 text-sm">Submit your entry with one click</p>
+              <h4 className="font-black text-white text-lg md:text-xl mb-3">Click Enter</h4>
+              <p className="text-[#E2E8F0]/80 text-sm md:text-base font-medium">Submit your entry with one click</p>
             </div>
-            <div>
-              <div className="w-12 h-12 rounded-full bg-[#FFD700]/20 border-2 border-[#FFD700] flex items-center justify-center mx-auto mb-3">
-                <span className="text-[#FFD700] font-bold text-xl">3</span>
+            <div className="group hover:scale-105 transition-all">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFD700]/20 to-[#C5A059]/20 border-4 border-[#FFD700] flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 transition-all">
+                <span className="text-[#FFD700] font-black text-2xl">3</span>
               </div>
-              <h4 className="font-bold text-[#E2E8F0] mb-2">Wait for Results</h4>
-              <p className="text-[#E2E8F0]/70 text-sm">Winners announced when giveaway ends</p>
+              <h4 className="font-black text-white text-lg md:text-xl mb-3">Wait for Results</h4>
+              <p className="text-[#E2E8F0]/80 text-sm md:text-base font-medium">Winners announced when giveaway ends</p>
             </div>
           </div>
         </div>

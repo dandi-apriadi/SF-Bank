@@ -7,6 +7,7 @@ const FULL_WIDTH_PAGES = [
   'Home',           // Landing Page
   'KvK',            // Kingdom vs Kingdom
   'Events',         // Kingdom Events
+  'Bank',         // Kingdom Events
   'Giveaway',       // Giveaways
   'Forms',          // Registration Forms
   'Join Kingdom',   // Join CTA Page

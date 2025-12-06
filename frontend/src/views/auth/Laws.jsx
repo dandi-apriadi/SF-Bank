@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { MdGavel, MdWarning, MdInfo, MdCheckCircle } from 'react-icons/md';
 import { GiScrollUnfurled, GiCastle, GiCrossedSwords, GiShield } from 'react-icons/gi';
 import { FiChevronDown, FiChevronUp, FiAlertTriangle } from 'react-icons/fi';
-import SacredLogo from '../../assets/img/sacred-forces-logo.png';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+
 
 const Laws = () => {
   const [expandedSection, setExpandedSection] = useState('general');

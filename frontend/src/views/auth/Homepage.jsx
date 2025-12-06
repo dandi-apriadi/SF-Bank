@@ -30,8 +30,9 @@ import {
   FiChevronRight
 } from 'react-icons/fi';
 import Navbar from '../../components/navbarhome';
-import SacredLogo from '../../assets/img/sacred-forces-logo.png';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
 import Logo from '../../assets/img/auth/logo.png';
+
 const Homepage = () => {
   const [stats, setStats] = useState({
     members: 150,

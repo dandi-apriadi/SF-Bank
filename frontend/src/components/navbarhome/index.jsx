@@ -33,6 +33,7 @@ const Navbar = ({ forceTransparent = false }) => {
     const iconMap = {
       'homepage': GiCastle,
       'kvk': GiCrossedSwords,
+      'bank': GiTwoCoins,
       'events': MdEvent,
       'giveaway': FiGift,
       'forms': GiScrollUnfurled,
@@ -70,17 +71,11 @@ const Navbar = ({ forceTransparent = false }) => {
     fetchUser();
   }, [dispatch]);
 
-  // Initialize theme
+  // Initialize theme - Always dark mode
   useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDark = saved ? saved === 'dark' : prefersDark;
-    setIsDark(initialDark);
-    if (initialDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setIsDark(true);
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
   }, []);
 
   useEffect(() => {
@@ -163,7 +158,7 @@ const Navbar = ({ forceTransparent = false }) => {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
-              {navbarRoutes.filter(route => ['homepage', 'about', 'kvk', 'events'].includes(route.path)).map((route) => {
+              {navbarRoutes.filter(route => ['homepage', 'about', 'kvk', 'bank', 'events'].includes(route.path)).map((route) => {
                 const isActive = isLinkActive(route.path);
                 return (
                   <Link 
@@ -248,13 +243,13 @@ const Navbar = ({ forceTransparent = false }) => {
                 <FaDiscord className="w-5 h-5" />
               </a>
 
-              {/* Theme Toggle */}
-              <button
+              {/* Theme Toggle - Commented out for dark mode only */}
+              {/* <button
                 onClick={() => setIsDark(!isDark)}
                 className="p-2 rounded-lg text-slate-500 dark:text-yellow-600 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
               >
                 {isDark ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
-              </button>
+              </button> */}
 
               {/* Login Button */}
               <Link
@@ -277,12 +272,13 @@ const Navbar = ({ forceTransparent = false }) => {
 
             {/* Mobile Menu Button */}
             <div className="flex items-center lg:hidden space-x-4">
-              <button
+              {/* Theme Toggle - Commented out for dark mode only */}
+              {/* <button
                 onClick={() => setIsDark(!isDark)}
                 className="p-2 rounded-lg text-slate-500 dark:text-yellow-600 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
               >
                 {isDark ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
-              </button>
+              </button> */}
               
               <button
                 onClick={toggleMobileMenu}

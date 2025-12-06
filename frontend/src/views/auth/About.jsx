@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { GiCastle, GiCrown, GiCrossedSwords, GiScrollUnfurled } from 'react-icons/gi';
 import { FiUsers, FiTarget, FiShield } from 'react-icons/fi';
-import SacredLogo from '../../assets/img/sacred-forces-logo.png';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+
 
 const About = () => {
   const pillars = [

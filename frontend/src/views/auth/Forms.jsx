@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { GiScrollUnfurled, GiQuillInk, GiCastle } from 'react-icons/gi';
 import { MdSend, MdCheckCircle, GiAward } from 'react-icons/md';
 import { FiUser, FiMail, FiMessageSquare, FiCheck } from 'react-icons/fi';
-import SacredLogo from '../../assets/img/sacred-forces-logo.png';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
 
 const Forms = () => {
   const [formType, setFormType] = useState('application');
