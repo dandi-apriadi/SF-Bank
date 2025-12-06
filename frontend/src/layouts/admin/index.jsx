@@ -6,7 +6,6 @@ import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "../../routes/routes-admin.js";
 import ErrorBoundary from 'components/ui/ErrorBoundary';
-import LoadingOverlay from 'components/ui/LoadingOverlay';
 import { fetchInstitutionMetrics } from 'store/slices/institutionSlice';
 import { getMe } from "store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +23,7 @@ export default function Admin(props) {
     }
     return false;
   });
-  const appName = process.env.REACT_APP_APP_NAME || 'PRIMA';
+  const appName = process.env.REACT_APP_APP_NAME || 'Sacred Bank';
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,7 +151,6 @@ export default function Admin(props) {
             {...rest}
           />
           <div className="flex-1 flex flex-col overflow-y-auto transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
-            {institution.isLoading && <LoadingOverlay text="Memuat metrik institusi..." />}
             <ErrorBoundary>
               <div className="flex-1 w-full">
                 <Routes>
