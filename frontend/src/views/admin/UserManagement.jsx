@@ -557,7 +557,7 @@ function UserManagement() {
                     Alliance
                   </label>
                   <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400">
-                    {selectedUser?.alliance || "-"}
+                    {selectedUser?.alliance?.name || selectedUser?.alliance || "-"}
                   </div>
                 </div>
 

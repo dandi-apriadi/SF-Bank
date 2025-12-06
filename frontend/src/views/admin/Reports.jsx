@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function Reports() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -31,76 +34,11 @@ export default function Reports() {
   useEffect(() => {
     AOS.init({ once: true, duration: 600 });
   }, []);
-  const allianceNames = ["Sacred Vanguard", "Sacred Legion", "Sacred Guardians"];
-  // recreate the same dummy data used in Dashboard and Deposits so charts match
-  // Increased to 50 members as requested
-  const [members] = useState(() => {
-    const arr = [];
-    for (let i = 1; i <= 50; i++) {
-      arr.push({
-        id: i,
-        name: `Member ${i}`,
-        food: 10000000 + i * 150000,
-        wood: 8000000 + i * 120000,
-        stone: 2000000 + i * 80000,
-        gold: 500000 + i * 50000,
-        weeksPaid: Math.min(100, (i * 3) % 101),
-        alliance: allianceNames[(i - 1) % allianceNames.length],
-      });
-    }
-    return arr;
-  });
-
-  // Alliance snapshot (mirrors data style from Alliance/AllianceDetail pages)
-  const [alliances] = useState(() => [
-    {
-      id: 1,
-      name: "Sacred Vanguard",
-      tag: "SAC-1",
-      membersCount: 42,
-      food: 320000000,
-      wood: 260000000,
-      stone: 140000000,
-      gold: 72000000,
-    },
-    {
-      id: 2,
-      name: "Sacred Legion",
-      tag: "SAC-2",
-      membersCount: 38,
-      food: 280000000,
-      wood: 220000000,
-      stone: 110000000,
-      gold: 61000000,
-    },
-    {
-      id: 3,
-      name: "Sacred Guardians",
-      tag: "SAC-3",
-      membersCount: 35,
-      food: 240000000,
-      wood: 210000000,
-      stone: 100000000,
-      gold: 55000000,
-    },
-  ]);
-
-  const [deposits] = useState(() => {
-    const arr = [];
-    for (let i = 1; i <= 50; i++) {
-      arr.push({
-        id: 1000 + i,
-        member: `Member ${i}`,
-        week: (i % 12) + 1,
-        date: `2025-11-${(i % 28) + 1}`,
-        food: 10000000 + i * 50000,
-        wood: 8000000 + i * 40000,
-        stone: 2000000 + i * 30000,
-        gold: 500000 + i * 20000,
-      });
-    }
-    return arr;
-  });
+  const [members, setMembers] = useState([]);
+  const [alliances, setAlliances] = useState([]);
+  const [deposits, setDeposits] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const formatToMillions = (n) => {
     if (n === null || n === undefined) return "-";
@@ -137,6 +75,28 @@ export default function Reports() {
       .slice(0, 2)
       .join("")
       .toUpperCase();
+
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await axios.get(`${API_BASE_URL}/api/v1/reports/summary`, {
+        withCredentials: true,
+      });
+      setMembers(res.data.members || []);
+      setAlliances(res.data.alliances || []);
+      setDeposits(res.data.deposits || []);
+    } catch (err) {
+      console.error('Fetch reports summary error:', err);
+      setError(err.response?.data?.msg || 'Failed to load reports');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
 
   // Filters for reports (week range + member search)
   const [weekFromInput, setWeekFromInput] = useState(1);
@@ -505,6 +465,27 @@ export default function Reports() {
                   <span>Gold</span>
                   <span>{formatShort(allianceTotals.gold)}</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="mt-4 bg-indigo-50 rounded-xl p-3 border border-indigo-100">
+              <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Top RSS Alliances</div>
+              <div className="space-y-2">
+                {topAlliances.slice(0, 3).map((a, idx) => (
+                  <div key={a.id} className="flex items-center justify-between p-2 rounded-lg bg-white border border-indigo-100 shadow-sm">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900">#{idx + 1} {a.name}</div>
+                      <div className="text-xs text-gray-500">{a.tag} · {a.membersCount} members</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-indigo-700">{formatShort(a.total)}</div>
+                      <div className="text-[11px] text-gray-500">{formatPercent((a.total / Math.max(1, allianceTotalResource)) * 100)} of total</div>
+                    </div>
+                  </div>
+                ))}
+                {topAlliances.length === 0 && (
+                  <div className="text-sm text-gray-500">No alliance data</div>
+                )}
               </div>
             </div>
           </div>

@@ -17,6 +17,7 @@ import {
     updateMemberContribution,
     deleteMemberContribution
 } from '../../controllers/administrator/memberContributionController.js';
+import { getReportsSummary } from '../../controllers/administrator/reportController.js';
 import { authenticate, authorize } from '../../middleware/AuthUser.js';
 
 const router = express.Router();
@@ -69,5 +70,8 @@ router.delete('/member-contributions/:id', deleteMemberContribution);
 
 // Delete member contribution by memberId, allianceId, and week
 router.delete('/member-contributions/:memberId/:allianceId/:week', deleteMemberContribution);
+
+// Reports summary (aggregated data for frontend Reports page)
+router.get('/reports/summary', getReportsSummary);
 
 export default router;

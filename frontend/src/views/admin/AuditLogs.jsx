@@ -9,7 +9,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const displayTargetType = (type) => {
   if (type === 'resource') return 'Resource (RSS)';
   if (type === 'alliance') return 'Alliance';
-  if (type === 'bank') return 'Bank';
   if (type === 'user') return 'User';
   return type || 'Unknown';
 };
@@ -312,7 +311,7 @@ export default function AuditLogs() {
             {/* Target Type Filter */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Type</label>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Entity being changed (User, Alliance, Bank, Resource/RSS).</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Entity being changed (User, Alliance, Resource/RSS).</p>
               <select
                 value={targetTypeFilter}
                 onChange={(e) => {
@@ -324,7 +323,6 @@ export default function AuditLogs() {
                 <option value="All">All Types</option>
                 <option value="user">User</option>
                 <option value="alliance">Alliance</option>
-                <option value="bank">Bank</option>
                 <option value="resource">Resource (RSS)</option>
               </select>
             </div>
