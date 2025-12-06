@@ -115,6 +115,7 @@ const seedFullBankData = async () => {
         console.log(`   ✅ Total users created: ${userCount}\n`);
 
         console.log('3️⃣  Creating member contributions (50 weeks x 500 members)...');
+        console.log('   ⏳ This may take a few minutes...');
         let contributionCount = 0;
 
         for (const user of users) {
