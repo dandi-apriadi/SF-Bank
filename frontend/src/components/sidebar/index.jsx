@@ -60,7 +60,7 @@ const Sidebar = ({ open, onClose }) => {
         bg-white dark:!bg-navy-800
         shadow-xl shadow-gray-300/20 dark:shadow-white/5
         transition-all dark:text-white
-        md:!z-50 lg:!z-50 xl:!z-0
+        !z-[9999]
         rounded-r-xl
         ${open ? "translate-x-0" : "-translate-x-96"}
       `}
@@ -71,6 +71,7 @@ const Sidebar = ({ open, onClose }) => {
           absolute top-4 right-4 cursor-pointer xl:hidden 
           ${roleColorScheme.bg} p-1.5 rounded-full 
           transition-all duration-200 ${roleColorScheme.shadow}
+          z-[10000]
         `}
         onClick={onClose}
         aria-label="Close Sidebar"

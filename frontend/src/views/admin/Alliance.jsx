@@ -291,7 +291,6 @@ export default function Alliance() {
                   <th className="px-4 py-3">🪨 Stone</th>
                   <th className="px-4 py-3">💰 Gold</th>
                   <th className="px-4 py-3">📦 Total RSS</th>
-                  <th className="px-4 py-3">📅 Weeks</th>
                   <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
@@ -317,7 +316,6 @@ export default function Alliance() {
                     <td className="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-semibold">{formatNumber(a.stone)}</td>
                     <td className="px-4 py-3 text-center text-yellow-600 dark:text-yellow-400 font-semibold">{formatNumber(a.gold)}</td>
                     <td className="px-4 py-3 text-center text-indigo-600 dark:text-indigo-400 font-bold">{formatNumber(a.total_rss)}</td>
-                    <td className="px-4 py-3 text-center text-purple-600 dark:text-purple-400 font-semibold">{a.weeks_donated}/100</td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
@@ -363,7 +361,7 @@ export default function Alliance() {
                     {getTypeIcon(a.tag)} {a.tag}
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-xs mb-2">
+                <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                   <div className="text-center p-2 bg-white dark:bg-slate-800 rounded-lg">
                     <div className="text-gray-500 dark:text-gray-400">Members</div>
                     <div className="font-semibold text-gray-800 dark:text-gray-200 mt-1">{a.members_count}</div>
@@ -371,10 +369,6 @@ export default function Alliance() {
                   <div className="text-center p-2 bg-white dark:bg-slate-800 rounded-lg">
                     <div className="text-gray-500 dark:text-gray-400">📦 Total</div>
                     <div className="font-bold text-indigo-600 dark:text-indigo-400 mt-1">{formatNumber(a.total_rss)}</div>
-                  </div>
-                  <div className="text-center p-2 bg-white dark:bg-slate-800 rounded-lg">
-                    <div className="text-gray-500 dark:text-gray-400">📅 Weeks</div>
-                    <div className="font-semibold text-purple-600 dark:text-purple-400 mt-1">{a.weeks_donated}/100</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-xs">

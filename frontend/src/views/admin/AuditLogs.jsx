@@ -230,35 +230,35 @@ export default function AuditLogs() {
         </header>
 
         {/* Statistics Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <div data-aos="fade-up" className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-slate-900/40 p-4 border border-gray-100 dark:border-slate-700">
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Logs</div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalLogs}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">All recorded activities</div>
+        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+          <div data-aos="fade-up" className="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg dark:shadow-slate-900/40 p-3 sm:p-4 border border-gray-100 dark:border-slate-700">
+            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</div>
+            <div className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-2">{stats.totalLogs}</div>
+            <div className="text-[9px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 sm:mt-1 hidden sm:block">All activities</div>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="40" className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow-lg dark:shadow-slate-900/40 p-4 border border-green-200 dark:border-green-800">
-            <div className="text-xs text-green-600 dark:text-green-400 uppercase tracking-wider font-semibold">Creates</div>
-            <div className="text-3xl font-bold text-green-700 dark:text-green-300 mt-2">{stats.creates}</div>
-            <div className="text-xs text-green-600 dark:text-green-400 mt-1">New records added</div>
+          <div data-aos="fade-up" data-aos-delay="40" className="bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg dark:shadow-slate-900/40 p-3 sm:p-4 border border-green-200 dark:border-green-800">
+            <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-400 uppercase tracking-wider font-semibold">Creates</div>
+            <div className="text-xl sm:text-3xl font-bold text-green-700 dark:text-green-300 mt-1 sm:mt-2">{stats.creates}</div>
+            <div className="text-[9px] sm:text-xs text-green-600 dark:text-green-400 mt-0.5 sm:mt-1 hidden sm:block">New records</div>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="80" className="bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow-lg dark:shadow-slate-900/40 p-4 border border-blue-200 dark:border-blue-800">
-            <div className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">Updates</div>
-            <div className="text-3xl font-bold text-blue-700 dark:text-blue-300 mt-2">{stats.updates}</div>
-            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">Records modified</div>
+          <div data-aos="fade-up" data-aos-delay="80" className="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg dark:shadow-slate-900/40 p-3 sm:p-4 border border-blue-200 dark:border-blue-800">
+            <div className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">Updates</div>
+            <div className="text-xl sm:text-3xl font-bold text-blue-700 dark:text-blue-300 mt-1 sm:mt-2">{stats.updates}</div>
+            <div className="text-[9px] sm:text-xs text-blue-600 dark:text-blue-400 mt-0.5 sm:mt-1 hidden sm:block">Modified</div>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="120" className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow-lg dark:shadow-slate-900/40 p-4 border border-red-200 dark:border-red-800">
-            <div className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wider font-semibold">Deletes</div>
-            <div className="text-3xl font-bold text-red-700 dark:text-red-300 mt-2">{stats.deletes}</div>
-            <div className="text-xs text-red-600 dark:text-red-400 mt-1">Records removed</div>
+          <div data-aos="fade-up" data-aos-delay="120" className="bg-red-50 dark:bg-red-900/20 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg dark:shadow-slate-900/40 p-3 sm:p-4 border border-red-200 dark:border-red-800">
+            <div className="text-[10px] sm:text-xs text-red-600 dark:text-red-400 uppercase tracking-wider font-semibold">Deletes</div>
+            <div className="text-xl sm:text-3xl font-bold text-red-700 dark:text-red-300 mt-1 sm:mt-2">{stats.deletes}</div>
+            <div className="text-[9px] sm:text-xs text-red-600 dark:text-red-400 mt-0.5 sm:mt-1 hidden sm:block">Removed</div>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="160" className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl shadow-lg dark:shadow-slate-900/40 p-4 border border-indigo-200 dark:border-indigo-800">
-            <div className="text-xs text-indigo-600 dark:text-indigo-400 uppercase tracking-wider font-semibold">Active Users</div>
-            <div className="text-3xl font-bold text-indigo-700 dark:text-indigo-300 mt-2">{uniqueUsers.length}</div>
-            <div className="text-xs text-indigo-600 dark:text-indigo-400 mt-1">Performed actions</div>
+          <div data-aos="fade-up" data-aos-delay="160" className="col-span-2 sm:col-span-1 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg dark:shadow-slate-900/40 p-3 sm:p-4 border border-indigo-200 dark:border-indigo-800">
+            <div className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 uppercase tracking-wider font-semibold">Active Users</div>
+            <div className="text-xl sm:text-3xl font-bold text-indigo-700 dark:text-indigo-300 mt-1 sm:mt-2">{uniqueUsers.length}</div>
+            <div className="text-[9px] sm:text-xs text-indigo-600 dark:text-indigo-400 mt-0.5 sm:mt-1 hidden sm:block">Performed actions</div>
           </div>
         </section>
 
@@ -381,9 +381,10 @@ export default function AuditLogs() {
           </div>
         </section>
 
-        {/* Logs Table */}
+        {/* Logs Table - Desktop */}
         <section data-aos="fade-up" className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-slate-900/40 border border-gray-100 dark:border-slate-700 overflow-hidden">
-          <div className="hidden sm:block overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-100 dark:bg-slate-700/60 sticky top-0">
                 <tr className="text-xs text-gray-600 dark:text-gray-300 font-semibold">
@@ -396,94 +397,148 @@ export default function AuditLogs() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700/50">
-                {paginatedLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">{formatTimeRelative(log.timestamp)}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">{formatDateTime(log.timestamp)}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900 dark:text-white">{log.user_name}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">{log.user_email}</div>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getActionBadgeColor(log.action)}`}>
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{getTargetTypeIcon(log.target_type)}</span>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">{log.target_name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{displayTargetType(log.target_type)} · ID #{log.target_id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-400 max-w-xs truncate">{log.details}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => openDetail(log)}
-                        className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors"
-                        title="View details"
-                      >
-                        <FiEye className="w-4 h-4" />
-                      </button>
+                {paginatedLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No audit logs found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">{formatTimeRelative(log.timestamp)}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">{formatDateTime(log.timestamp)}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-gray-900 dark:text-white">{log.user_name}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{log.user_email}</div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getActionBadgeColor(log.action)}`}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{getTargetTypeIcon(log.target_type)}</span>
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">{log.target_name}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{displayTargetType(log.target_type)} · ID #{log.target_id}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-gray-400 max-w-xs truncate">{log.details}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => openDetail(log)}
+                          className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors"
+                          title="View details"
+                        >
+                          <FiEye className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Mobile Cards */}
-          <div className="sm:hidden space-y-3 p-4">
-            {paginatedLogs.map((log) => (
-              <div key={log.id} className="bg-gray-50 dark:bg-slate-700/60 rounded-lg p-4 border border-gray-100 dark:border-slate-600">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">{log.user_name}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{log.user_email}</div>
-                  </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${getActionBadgeColor(log.action)}`}>
-                    {log.action}
-                  </span>
+          {/* Mobile Cards View */}
+          <div className="block md:hidden">
+            {paginatedLogs.length === 0 ? (
+              <div className="text-center py-12 px-4">
+                <div className="text-gray-400 dark:text-gray-500 mb-2">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <div className="space-y-2 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{getTargetTypeIcon(log.target_type)}</span>
-                    <span className="text-sm text-gray-700 dark:text-gray-400">{log.target_name}</span>
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{displayTargetType(log.target_type)} · ID #{log.target_id}</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{log.details}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">{formatDateTime(log.timestamp)}</div>
-                </div>
-                <button
-                  onClick={() => openDetail(log)}
-                  className="w-full px-3 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors text-xs font-medium flex items-center justify-center gap-2"
-                >
-                  <FiEye className="w-4 h-4" />
-                  View Details
-                </button>
+                <div className="text-gray-500 dark:text-gray-400 font-medium">No audit logs found</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">Try adjusting your filters</div>
               </div>
-            ))}
+            ) : (
+              <div className="space-y-3 p-3">
+                {paginatedLogs.map((log) => (
+                  <div 
+                    key={log.id} 
+                    className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 border border-gray-200 dark:border-slate-600 shadow-sm active:scale-[0.98] transition-transform"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-gray-900 dark:text-white truncate">{log.user_name}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 truncate">{log.user_email}</div>
+                      </div>
+                      <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${getActionBadgeColor(log.action)}`}>
+                        {log.action}
+                      </span>
+                    </div>
+
+                    {/* Target Info */}
+                    <div className="bg-white dark:bg-slate-900/50 rounded-lg p-2.5 mb-2.5 border border-gray-100 dark:border-slate-700">
+                      <div className="flex items-start gap-2.5">
+                        <span className="text-xl flex-shrink-0 mt-0.5">{getTargetTypeIcon(log.target_type)}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-gray-900 dark:text-white text-sm truncate">{log.target_name}</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                            <span className="font-medium">{displayTargetType(log.target_type)}</span>
+                            <span className="mx-1">•</span>
+                            <span>ID #{log.target_id}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    {log.details && (
+                      <div className="mb-2.5">
+                        <div className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Details</div>
+                        <div className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2 bg-gray-50 dark:bg-slate-900/50 rounded-lg p-2 border border-gray-200 dark:border-slate-700">
+                          {log.details}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Timestamp & Action */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-medium">{formatTimeRelative(log.timestamp)}</span>
+                      </div>
+                      <button
+                        onClick={() => openDetail(log)}
+                        className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all text-xs font-semibold flex items-center gap-1.5 shadow-md active:scale-95"
+                      >
+                        <FiEye className="w-3.5 h-3.5" />
+                        Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-4 border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Page {currentPage} of {totalPages} ({filteredLogs.length} logs)
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-4 border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+                Page <span className="font-semibold text-gray-900 dark:text-white">{currentPage}</span> of <span className="font-semibold">{totalPages}</span> 
+                <span className="hidden sm:inline"> ({filteredLogs.length} logs)</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium"
                 >
-                  Prev
+                  <span className="hidden sm:inline">Prev</span>
+                  <span className="sm:hidden">←</span>
                 </button>
-                <div className="flex gap-1">
+                <div className="hidden sm:flex gap-1">
                   {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
                     const page = Math.max(1, currentPage - 2) + i;
                     if (page > totalPages) return null;
@@ -502,12 +557,17 @@ export default function AuditLogs() {
                     );
                   })}
                 </div>
+                {/* Mobile page indicator */}
+                <div className="sm:hidden px-3 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+                  {currentPage}/{totalPages}
+                </div>
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
+                  <span className="sm:hidden">→</span>
                 </button>
               </div>
             </div>
