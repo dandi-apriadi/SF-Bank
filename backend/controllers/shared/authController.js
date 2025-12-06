@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 
 // Helper to send uniform invalid credential response (avoid user enumeration)
-const invalidCredentials = (res) => res.status(401).json({ msg: "Email atau password salah" });
+const invalidCredentials = (res) => res.status(401).json({ msg: "Invalid email or password" });
 
 // Login User
 export const login = async (req, res) => {
@@ -136,14 +136,14 @@ export const register = async (req, res) => {
     try {
         const { name, email, password, role = 'R5', user_id, alliance_id } = req.body || {};
         if (!name || !email || !password) {
-            return res.status(400).json({ msg: "name, email, dan password wajib diisi" });
+            return res.status(400).json({ msg: "Name, email, and password are required" });
         }
 
         // Dynamic import from SF BANK models
         const { User } = await import("../../models/index.js");
         const existing = await User.findOne({ where: { email } });
         if (existing) {
-            return res.status(409).json({ msg: "Email sudah terdaftar" });
+            return res.status(409).json({ msg: "Email is already registered" });
         }
 
         // Create user (password hashed by model hook)
@@ -165,12 +165,12 @@ export const register = async (req, res) => {
         });
 
         res.status(201).json({
-            msg: "Registrasi berhasil",
+            msg: "Registration successful",
             user: newUser.toJSON()
         });
     } catch (error) {
         console.error("Register error:", error);
-        return res.status(500).json({ msg: "Gagal registrasi" });
+        return res.status(500).json({ msg: "Registration failed" });
     }
 };
 
@@ -194,7 +194,7 @@ export const Me = async (req, res) => {
                 user: req.session ? req.session.user : 'N/A'
             });
             return res.status(401).json({ 
-                msg: "Mohon login ke akun anda",
+                msg: "Please login to your account",
                 debug: process.env.NODE_ENV !== 'production' ? {
                     sessionExists: !!req.session,
                     sessionId: req.sessionID,
@@ -221,22 +221,22 @@ export const Me = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({ msg: "User tidak ditemukan" });
+            return res.status(404).json({ msg: "User not found" });
         }
 
         res.status(200).json(user);
     } catch (error) {
         console.error("Get user error:", error);
-        res.status(500).json({ msg: "Terjadi kesalahan pada server" });
+        res.status(500).json({ msg: "An error occurred on the server" });
     }
 };
 
 // Logout User
 export const logOut = (req, res) => {
     req.session.destroy((err) => {
-        if (err) return res.status(400).json({ msg: "Tidak dapat Logout" });
+        if (err) return res.status(400).json({ msg: "Unable to logout" });
 
         // Return successful logout message
-        res.status(200).json({ msg: "Anda telah Logout" });
+        res.status(200).json({ msg: "You have been logged out" });
     });
 };

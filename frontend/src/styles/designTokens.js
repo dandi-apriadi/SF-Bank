@@ -1,5 +1,5 @@
 // Design Tokens (Level 1 Semantic Mapping)
-// Catatan: Gunakan token ini di komponen baru agar konsisten dan mudah diganti.
+// Note: Use these tokens in new components for consistency and easy replacement.
 
 export const colors = {
   // Brand / Primary

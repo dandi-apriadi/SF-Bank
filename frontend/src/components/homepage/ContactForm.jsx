@@ -109,7 +109,7 @@ const ContactForm = () => {
                         border-green-200 dark:border-green-800 
                         text-green-600 dark:text-green-400 
                         p-4 rounded-xl text-center animate-fade-in">
-                        ✨ Pesan berhasil dikirim!
+                        ✨ Message sent successfully!
                     </div>
                 )}
 

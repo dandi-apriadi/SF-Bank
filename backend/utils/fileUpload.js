@@ -45,7 +45,7 @@ const imageFilter = (req, file, cb) => {
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(new Error('Hanya file gambar yang diperbolehkan (JPEG, JPG, PNG, GIF, WEBP)'));
+    cb(new Error('Only image files are allowed (JPEG, JPG, PNG, GIF, WEBP)'));
   }
 };
 
@@ -57,7 +57,7 @@ const documentFilter = (req, file, cb) => {
   if (extname) {
     return cb(null, true);
   } else {
-    cb(new Error('Hanya file dokumen yang diperbolehkan (PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX)'));
+    cb(new Error('Only document files are allowed (PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX)'));
   }
 };
 
@@ -69,7 +69,7 @@ const newsFileFilter = (req, file, cb) => {
   if (extname) {
     return cb(null, true);
   } else {
-    cb(new Error('Tipe file tidak diperbolehkan. Gunakan gambar (JPEG, PNG, GIF, WEBP) atau dokumen (PDF, DOC, XLS, PPT)'));
+    cb(new Error('File type not allowed. Use images (JPEG, PNG, GIF, WEBP) or documents (PDF, DOC, XLS, PPT)'));
   }
 };
 
@@ -98,7 +98,7 @@ export const uploadEvidenceFile = multer({
     const allowed = /jpeg|jpg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx/;
     const extname = allowed.test(path.extname(file.originalname).toLowerCase());
     if (extname) return cb(null, true);
-    cb(new Error('Tipe file tidak diperbolehkan untuk eviden'));
+    cb(new Error('File type not allowed for evidence'));
   },
   limits: {
     fileSize: 20 * 1024 * 1024 // 20MB limit

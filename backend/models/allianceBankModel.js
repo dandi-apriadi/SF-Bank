@@ -46,9 +46,6 @@ const AllianceBank = db.define('alliance_bank', {
     updatedAt: 'updated_at',
     indexes: [
         {
-            fields: ['alliance_id']
-        },
-        {
             unique: true,
             fields: ['bank_id']
         }

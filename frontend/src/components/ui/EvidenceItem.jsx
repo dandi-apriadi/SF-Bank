@@ -14,7 +14,7 @@ const EvidenceItem = ({ item }) => (
     </div>
     <div className="flex items-center space-x-2">
       <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium ${statusBadge(item.status)}`}>
-        {item.status === 'approved' ? 'Disetujui' : item.status==='pending' ? 'Pending':'Revisi'}
+        {item.status === 'approved' ? 'Approved' : item.status==='pending' ? 'Pending':'Revision'}
       </span>
       <button className="p-2 text-gray-400 hover:text-gray-600">
         <EyeIcon className="h-4 w-4" />

@@ -88,13 +88,7 @@ const User = db.define('users', {
     updatedAt: 'updated_at',
     indexes: [
         {
-            fields: ['role']
-        },
-        {
             fields: ['alliance_id']
-        },
-        {
-            fields: ['status']
         }
     ],
     hooks: {

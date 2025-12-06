@@ -15,8 +15,8 @@ export const fetchProjection = createAsyncThunk('projection/fetch', async (_, { 
     projectedScore: +projectedScore.toFixed(2),
     projectedGrade,
     assumptions: [
-      'Peningkatan linear 5% terhadap gap tersisa',
-      'Tidak ada penurunan kinerja kriteria yang sudah selesai'
+      'Linear increase 5% to the remaining gap',
+      'No performance decrease for completed criteria'
     ],
     generatedAt: new Date().toISOString()
   };

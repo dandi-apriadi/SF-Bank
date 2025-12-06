@@ -58,7 +58,7 @@ const NavbarSettings = () => {
       // Show success notification
       const notification = document.createElement('div');
       notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-      notification.textContent = 'Pengaturan berhasil disimpan!';
+      notification.textContent = 'Settings saved successfully!';
       document.body.appendChild(notification);
       
       setTimeout(() => {
@@ -297,10 +297,10 @@ const NavbarSettings = () => {
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { key: 'white', label: 'Putih', bg: 'bg-white border-gray-300' },
-                        { key: 'dark', label: 'Gelap', bg: 'bg-gray-900 border-gray-700' },
-                        { key: 'transparent', label: 'Transparan', bg: 'bg-transparent border-gray-300 border-dashed' },
-                        { key: 'gradient', label: 'Gradien', bg: 'bg-gradient-to-r from-blue-600 to-indigo-600' }
+                        { key: 'white', label: 'White', bg: 'bg-white border-gray-300' },
+                        { key: 'dark', label: 'Dark', bg: 'bg-gray-900 border-gray-700' },
+                        { key: 'transparent', label: 'Transparent', bg: 'bg-transparent border-gray-300 border-dashed' },
+                        { key: 'gradient', label: 'Gradient', bg: 'bg-gradient-to-r from-blue-600 to-indigo-600' }
                       ].map((option) => (
                         <button
                           key={option.key}
@@ -519,7 +519,7 @@ const NavbarSettings = () => {
                   💡 Tips
                 </h3>
                 <ul className="space-y-3 text-blue-800 dark:text-blue-200 text-sm">
-                  <li>• Gunakan Preview untuk melihat perubahan secara real-time</li>
+                  <li>• Use Preview to see changes in real-time</li>
                   <li>• Gradient background cocok untuk landing page yang modern</li>
                   <li>• Compact mode berguna untuk layar kecil</li>
                   <li>• Fixed position membuat navbar selalu terlihat saat scroll</li>

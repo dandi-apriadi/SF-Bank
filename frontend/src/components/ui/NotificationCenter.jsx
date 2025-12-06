@@ -43,10 +43,10 @@ const NotificationCenter = ({ maxVisible = 6 }) => {
                 {!n.read && <span className="w-2 h-2 mt-1 rounded-full bg-blue-500" />}
               </div>
             ))}
-            {!items.length && <div className="p-4 text-xs text-gray-400">Tidak ada notifikasi</div>}
+            {!items.length && <div className="p-4 text-xs text-gray-400">No notifications</div>}
           </div>
           <div className="px-3 py-2 border-t border-gray-100 text-right">
-            <button className="text-[11px] text-blue-600 hover:underline">Lihat Semua</button>
+            <button className="text-[11px] text-blue-600 hover:underline">View All</button>
           </div>
         </div>
       )}

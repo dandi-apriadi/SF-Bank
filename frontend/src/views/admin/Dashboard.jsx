@@ -319,7 +319,7 @@ export default function Dashboard() {
           </div>
 
           {weeklyTotals.length === 0 && rssViewMode === 'chart' && (
-            <div className="text-sm text-gray-500 dark:text-gray-400">Belum ada data kontribusi yang tercatat.</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">No contribution data recorded yet.</div>
           )}
 
           {rssViewMode === 'chart' && weeklyTotals.length > 0 && (
@@ -790,7 +790,7 @@ export default function Dashboard() {
           {rssViewMode === 'table' && (
             <div className="mt-2 overflow-x-auto">
               {topContributors.length === 0 ? (
-                <div className="text-sm text-gray-500 dark:text-gray-400">Belum ada data kontribusi yang tercatat.</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">No contribution data recorded yet.</div>
               ) : (
                 <table className="min-w-full table-fixed text-sm">
                   <thead className="bg-gray-100 dark:bg-slate-700/60">

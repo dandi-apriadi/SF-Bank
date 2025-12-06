@@ -75,13 +75,7 @@ const AuditLog = db.define('audit_logs', {
             fields: ['user_id']
         },
         {
-            fields: ['action']
-        },
-        {
             fields: ['target_type', 'target_id']
-        },
-        {
-            fields: ['timestamp']
         }
     ]
 });

@@ -32,7 +32,7 @@ class AuditLogger {
       console.log(`[AUDIT LOG] User ${userId} - ${action} ${targetType} #${targetId}: ${details}`);
     } catch (error) {
       console.error("[AUDIT LOG ERROR]", error);
-      // Jangan throw error agar tidak menggangu operasi utama
+      // Don't throw error to avoid disrupting main operation
     }
   }
 

@@ -113,7 +113,7 @@ app.use((err, req, res, next) => {
     // Handle Multer errors (e.g., file too large) with a clear 413 response
     if (err && (err instanceof multer.MulterError || err.code === 'LIMIT_FILE_SIZE')) {
         console.warn('Multer error:', err.code || err.message);
-        return res.status(413).json({ msg: 'File terlalu besar atau upload gagal', code: err.code || 'MULTER_ERROR' });
+        return res.status(413).json({ msg: 'File is too large or upload failed', code: err.code || 'MULTER_ERROR' });
     }
 
     const isDev = (process.env.NODE_ENV || 'development') === 'development';

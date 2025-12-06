@@ -2,7 +2,7 @@ import React from 'react';
 import { tokenClasses } from 'styles/designTokens';
 
 /**
- * ButtonPrimary - tombol utama konsisten menggunakan design tokens.
+ * ButtonPrimary - main button consistent using design tokens.
  * Props:
  * - children: isi konten
  * - className: tambahan kelas opsional

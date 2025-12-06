@@ -11,9 +11,9 @@ export const useLogout = () => {
   const logout = async (options = {}) => {
     const {
       showConfirmation = true,
-      confirmTitle = 'Konfirmasi Logout',
+      confirmTitle = 'Confirm Logout',
       confirmText = 'Are you sure you want to logout from the system?',
-      successTitle = 'Logout Berhasil!',
+      successTitle = 'Logout Successful!',
       successText = 'You have successfully logged out from the system',
       redirectTo = '/auth/signin'
     } = options;
@@ -30,7 +30,7 @@ export const useLogout = () => {
         confirmButtonColor: '#dc2626',
         cancelButtonColor: '#6b7280',
         confirmButtonText: 'Yes, Logout',
-        cancelButtonText: 'Batal',
+        cancelButtonText: 'Cancel',
         reverseButtons: true,
         customClass: {
           popup: 'rounded-xl',
@@ -47,7 +47,7 @@ export const useLogout = () => {
         // Show loading state
         Swal.fire({
           title: 'Logging out...',
-          text: 'Mohon tunggu sebentar',
+          text: 'Please wait a moment',
           allowOutsideClick: false,
           showConfirmButton: false,
           didOpen: () => {
@@ -87,8 +87,8 @@ export const useLogout = () => {
         } else {
           // Handle logout error
           Swal.fire({
-            title: 'Logout Gagal!',
-            text: logoutResult.payload || 'Terjadi kesalahan saat logout',
+            title: 'Logout Failed!',
+            text: logoutResult.payload || 'An error occurred during logout',
             icon: 'error',
             confirmButtonColor: '#dc2626',
             confirmButtonText: 'OK',
@@ -104,7 +104,7 @@ export const useLogout = () => {
         console.error('Logout error:', error);
         Swal.fire({
           title: 'Error!',
-          text: 'Terjadi kesalahan yang tidak terduga',
+          text: 'An unexpected error occurred',
           icon: 'error',
           confirmButtonColor: '#dc2626',
           confirmButtonText: 'OK',

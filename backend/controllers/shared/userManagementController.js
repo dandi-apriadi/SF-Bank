@@ -24,7 +24,7 @@ export const getUsers = async (req, res) => {
         console.error('Get users error:', error);
         return res.status(500).json({
             success: false,
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }
@@ -48,7 +48,7 @@ export const getUserById = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                msg: 'User tidak ditemukan'
+                msg: 'User not found'
             });
         }
 
@@ -61,7 +61,7 @@ export const getUserById = async (req, res) => {
         console.error('Get user by ID error:', error);
         return res.status(500).json({
             success: false,
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }
@@ -87,7 +87,7 @@ export const createUser = async (req, res) => {
         if (!fullname || !email || !role || !password) {
             return res.status(400).json({
                 success: false,
-                msg: 'Nama lengkap, email, role, dan password harus diisi'
+                msg: 'Full name, email, role, and password are required'
             });
         }
 
@@ -95,7 +95,7 @@ export const createUser = async (req, res) => {
         if (password.length < 8) {
             return res.status(400).json({
                 success: false,
-                msg: 'Password harus minimal 8 karakter'
+                msg: 'Password must be at least 8 characters'
             });
         }
 
@@ -104,7 +104,7 @@ export const createUser = async (req, res) => {
         if (!emailRegex.test(email)) {
             return res.status(400).json({
                 success: false,
-                msg: 'Format email tidak valid'
+                msg: 'Invalid email format'
             });
         }
 
@@ -116,7 +116,7 @@ export const createUser = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                msg: 'Email sudah terdaftar'
+                msg: 'Email is already registered'
             });
         }
 
@@ -136,7 +136,7 @@ export const createUser = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            msg: 'User berhasil dibuat',
+            msg: 'User created successfully',
             data: {
                 user_id: newUser.user_id,
                 fullname: newUser.fullname,
@@ -155,11 +155,11 @@ export const createUser = async (req, res) => {
             const validationErrors = error.errors.map(err => {
                 switch (err.path) {
                     case 'email':
-                        return 'Format email tidak valid';
+                        return 'Invalid email format';
                     case 'fullname':
-                        return 'Nama lengkap harus diisi dan minimal 2 karakter';
+                        return 'Full name is required and must be at least 2 characters';
                     case 'password':
-                        return 'Password tidak valid';
+                        return 'Invalid password';
                     default:
                         return err.message;
                 }
@@ -174,10 +174,10 @@ export const createUser = async (req, res) => {
         // Handle unique constraint errors
         if (error.name === 'SequelizeUniqueConstraintError') {
             const field = error.errors[0]?.path;
-            let message = 'Data sudah terdaftar';
+            let message = 'Data is already registered';
             
             if (field === 'email') {
-                message = 'Email sudah terdaftar';
+                message = 'Email is already registered';
             }
             
             return res.status(400).json({
@@ -188,7 +188,7 @@ export const createUser = async (req, res) => {
         
         return res.status(500).json({
             success: false,
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }
@@ -220,7 +220,7 @@ export const updateUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                msg: 'User tidak ditemukan'
+                msg: 'User not found'
             });
         }
 
@@ -230,7 +230,7 @@ export const updateUser = async (req, res) => {
             if (!emailRegex.test(email)) {
                 return res.status(400).json({
                     success: false,
-                    msg: 'Format email tidak valid'
+                    msg: 'Invalid email format'
                 });
             }
 
@@ -245,7 +245,7 @@ export const updateUser = async (req, res) => {
             if (existingUser) {
                 return res.status(400).json({
                     success: false,
-                    msg: 'Email sudah terdaftar'
+                    msg: 'Email is already registered'
                 });
             }
         }
@@ -254,7 +254,7 @@ export const updateUser = async (req, res) => {
         if (password && password.trim() !== '' && password.length < 8) {
             return res.status(400).json({
                 success: false,
-                msg: 'Password harus minimal 8 karakter'
+                msg: 'Password must be at least 8 characters'
             });
         }
 
@@ -290,7 +290,7 @@ export const updateUser = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            msg: 'User berhasil diperbarui',
+            msg: 'User updated successfully',
             data: updatedUser
         });
 
@@ -303,11 +303,11 @@ export const updateUser = async (req, res) => {
             const validationErrors = error.errors.map(err => {
                 switch (err.path) {
                     case 'email':
-                        return 'Format email tidak valid';
+                        return 'Invalid email format';
                     case 'fullname':
-                        return 'Nama lengkap harus diisi dan minimal 2 karakter';
+                        return 'Full name is required and must be at least 2 characters';
                     case 'password':
-                        return 'Password tidak valid';
+                        return 'Invalid password';
                     default:
                         return err.message;
                 }
@@ -322,12 +322,12 @@ export const updateUser = async (req, res) => {
         // Handle unique constraint errors
         if (error.name === 'SequelizeUniqueConstraintError') {
             const field = error.errors[0]?.path;
-            let message = 'Data sudah terdaftar';
+            let message = 'Data is already registered';
             
             if (field === 'email') {
-                message = 'Email sudah terdaftar';
+                message = 'Email is already registered';
             } else if (field === 'nip') {
-                message = 'NIP sudah terdaftar';
+                message = 'NIP is already registered';
             }
             
             return res.status(400).json({
@@ -338,7 +338,7 @@ export const updateUser = async (req, res) => {
         
         return res.status(500).json({
             success: false,
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }
@@ -362,7 +362,7 @@ export const deleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                msg: 'User tidak ditemukan'
+                msg: 'User not found'
             });
         }
 
@@ -370,7 +370,7 @@ export const deleteUser = async (req, res) => {
         if (req.user_id === id) {
             return res.status(400).json({
                 success: false,
-                msg: 'Tidak dapat menghapus akun sendiri'
+                msg: 'Cannot delete your own account'
             });
         }
 
@@ -384,7 +384,7 @@ export const deleteUser = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            msg: 'User berhasil dihapus'
+            msg: 'User deleted successfully'
         });
 
     } catch (error) {
@@ -392,7 +392,7 @@ export const deleteUser = async (req, res) => {
         console.error('Delete user error:', error);
         return res.status(500).json({
             success: false,
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }
@@ -411,7 +411,7 @@ export const changePassword = async (req, res) => {
 
         if (!oldPassword || !newPassword) {
             return res.status(400).json({
-                msg: 'Password lama dan baru harus diisi'
+                msg: 'Old and new passwords are required'
             });
         }
 
@@ -421,14 +421,14 @@ export const changePassword = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                msg: 'User tidak ditemukan'
+                msg: 'User not found'
             });
         }
 
         const validPassword = await argon2.verify(user.password, oldPassword);
         if (!validPassword) {
             return res.status(400).json({
-                msg: 'Password lama tidak sesuai'
+                msg: 'Old password does not match'
             });
         }
 
@@ -444,14 +444,14 @@ export const changePassword = async (req, res) => {
         await transaction.commit();
 
         return res.status(200).json({
-            msg: 'Password berhasil diperbarui'
+            msg: 'Password updated successfully'
         });
 
     } catch (error) {
         if (transaction) await transaction.rollback();
         console.error('Change password error:', error);
         return res.status(500).json({
-            msg: 'Terjadi kesalahan pada server',
+            msg: 'An error occurred on the server',
             error: error.message
         });
     }

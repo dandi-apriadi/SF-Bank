@@ -27,9 +27,9 @@ export function SidebarLinks(props) {
     );
 
     if (activeMacroRoute) {
-      dispatch(setMicroPage(activeMacroRoute.name)); // Set makro page jika rute makro aktif
+      dispatch(setMicroPage(activeMacroRoute.name)); // Set macro page if macro route is active
     } else {
-      dispatch(setMicroPage("unset")); // Set unset jika tidak ada rute makro yang aktif
+      dispatch(setMicroPage("unset")); // Set unset if no macro route is active
     }
   }, [routes, location.pathname, dispatch]);
 

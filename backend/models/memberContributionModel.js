@@ -96,12 +96,6 @@ const MemberContribution = db.define('member_contributions', {
             fields: ['alliance_id']
         },
         {
-            fields: ['week']
-        },
-        {
-            fields: ['date']
-        },
-        {
             unique: true,
             fields: ['member_id', 'alliance_id', 'week']
         }

@@ -22,7 +22,7 @@ export const contactController = {
 
     // Optionally, you could create a Notification or ActivityLog here.
 
-    return res.json({ msg: 'Pesan berhasil diterima. Tim kami akan menghubungi Anda.', data: { received: true } });
+    return res.json({ msg: 'Message received successfully. Our team will contact you.', data: { received: true } });
   })
 };
 

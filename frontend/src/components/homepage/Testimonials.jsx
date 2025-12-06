@@ -8,18 +8,18 @@ import { API_CONFIG } from 'utils/apiConfig';
 const dummyBlogPosts = [
     {
         id: 1,
-        title: 'Panduan Lengkap untuk Pemula Vaping',
-        excerpt: 'Semua yang perlu Anda ketahui untuk memulai perjalanan vaping Anda dengan benar.',
+        title: 'Complete Guide for Vaping Beginners',
+        excerpt: 'Everything you need to know to start your vaping journey correctly.',
         image: 'https://images.unsplash.com/photo-1562311783-6b2c90d0758f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-03-15T14:30:00',
         author: 'John Doe',
         category: 'Beginner Guide',
-        slug: 'panduan-pemula-vaping'
+        slug: 'complete-vaping-beginners-guide'
     },
     {
         id: 2,
-        title: 'Top 5 Liquid Vape dengan Rasa Terbaik 2024',
-        excerpt: 'Ulasan tentang liquid vape premium dengan cita rasa yang luar biasa untuk tahun ini.',
+        title: 'Top 5 Best Flavored Liquid Vapes 2024',
+        excerpt: 'A review of premium liquid vapes with outstanding flavors for this year.',
         image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-03-10T09:15:00',
         author: 'Jane Smith',
@@ -28,8 +28,8 @@ const dummyBlogPosts = [
     },
     {
         id: 3,
-        title: 'Cara Merawat Pod System Anda',
-        excerpt: 'Tips dan trik untuk memperpanjang umur pod system dan mengoptimalkan kinerja.',
+        title: 'How to Maintain Your Pod System',
+        excerpt: 'Tips and tricks to extend the life of your pod system and optimize performance.',
         image: 'https://images.unsplash.com/photo-1567393582594-1a3700905a4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-03-05T16:45:00',
         author: 'Mike Johnson',
@@ -38,8 +38,8 @@ const dummyBlogPosts = [
     },
     {
         id: 4,
-        title: 'Perbedaan Antara Freebase dan Salt Nicotine',
-        excerpt: 'Memahami perbedaan, kelebihan, dan kekurangan dari dua jenis nikotin utama dalam liquid vape.',
+        title: 'Difference Between Freebase and Salt Nicotine',
+        excerpt: 'Understanding the differences, advantages, and disadvantages of the two main types of nicotine in liquid vapes.',
         image: 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-03-02T11:20:00',
         author: 'Sarah Williams',
@@ -48,23 +48,23 @@ const dummyBlogPosts = [
     },
     {
         id: 5,
-        title: 'Tren Vaping Terbaru di Indonesia',
-        excerpt: 'Mengikuti perkembangan terbaru dalam industri vaping di Indonesia dan tren yang sedang populer.',
+        title: 'Latest Vaping Trends in Indonesia',
+        excerpt: 'Follow the latest developments in the vaping industry in Indonesia and current popular trends.',
         image: 'https://images.unsplash.com/photo-1530716222358-0a3577f5d8be?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-02-28T13:45:00',
         author: 'David Brown',
         category: 'Industry News',
-        slug: 'tren-vaping-terbaru-indonesia'
+        slug: 'latest-vaping-trends-indonesia'
     },
     {
         id: 6,
-        title: 'Vaping dan Kesehatan: Fakta vs Mitos',
-        excerpt: 'Membahas berbagai penelitian terkini tentang dampak vaping terhadap kesehatan.',
+        title: 'Vaping and Health: Facts vs Myths',
+        excerpt: 'Discussing various current research on the impact of vaping on health.',
         image: 'https://images.unsplash.com/photo-1571732262721-64accf5a3602?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
         date: '2024-02-25T10:30:00',
         author: 'Emma Davis',
         category: 'Health',
-        slug: 'vaping-kesehatan-fakta-mitos'
+        slug: 'vaping-health-facts-myths'
     },
     // More blog posts can be added here
 ];

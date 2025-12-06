@@ -54,8 +54,8 @@ const SignIn = () => {
       Swal.fire({
         icon: 'warning',
         iconColor: '#f59e0b',
-        title: 'Kolom Kosong',
-        text: 'Silahkan isi email dan password',
+        title: 'Empty Fields',
+        text: 'Please fill in your email and password',
         timer: 2000,
         timerProgressBar: true,
         confirmButtonColor: '#3b82f6',
@@ -76,7 +76,7 @@ const SignIn = () => {
       Swal.fire({
         icon: 'warning',
         iconColor: '#f59e0b',
-        title: 'Email Tidak Valid',
+        title: 'Invalid Email',
         text: 'Please enter a valid email address',
         timer: 2000,
         timerProgressBar: true,
@@ -99,10 +99,10 @@ const SignIn = () => {
       Swal.fire({
         icon: 'error',
         iconColor: '#3b82f6',
-        title: 'Login Gagal',
-        text: error?.message || 'Email atau password tidak valid',
+        title: 'Login Failed',
+        text: error?.message || 'Invalid email or password',
         confirmButtonColor: '#3b82f6',
-        confirmButtonText: 'Coba Lagi',
+        confirmButtonText: 'Try Again',
         timer: 3000,
         timerProgressBar: true,
         customClass: {
@@ -121,7 +121,7 @@ const SignIn = () => {
         <div className="bg-white/95 rounded-2xl p-8 flex flex-col items-center shadow-2xl border border-gray-200">
           <div className="animate-spin rounded-full h-12 w-12 border-3 border-blue-600 border-t-transparent mb-4" />
           <p className="text-gray-700 font-semibold">Memverifikasi kredensial...</p>
-          <p className="text-gray-500 text-sm mt-1">Mohon tunggu sebentar</p>
+          <p className="text-gray-500 text-sm mt-1">Please wait a moment</p>
         </div>
       </div>
     );
