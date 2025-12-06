@@ -5,9 +5,8 @@ import Links from "./components/Links";
 // Use single routes file for admin only
 import routesAdmin from "../../routes/routes-admin.js";
 import { useSelector } from "react-redux";
-// Replaced local images with Unsplash URLs
-const BETON_LOGO_URL = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80';
-const PROPOSAL_GEDUNG_URL = 'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1400&q=80';
+import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+import SacredLogoStatic from '../../assets/img/auth/logo.png';
 
 // Validate routes to ensure they contain valid components
 const validateRoutes = (routes) => {
@@ -90,10 +89,10 @@ const Sidebar = ({ open, onClose }) => {
           {/* Background Overlay with Role-based Color */}
           <div className={`absolute inset-0 ${roleColorScheme.bg} opacity-90`}></div>
 
-          {/* Background Image with Parallax Effect - Using Building Image */}
+          {/* Background Image with Parallax Effect - Using Sacred Logo */}
           <div className="absolute inset-0 opacity-20 bg-cover bg-center"
             style={{
-              backgroundImage: `url(${PROPOSAL_GEDUNG_URL})`,
+              backgroundImage: `url(${SacredLogoStatic})`,
               transform: 'scale(1.1)',
               backgroundPosition: 'center'
             }}>
@@ -103,7 +102,7 @@ const Sidebar = ({ open, onClose }) => {
           <div className="relative z-10 flex flex-col items-center">
             <div className="h-16 w-16 mb-2 rounded-full overflow-hidden border-2 border-white shadow-md">
               <img
-                src={BETON_LOGO_URL}
+                src={SacredLogo}
                 alt="SacredBank Logo"
                 className="w-full h-full object-cover"
               />

@@ -32,6 +32,12 @@ export default function Admin(props) {
   useEffect(() => { dispatch(getMe()); }, [dispatch]);
   useEffect(()=>{ if(!institution.data && !institution.isLoading) dispatch(fetchInstitutionMetrics()); }, [institution, dispatch]);
 
+  // Force white theme in admin panel
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    setIsDarkMode(false);
+  }, []);
+
   useEffect(() => {
     const currentPath = location.pathname.split("/").pop();
     const currentRoute = routes.find(

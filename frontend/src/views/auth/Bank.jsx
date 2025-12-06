@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   GiTwoCoins, 
-  GiReceiveMoney,
-  GiPayMoney,
   GiTrophyCup,
   GiChestArmor,
   GiCoinsPile,
@@ -19,25 +17,110 @@ import {
   MdStar
 } from 'react-icons/md';
 import { 
-  FiArrowRight,
-  FiDollarSign,
-  FiAward
+  FiArrowRight
 } from 'react-icons/fi';
 import SacredLogo from '../../assets/img/auth/animatedlogo.gif';
+import { fetchAlliances, fetchReportsSummary } from '../../services/bankService';
 
 const Bank = () => {
-  const [stats, setStats] = useState({
-    totalFood: 1250000000,
-    totalWood: 950000000,
-    totalStone: 720000000,
-    totalGold: 580000000,
-    totalMembers: 150,
-    totalContributions: 3500000000,
-    weeklyAverage: 23333333
-  });
+  const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
+  const [topContributors, setTopContributors] = useState([]);
+  const [recentContributions, setRecentContributions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     document.title = "Kingdom Bank - Sacred3946";
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError('');
+
+      try {
+        const [summary, alliances] = await Promise.all([
+          fetchReportsSummary(),
+          fetchAlliances(),
+        ]);
+
+        const allianceList = Array.isArray(alliances) ? alliances : [];
+        const deposits = Array.isArray(summary?.deposits) ? summary.deposits : [];
+        const members = Array.isArray(summary?.members) ? summary.members : [];
+
+        const totals = allianceList.reduce((acc, alliance) => {
+          acc.food += parseInt(alliance.food) || 0;
+          acc.wood += parseInt(alliance.wood) || 0;
+          acc.stone += parseInt(alliance.stone) || 0;
+          acc.gold += parseInt(alliance.gold) || 0;
+          acc.members += parseInt(alliance.members_count) || 0;
+          return acc;
+        }, { food: 0, wood: 0, stone: 0, gold: 0, members: 0 });
+
+        const totalContributions = totals.food + totals.wood + totals.stone + totals.gold;
+        const uniqueWeeks = new Set(deposits.map((d) => parseInt(d.week) || 0).filter(Boolean));
+        const weeklyAverage = uniqueWeeks.size ? Math.round(totalContributions / uniqueWeeks.size) : 0;
+
+        setStats({
+          totalFood: totals.food,
+          totalWood: totals.wood,
+          totalStone: totals.stone,
+          totalGold: totals.gold,
+          totalMembers: totals.members,
+          totalContributions,
+          weeklyAverage,
+        });
+
+        const contributorIcons = ['👑', '⚔️', '🛡️', '🏆', '📜', '🎯', '🧭'];
+        const contributors = members
+          .slice()
+          .sort((a, b) => (b.total || 0) - (a.total || 0))
+          .slice(0, 5)
+          .map((m, idx) => ({
+            rank: idx + 1,
+            name: m.name || `Member ${m.id}`,
+            totalRss: m.total || 0,
+            food: m.food || 0,
+            wood: m.wood || 0,
+            stone: m.stone || 0,
+            gold: m.gold || 0,
+            icon: contributorIcons[idx] || '🏅',
+          }));
+        setTopContributors(contributors);
+
+        const recent = deposits
+          .slice()
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 10)
+          .map((d) => {
+            const food = d.food || 0;
+            const wood = d.wood || 0;
+            const stone = d.stone || 0;
+            const gold = d.gold || 0;
+            const total = d.total || food + wood + stone + gold;
+            return {
+              id: d.id,
+              member: d.member || d.member_name || 'Member',
+              food,
+              wood,
+              stone,
+              gold,
+              totalRss: total,
+              week: d.week || 0,
+              date: d.date ? new Date(d.date).toLocaleString() : '-'
+            };
+          });
+        setRecentContributions(recent);
+      } catch (err) {
+        const message = err?.message || 'Failed to load bank data';
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   // Animation variants
@@ -67,21 +150,34 @@ const Bank = () => {
     return num.toString();
   };
 
-  const topContributors = [
-    { rank: 1, name: "Emperor", totalRss: 250000000, food: 80000000, wood: 70000000, stone: 60000000, gold: 40000000, icon: '👑' },
-    { rank: 2, name: "Warlord", totalRss: 200000000, food: 65000000, wood: 55000000, stone: 50000000, gold: 30000000, icon: '⚔️' },
-    { rank: 3, name: "General", totalRss: 180000000, food: 60000000, wood: 50000000, stone: 45000000, gold: 25000000, icon: '🛡️' },
-    { rank: 4, name: "Commander", totalRss: 150000000, food: 50000000, wood: 40000000, stone: 35000000, gold: 25000000, icon: '🏆' },
-    { rank: 5, name: "Strategist", totalRss: 120000000, food: 40000000, wood: 35000000, stone: 30000000, gold: 15000000, icon: '📜' }
-  ];
+  const resolvedStats = stats || {
+    totalFood: 0,
+    totalWood: 0,
+    totalStone: 0,
+    totalGold: 0,
+    totalMembers: 0,
+    totalContributions: 0,
+    weeklyAverage: 0,
+  };
 
-  const recentContributions = [
-    { id: 1, member: 'Emperor', food: 5000000, wood: 3000000, stone: 2000000, gold: 1000000, totalRss: 11000000, date: '2 hours ago', week: 49 },
-    { id: 2, member: 'Warlord', food: 4000000, wood: 3500000, stone: 2500000, gold: 1500000, totalRss: 11500000, date: '5 hours ago', week: 49 },
-    { id: 3, member: 'General', food: 3500000, wood: 3000000, stone: 2000000, gold: 1000000, totalRss: 9500000, date: '1 day ago', week: 49 },
-    { id: 4, member: 'Commander', food: 4000000, wood: 2500000, stone: 2000000, gold: 1500000, totalRss: 10000000, date: '1 day ago', week: 49 },
-    { id: 5, member: 'Strategist', food: 3000000, wood: 2000000, stone: 1500000, gold: 1000000, totalRss: 7500000, date: '2 days ago', week: 48 }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0F172A] text-navy-700 dark:text-white">
+        <p className="text-lg font-semibold">Loading bank data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0F172A] text-navy-700 dark:text-white px-4 text-center">
+        <div>
+          <p className="text-lg font-semibold mb-2">Failed to load bank data</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A] pt-24 pb-32 overflow-hidden">
@@ -181,7 +277,7 @@ const Bank = () => {
                 <div className="bg-green-500/10 w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
                   <GiWheat className="w-10 h-10 text-green-400" />
                 </div>
-                <div className="text-3xl font-black text-white mb-2">{formatNumber(stats.totalFood)}</div>
+                <div className="text-3xl font-black text-white mb-2">{formatNumber(resolvedStats.totalFood)}</div>
                 <div className="text-sm font-semibold text-green-400/90 uppercase tracking-wide">Total Food</div>
               </motion.div>
               <motion.div 
@@ -191,18 +287,18 @@ const Bank = () => {
                 <div className="bg-amber-600/10 w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
                   <GiWoodPile className="w-10 h-10 text-amber-600" />
                 </div>
-                <div className="text-3xl font-black text-white mb-2">{formatNumber(stats.totalWood)}</div>
+                <div className="text-3xl font-black text-white mb-2">{formatNumber(resolvedStats.totalWood)}</div>
                 <div className="text-sm font-semibold text-amber-600/90 uppercase tracking-wide">Total Wood</div>
               </motion.div>
               <motion.div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="group bg-gradient-to-br from-[#1E293B]/95 to-[#0F172A]/90 backdrop-blur-xl rounded-2xl p-8 border-2 border-slate-400/30 hover:border-slate-300/60 shadow-lg hover:shadow-slate-400/20 transition-all duration-300"
               >
-                <div className="bg-slate-400/10 w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                  <GiStoneBlock className="w-10 h-10 text-slate-400" />
+                <div className="bg-slate-200/15 w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                  <GiStoneBlock className="w-10 h-10 text-white" />
                 </div>
-                <div className="text-3xl font-black text-white mb-2">{formatNumber(stats.totalStone)}</div>
-                <div className="text-sm font-semibold text-slate-400/90 uppercase tracking-wide">Total Stone</div>
+                <div className="text-3xl font-black text-white mb-2">{formatNumber(resolvedStats.totalStone)}</div>
+                <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">Total Stone</div>
               </motion.div>
               <motion.div 
                 whileHover={{ scale: 1.05, y: -5 }}
@@ -211,7 +307,7 @@ const Bank = () => {
                 <div className="bg-[#FFD700]/10 w-16 h-16 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
                   <GiGoldBar className="w-10 h-10 text-[#FFD700]" />
                 </div>
-                <div className="text-3xl font-black text-white mb-2">{formatNumber(stats.totalGold)}</div>
+                <div className="text-3xl font-black text-white mb-2">{formatNumber(resolvedStats.totalGold)}</div>
                 <div className="text-sm font-semibold text-[#FFD700]/90 uppercase tracking-wide">Total Gold</div>
               </motion.div>
             </motion.div>
@@ -228,7 +324,7 @@ const Bank = () => {
                     <span className="text-xs font-bold text-[#FFD700] uppercase">Total</span>
                   </div>
                 </div>
-                <div className="text-4xl font-black text-white mb-2">{formatNumber(stats.totalContributions)}</div>
+                <div className="text-4xl font-black text-white mb-2">{formatNumber(resolvedStats.totalContributions)}</div>
                 <div className="text-sm font-semibold text-[#E2E8F0]/80 uppercase tracking-wide">Total Resources</div>
               </motion.div>
               <motion.div 
@@ -241,7 +337,7 @@ const Bank = () => {
                     <span className="text-xs font-bold text-[#C5A059] uppercase">Active</span>
                   </div>
                 </div>
-                <div className="text-4xl font-black text-white mb-2">{stats.totalMembers}</div>
+                <div className="text-4xl font-black text-white mb-2">{resolvedStats.totalMembers}</div>
                 <div className="text-sm font-semibold text-[#E2E8F0]/80 uppercase tracking-wide">Contributors</div>
               </motion.div>
               <motion.div 
@@ -254,7 +350,7 @@ const Bank = () => {
                     <span className="text-xs font-bold text-blue-400 uppercase">Weekly</span>
                   </div>
                 </div>
-                <div className="text-4xl font-black text-white mb-2">{formatNumber(stats.weeklyAverage)}</div>
+                <div className="text-4xl font-black text-white mb-2">{formatNumber(resolvedStats.weeklyAverage)}</div>
                 <div className="text-sm font-semibold text-[#E2E8F0]/80 uppercase tracking-wide">Average</div>
               </motion.div>
             </motion.div>
@@ -341,7 +437,7 @@ const Bank = () => {
                         <span className="font-black text-white">{formatNumber(contributor.wood)}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="flex items-center text-slate-400 font-semibold"><GiStoneBlock className="w-4 h-4 mr-1" />Stone</span>
+                        <span className="flex items-center text-white font-semibold"><GiStoneBlock className="w-4 h-4 mr-1" />Stone</span>
                         <span className="font-black text-white">{formatNumber(contributor.stone)}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
@@ -431,7 +527,7 @@ const Bank = () => {
                         <div className="text-base font-black text-amber-600">{formatNumber(contribution.wood)}</div>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap text-center">
-                        <div className="text-base font-black text-slate-400">{formatNumber(contribution.stone)}</div>
+                        <div className="text-base font-black text-white">{formatNumber(contribution.stone)}</div>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap text-center">
                         <div className="text-base font-black text-[#FFD700]">{formatNumber(contribution.gold)}</div>

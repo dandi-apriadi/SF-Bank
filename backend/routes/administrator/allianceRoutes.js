@@ -22,14 +22,13 @@ import { authenticate, authorize } from '../../middleware/AuthUser.js';
 
 const router = express.Router();
 
-// All alliance routes require authentication
-router.use(authenticate);
-
-// Get all alliances
+// Public routes for bank view (no auth required)
 router.get('/alliances', getAlliances);
-
-// Get single alliance by ID
 router.get('/alliances/:id', getAllianceById);
+router.get('/reports/summary', getReportsSummary);
+
+// Protected routes
+router.use(authenticate);
 
 // Get alliance members with contributions
 router.get('/alliances/:id/members', getAllianceMembers);
@@ -70,8 +69,5 @@ router.delete('/member-contributions/:id', deleteMemberContribution);
 
 // Delete member contribution by memberId, allianceId, and week
 router.delete('/member-contributions/:memberId/:allianceId/:week', deleteMemberContribution);
-
-// Reports summary (aggregated data for frontend Reports page)
-router.get('/reports/summary', getReportsSummary);
 
 export default router;
