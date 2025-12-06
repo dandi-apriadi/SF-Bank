@@ -34,8 +34,7 @@ const NotificationCenter = ({ maxVisible = 6 }) => {
             </div>
           </div>
           <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
-            {isLoading && <div className="p-4 text-xs text-gray-500">Memuat...</div>}
-            {!isLoading && items.slice(0, maxVisible).map(n=> (
+            {items.slice(0, maxVisible).map(n=> (
               <div key={n.id} className={`p-3 text-xs cursor-pointer flex items-start space-x-2 hover:bg-gray-50 ${priorityStyles[n.priority] || ''} border-l-4`} onClick={()=>dispatch(markRead(n.id))}>
                 <div className="flex-1">
                   <p className="font-medium leading-snug">{n.message}</p>
@@ -44,7 +43,7 @@ const NotificationCenter = ({ maxVisible = 6 }) => {
                 {!n.read && <span className="w-2 h-2 mt-1 rounded-full bg-blue-500" />}
               </div>
             ))}
-            {!isLoading && !items.length && <div className="p-4 text-xs text-gray-400">Tidak ada notifikasi</div>}
+            {!items.length && <div className="p-4 text-xs text-gray-400">Tidak ada notifikasi</div>}
           </div>
           <div className="px-3 py-2 border-t border-gray-100 text-right">
             <button className="text-[11px] text-blue-600 hover:underline">Lihat Semua</button>

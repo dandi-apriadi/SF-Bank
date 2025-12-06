@@ -1,12 +1,6 @@
 import React from 'react';
 
-const LoadingOverlay = ({ text = 'Reloading Sacred Bank...' }) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-[60]">
-    <div className="px-6 py-4 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center space-x-3">
-      <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent animate-spin rounded-full" />
-      <span className="text-sm text-gray-700 font-medium">{text}</span>
-    </div>
-  </div>
-);
+// Loading overlay disabled - returns null to remove all loading animations
+const LoadingOverlay = ({ text = 'Reloading Sacred Bank...' }) => null;
 
 export default LoadingOverlay;

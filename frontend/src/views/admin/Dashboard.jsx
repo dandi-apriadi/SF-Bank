@@ -209,12 +209,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {loading && (
-        <div className="mb-4 rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200">
-          Memuat data dashboard...
-        </div>
-      )}
-
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {/* Card: Members */}
         <div data-aos="fade-up" className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-slate-900/40 p-4 sm:p-5 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
