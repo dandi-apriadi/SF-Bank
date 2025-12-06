@@ -124,7 +124,7 @@ const Sidebar = ({ open, onClose }) => {
             <FaUserCircle className="h-9 w-9 text-white" />
           </div>
           <div className="ml-3 flex-1">
-            <h4 className="font-bold text-gray-800 dark:text-white truncate">{user?.fullname || 'User'}</h4>
+            <h4 className="font-bold text-gray-800 dark:text-white truncate">{user?.name || 'User'}</h4>
             {user?.role && (
               <div className="flex items-center mt-1">
                 <span className={`

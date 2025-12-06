@@ -1,42 +1,44 @@
 // backend/routes/audit/auditLogRoutes.js
-const express = require("express");
+import express from 'express';
+import {
+  getAllLogs,
+  getStatistics,
+  getLogDetail,
+  getLogsByUser,
+  getLogsByTarget,
+  createLog,
+  exportLogs,
+  deleteOldLogs,
+} from '../../controllers/audit/auditLogController.js';
+import { authenticate, authorize } from '../../middleware/AuthUser.js';
+
 const router = express.Router();
-const AuditLogController = require("../../controllers/audit/auditLogController");
-const AuthUser = require("../../middleware/AuthUser");
 
 // Middleware untuk cek admin role
-const checkAdminRole = (req, res, next) => {
-  if (!req.user || !["Admin", "R5"].includes(req.user.role)) {
-    return res.status(403).json({
-      success: false,
-      message: "Unauthorized: Admin access required",
-    });
-  }
-  next();
-};
+const checkAdminRole = authorize(['Admin', 'R5']);
 
 // GET - Get all audit logs dengan filter
-router.get("/", AuthUser, checkAdminRole, AuditLogController.getAllLogs);
+router.get('/', authenticate, checkAdminRole, getAllLogs);
 
 // GET - Get statistics
-router.get("/statistics", AuthUser, checkAdminRole, AuditLogController.getStatistics);
+router.get('/statistics', authenticate, checkAdminRole, getStatistics);
 
 // GET - Get audit log detail
-router.get("/:logId", AuthUser, checkAdminRole, AuditLogController.getLogDetail);
+router.get('/:logId', authenticate, checkAdminRole, getLogDetail);
 
 // GET - Get logs by user
-router.get("/user/:userId", AuthUser, checkAdminRole, AuditLogController.getLogsByUser);
+router.get('/user/:userId', authenticate, checkAdminRole, getLogsByUser);
 
 // GET - Get logs by target (alliance, user, bank, resource)
-router.get("/target/:targetType/:targetId", AuthUser, checkAdminRole, AuditLogController.getLogsByTarget);
+router.get('/target/:targetType/:targetId', authenticate, checkAdminRole, getLogsByTarget);
 
 // POST - Create audit log (internal use)
-router.post("/", AuthUser, AuditLogController.createLog);
+router.post('/', authenticate, createLog);
 
 // GET - Export logs to CSV
-router.get("/export/csv", AuthUser, checkAdminRole, AuditLogController.exportLogs);
+router.get('/export/csv', authenticate, checkAdminRole, exportLogs);
 
 // POST - Delete old logs
-router.post("/delete-old", AuthUser, checkAdminRole, AuditLogController.deleteOldLogs);
+router.post('/delete-old', authenticate, checkAdminRole, deleteOldLogs);
 
-module.exports = router;
+export default router;

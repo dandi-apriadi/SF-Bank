@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FiSearch, FiEdit2, FiTrash2, FiX, FiCheck, FiMail, FiUser, FiShield, FiActivity } from "react-icons/fi";
+import { FiSearch, FiEdit2, FiTrash2, FiX, FiCheck, FiMail, FiUser, FiShield, FiActivity, FiLoader } from "react-icons/fi";
+import userService from "../../services/userService.js";
 
 function UserManagement() {
   // Dark mode detection
@@ -15,47 +16,64 @@ function UserManagement() {
     return () => observer.disconnect();
   }, []);
 
-  // Sample user data with admin role
-  const allianceNames = ["Sacred Vanguard", "Sacred Legion", "Sacred Guardians"];
-  const [users, setUsers] = useState(() => {
-    const arr = [];
-    const roles = ["R1", "R2", "R3", "R4", "R5", "Admin"];
-    const statuses = ["Active", "Inactive"];
-    for (let i = 1; i <= 30; i++) {
-      const joined = new Date();
-      joined.setDate(joined.getDate() - Math.floor(Math.random() * 365));
-      arr.push({
-        id: i,
-        user_id: `${1000 + i}`,
-        name: `User ${i}`,
-        email: `user${i}@kingdom.com`,
-        role: roles[i % roles.length],
-        alliance: allianceNames[(i - 1) % allianceNames.length],
-        status: i % 7 === 0 ? "Inactive" : "Active",
-        joined_date: joined.toISOString().slice(0, 10),
-        last_login: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      });
-    }
-    return arr;
-  });
-
-  // Search and filter states
+  // State management
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Edit/Create panels
+  const [showEditPanel, setShowEditPanel] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", role: "R1", password: "" });
+  const [editLoading, setEditLoading] = useState(false);
+
+  const [showCreatePanel, setShowCreatePanel] = useState(false);
+  const [createForm, setCreateForm] = useState({ user_id: "", name: "", email: "", role: "R1", password: "" });
+  const [createLoading, setCreateLoading] = useState(false);
+
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await userService.getAllUsers({ 
+        page: currentPage, 
+        limit: itemsPerPage,
+        role: roleFilter !== "All" ? roleFilter : null 
+      });
+      
+      if (response.data) {
+        setUsers(response.data);
+      } else {
+        setUsers(response || []);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError(err.message || 'Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filtered users
   const filteredUsers = users.filter((user) => {
     const matchSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.user_id.toString().includes(searchQuery) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchRole = roleFilter === "All" || user.role === roleFilter;
     return matchSearch && matchRole;
   });
 
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -65,23 +83,6 @@ function UserManagement() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, roleFilter]);
-
-  // Right panel state for editing user
-  const [showEditPanel, setShowEditPanel] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [editForm, setEditForm] = useState({
-    name: "",
-    email: "",
-    role: "R1",
-  });
-
-  const [showCreatePanel, setShowCreatePanel] = useState(false);
-  const [createForm, setCreateForm] = useState({
-    user_id: "",
-    name: "",
-    email: "",
-    role: "R1",
-  });
 
   const openEditPanel = (user) => {
     setSelectedUser(user);
@@ -101,16 +102,12 @@ function UserManagement() {
   const closeEditPanel = () => {
     setShowEditPanel(false);
     setSelectedUser(null);
-    setEditForm({
-      name: "",
-      email: "",
-      role: "Member",
-    });
+    setEditForm({ name: "", email: "", role: "R1", password: "" });
   };
 
   const closeCreatePanel = () => {
     setShowCreatePanel(false);
-    setCreateForm({ user_id: "", name: "", email: "", role: "R1" });
+    setCreateForm({ user_id: "", name: "", email: "", role: "R1", password: "" });
   };
 
   const handleEditInputChange = (e) => {
@@ -121,8 +118,6 @@ function UserManagement() {
     }));
   };
 
-  const isNumericId = (val) => /^[0-9]+$/.test(val);
-
   const handleCreateInputChange = (e) => {
     const { name, value } = e.target;
     setCreateForm((prev) => ({
@@ -131,79 +126,111 @@ function UserManagement() {
     }));
   };
 
-  const submitEditForm = (e) => {
+  const submitEditForm = async (e) => {
     e.preventDefault();
     if (!editForm.name.trim() || !editForm.email.trim()) {
       alert("Please fill in all required fields");
       return;
     }
-    
-    // Update user
-    setUsers(prev => prev.map(u => 
-      u.id === selectedUser.id 
-        ? {
-            ...u,
-            name: editForm.name.trim(),
-            email: editForm.email.trim(),
-            role: editForm.role,
-          }
-        : u
-    ));
-    
-    alert(`User ${editForm.name} updated successfully!`);
-    closeEditPanel();
+
+    try {
+      setEditLoading(true);
+      const updateData = {
+        name: editForm.name.trim(),
+        email: editForm.email.trim(),
+        role: editForm.role,
+      };
+      
+      // Only include password if it's provided
+      if (editForm.password && editForm.password.trim()) {
+        updateData.password = editForm.password.trim();
+      }
+      
+      const response = await userService.updateUser(selectedUser.id, updateData);
+
+      // Refresh data from server to ensure sync with database
+      await fetchUsers();
+
+      alert(`User ${editForm.name} updated successfully!`);
+      closeEditPanel();
+    } catch (err) {
+      console.error('Error updating user:', err);
+      alert(`Error updating user: ${err.message}`);
+    } finally {
+      setEditLoading(false);
+    }
   };
 
-  const submitCreateForm = (e) => {
+  const submitCreateForm = async (e) => {
     e.preventDefault();
-    if (!createForm.user_id.trim() || !createForm.name.trim() || !createForm.email.trim()) {
+    if (!createForm.user_id.trim() || !createForm.name.trim() || !createForm.email.trim() || !createForm.password.trim()) {
       alert("Please fill in all required fields");
       return;
     }
 
-    if (!isNumericId(createForm.user_id.trim())) {
-      alert("User ID must be numeric");
-      return;
+    try {
+      setCreateLoading(true);
+      const response = await userService.createUser({
+        user_id: createForm.user_id.trim(),
+        name: createForm.name.trim(),
+        email: createForm.email.trim(),
+        role: createForm.role,
+        password: createForm.password.trim(),
+        status: 'Active',
+        joined_date: new Date().toISOString().slice(0, 10),
+      });
+
+      // Add new user to local state
+      setUsers((prev) => [response.data || response, ...prev]);
+      alert(`User ${createForm.name} created successfully!`);
+      closeCreatePanel();
+      setCurrentPage(1);
+    } catch (err) {
+      console.error('Error creating user:', err);
+      alert(`Error creating user: ${err.message}`);
+    } finally {
+      setCreateLoading(false);
     }
-
-    const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1;
-    const newUser = {
-      id: nextId,
-      user_id: createForm.user_id.trim(),
-      name: createForm.name.trim(),
-      email: createForm.email.trim(),
-      role: createForm.role,
-      joined_date: new Date().toISOString().slice(0, 10),
-      last_login: new Date().toISOString(),
-    };
-
-    setUsers((prev) => [newUser, ...prev]);
-    alert(`User ${newUser.name} created successfully!`);
-    closeCreatePanel();
-    setCurrentPage(1);
   };
 
   // Delete user
-  const deleteUser = (userId) => {
+  const deleteUser = async (userId) => {
+    // Find user to check role
+    const userToDelete = users.find(u => u.id === userId);
+    
+    if (userToDelete?.role === 'Admin') {
+      alert("Cannot delete Admin users. This is a security restriction.");
+      return;
+    }
+    
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-    setUsers(prev => prev.filter(u => u.id !== userId));
-    alert("User deleted successfully!");
-    if (showEditPanel && selectedUser?.id === userId) {
-      closeEditPanel();
+
+    try {
+      await userService.deleteUser(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      alert("User deleted successfully!");
+      if (showEditPanel && selectedUser?.id === userId) {
+        closeEditPanel();
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      alert(`Error deleting user: ${err.message}`);
     }
   };
 
   // Helper functions
   const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
     const date = new Date(dateStr);
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   };
 
   const formatDateTime = (dateStr) => {
+    if (!dateStr) return "-";
     const date = new Date(dateStr);
-    return date.toLocaleString("en-US", { 
-      year: "numeric", 
-      month: "short", 
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit"
@@ -214,14 +241,16 @@ function UserManagement() {
     switch (role) {
       case "Admin":
         return "bg-yellow-500 text-white";
-      case "R5":
-        return "bg-purple-500 text-white";
-      case "R4":
-        return "bg-blue-500 text-white";
+      case "R1":
+        return "bg-red-500 text-white";
+      case "R2":
+        return "bg-orange-500 text-white";
       case "R3":
         return "bg-green-500 text-white";
-      case "R2":
-        return "bg-teal-500 text-white";
+      case "R4":
+        return "bg-blue-500 text-white";
+      case "R5":
+        return "bg-purple-500 text-white";
       default:
         return "bg-gray-500 text-white";
     }
@@ -231,9 +260,9 @@ function UserManagement() {
   const stats = {
     total: users.length,
     admins: users.filter(u => u.role === "Admin").length,
+    r1: users.filter(u => u.role === "R1").length,
     r5: users.filter(u => u.role === "R5").length,
-    r4: users.filter(u => u.role === "R4").length,
-    r3: users.filter(u => u.role === "R3").length,
+    active: users.filter(u => u.status === "Active").length,
   };
 
   return (
@@ -270,7 +299,7 @@ function UserManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-100 text-sm font-medium">Total Users</p>
-                <p className="text-3xl font-bold mt-1">{stats.total}</p>
+                <p className="text-3xl font-bold mt-1">{loading ? '-' : stats.total}</p>
               </div>
               <FiUser className="text-4xl text-blue-200" />
             </div>
@@ -281,37 +310,53 @@ function UserManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-yellow-100 text-sm font-medium">Admins</p>
-                <p className="text-3xl font-bold mt-1">{stats.admins}</p>
+                <p className="text-3xl font-bold mt-1">{loading ? '-' : stats.admins}</p>
               </div>
               <FiShield className="text-4xl text-yellow-200" />
             </div>
           </div>
 
-          {/* R5 */}
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 shadow-lg text-white">
+          {/* R1 */}
+          <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">R5</p>
-                <p className="text-3xl font-bold mt-1">{stats.r5}</p>
+                <p className="text-red-100 text-sm font-medium">R1</p>
+                <p className="text-3xl font-bold mt-1">{loading ? '-' : stats.r1}</p>
               </div>
-              <FiShield className="text-4xl text-purple-200" />
+              <FiShield className="text-4xl text-red-200" />
             </div>
           </div>
 
-          {/* R4 */}
+          {/* Active Users */}
           <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100 text-sm font-medium">R4</p>
-                <p className="text-3xl font-bold mt-1">{stats.r4}</p>
+                <p className="text-green-100 text-sm font-medium">Active</p>
+                <p className="text-3xl font-bold mt-1">{loading ? '-' : stats.active}</p>
               </div>
               <FiActivity className="text-4xl text-green-200" />
             </div>
           </div>
         </div>
 
-        {/* Search and Filter */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-2xl dark:shadow-slate-900/60 p-4 mb-6 border border-gray-100 dark:border-slate-700">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
+            <p className="font-medium">Error: {error}</p>
+            <button onClick={fetchUsers} className="mt-2 underline text-sm">Try again</button>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <FiLoader className="animate-spin text-4xl text-indigo-600 dark:text-indigo-400" />
+            <p className="ml-3 text-gray-600 dark:text-gray-300">Loading users...</p>
+          </div>
+        ) : (
+          <>
+            {/* Search and Filter */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-2xl dark:shadow-slate-900/60 p-4 mb-6 border border-gray-100 dark:border-slate-700">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Search */}
             <div className="md:col-span-1">
@@ -410,8 +455,13 @@ function UserManagement() {
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteUser(user.id); }}
-                          className="p-2 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors"
-                          title="Delete user"
+                          disabled={user.role === 'Admin'}
+                          className={`p-2 rounded-lg transition-colors ${
+                            user.role === 'Admin'
+                              ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50'
+                              : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/60'
+                          }`}
+                          title={user.role === 'Admin' ? 'Cannot delete Admin users' : 'Delete user'}
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
@@ -449,6 +499,8 @@ function UserManagement() {
             </div>
           </div>
         </div>
+          </>
+        )}
 
       </div>
 
@@ -537,6 +589,24 @@ function UserManagement() {
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   />
+                </div>
+
+                {/* Password */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    New Password (leave empty to keep current)
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={editForm.password}
+                    onChange={handleEditInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Enter new password (optional)"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Leave blank to keep the current password
+                  </p>
                 </div>
               </div>
 
@@ -654,6 +724,22 @@ function UserManagement() {
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     required
                   />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password *</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={createForm.password}
+                    onChange={handleCreateInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Enter initial password"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Minimum 8 characters recommended
+                  </p>
                 </div>
               </div>
 

@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { FiSearch, FiFilter, FiDownload, FiEye, FiX } from "react-icons/fi";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const displayTargetType = (type) => {
+  if (type === 'resource') return 'Resource (RSS)';
+  if (type === 'alliance') return 'Alliance';
+  if (type === 'bank') return 'Bank';
+  if (type === 'user') return 'User';
+  return type || 'Unknown';
+};
 
 export default function AuditLogs() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -10,93 +21,11 @@ export default function AuditLogs() {
     }
     return false;
   });
-
-  useEffect(() => {
-    AOS.init({ once: true, duration: 600 });
-  }, []);
-
-  // Listen to dark mode changes
-  useEffect(() => {
-    const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setIsDarkMode(isDark);
-    };
-
-    checkDarkMode();
-
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['class'],
-      subtree: false
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Sample audit logs data
-  const [auditLogs] = useState(() => {
-    const logs = [];
-    const actions = ["CREATE", "UPDATE", "DELETE"];
-    const targetTypes = ["user", "alliance", "bank", "resource"];
-    const users = [
-      { id: 1, name: "Admin User", email: "admin@kingdom.com" },
-      { id: 2, name: "Manager One", email: "manager1@kingdom.com" },
-      { id: 3, name: "Manager Two", email: "manager2@kingdom.com" },
-      { id: 4, name: "Officer Alpha", email: "officer@kingdom.com" },
-    ];
-
-    for (let i = 1; i <= 100; i++) {
-      const user = users[Math.floor(Math.random() * users.length)];
-      const action = actions[Math.floor(Math.random() * actions.length)];
-      const targetType = targetTypes[Math.floor(Math.random() * targetTypes.length)];
-      
-      const timestamp = new Date();
-      timestamp.setHours(timestamp.getHours() - Math.floor(Math.random() * 72));
-      
-      let details = "";
-      let targetName = "";
-      
-      if (targetType === "user") {
-        targetName = `User ${Math.floor(Math.random() * 50)}`;
-        if (action === "CREATE") details = "Created new user with role R2";
-        else if (action === "UPDATE") details = "Updated role from R1 to R3, status to Active";
-        else details = "Deleted user account";
-      } else if (targetType === "alliance") {
-        targetName = `Alliance ${Math.floor(Math.random() * 20)}`;
-        if (action === "CREATE") details = "Created new alliance with tag SF-A";
-        else if (action === "UPDATE") details = "Updated alliance description and leader";
-        else details = "Deleted alliance";
-      } else if (targetType === "bank") {
-        targetName = `Bank ${Math.floor(Math.random() * 10)}`;
-        if (action === "CREATE") details = "Created alliance bank account";
-        else if (action === "UPDATE") details = "Updated bank name and ID";
-        else details = "Removed bank account";
-      } else if (targetType === "resource") {
-        targetName = `Member ${Math.floor(Math.random() * 100)}`;
-        if (action === "CREATE") details = "Added contribution: Food 5M, Wood 3M";
-        else if (action === "UPDATE") details = "Updated contribution: Added Stone 2M, Gold 1M";
-        else details = "Deleted contribution record";
-      }
-
-      logs.push({
-        id: i,
-        user_id: user.id,
-        user_name: user.name,
-        user_email: user.email,
-        action: action,
-        target_type: targetType,
-        target_id: Math.floor(Math.random() * 1000) + 1,
-        target_name: targetName,
-        timestamp: timestamp.toISOString(),
-        details: details,
-        ip_address: `192.168.1.${Math.floor(Math.random() * 255)}`,
-        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      });
-    }
-    
-    return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  });
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [stats, setStats] = useState({ totalLogs: 0, creates: 0, updates: 0, deletes: 0 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 1, limit: 200 });
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,27 +35,74 @@ export default function AuditLogs() {
   const [dateFromFilter, setDateFromFilter] = useState("");
   const [dateToFilter, setDateToFilter] = useState("");
 
-  // Filtered logs
-  const filteredLogs = auditLogs.filter((log) => {
-    const matchSearch =
-      log.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.user_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.target_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.details.toLowerCase().includes(searchQuery.toLowerCase());
+  const fetchAuditLogs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const matchAction = actionFilter === "All" || log.action === actionFilter;
-    const matchTargetType = targetTypeFilter === "All" || log.target_type === targetTypeFilter;
-    const matchUser = userFilter === "All" || log.user_id === parseInt(userFilter);
-    
-    let matchDate = true;
-    if (dateFromFilter || dateToFilter) {
-      const logDate = new Date(log.timestamp).toISOString().split('T')[0];
-      if (dateFromFilter && logDate < dateFromFilter) matchDate = false;
-      if (dateToFilter && logDate > dateToFilter) matchDate = false;
+      const params = {
+        page: 1,
+        limit: 500,
+      };
+
+      if (searchQuery) params.search = searchQuery;
+      if (actionFilter !== "All") params.action = actionFilter;
+      if (targetTypeFilter !== "All") params.targetType = targetTypeFilter;
+      if (userFilter !== "All") params.userId = userFilter;
+      if (dateFromFilter) params.dateFrom = dateFromFilter;
+      if (dateToFilter) params.dateTo = dateToFilter;
+
+      const res = await axios.get(`${API_BASE_URL}/api/v1/audit-logs`, {
+        params,
+        withCredentials: true,
+      });
+
+      const logs = (res.data.logs || []).map((log) => ({
+        ...log,
+        target_name: log.target_name || `${log.target_type || 'target'} #${log.target_id || ''}`,
+      }));
+
+      setAuditLogs(logs);
+      setPagination({
+        page: res.data.page || 1,
+        total: res.data.total || logs.length,
+        totalPages: res.data.totalPages || 1,
+        limit: res.data.limit || params.limit,
+      });
+    } catch (err) {
+      console.error('Fetch audit logs error:', err);
+      setError(err.response?.data?.msg || 'Failed to load audit logs');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return matchSearch && matchAction && matchTargetType && matchUser && matchDate;
-  });
+  const fetchStatistics = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/v1/audit-logs/statistics`, {
+        withCredentials: true,
+      });
+      setStats({
+        totalLogs: res.data.total || 0,
+        creates: res.data.creates || 0,
+        updates: res.data.updates || 0,
+        deletes: res.data.deletes || 0,
+      });
+    } catch (err) {
+      console.error('Fetch audit statistics error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAuditLogs();
+  }, [actionFilter, targetTypeFilter, userFilter, dateFromFilter, dateToFilter, searchQuery]);
+
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  // Data already filtered by backend
+  const filteredLogs = auditLogs;
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -215,39 +191,34 @@ export default function AuditLogs() {
     }
   };
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const csv = [
-      ["ID", "User", "Email", "Action", "Target Type", "Target Name", "Timestamp", "Details", "IP Address"],
-      ...filteredLogs.map(log => [
-        log.id,
-        log.user_name,
-        log.user_email,
-        log.action,
-        log.target_type,
-        log.target_name,
-        formatDateTime(log.timestamp),
-        log.details,
-        log.ip_address,
-      ])
-    ]
-    .map(row => row.map(cell => `"${cell}"`).join(","))
-    .join("\n");
+  // Export to CSV (backend)
+  const exportToCSV = async () => {
+    try {
+      const params = {};
+      if (searchQuery) params.search = searchQuery;
+      if (actionFilter !== "All") params.action = actionFilter;
+      if (targetTypeFilter !== "All") params.targetType = targetTypeFilter;
+      if (userFilter !== "All") params.userId = userFilter;
+      if (dateFromFilter) params.dateFrom = dateFromFilter;
+      if (dateToFilter) params.dateTo = dateToFilter;
 
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-  };
+      const res = await axios.get(`${API_BASE_URL}/api/v1/audit-logs/export/csv`, {
+        params,
+        withCredentials: true,
+        responseType: 'blob',
+      });
 
-  // Statistics
-  const stats = {
-    totalLogs: auditLogs.length,
-    creates: auditLogs.filter(l => l.action === "CREATE").length,
-    updates: auditLogs.filter(l => l.action === "UPDATE").length,
-    deletes: auditLogs.filter(l => l.action === "DELETE").length,
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'text/csv' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (err) {
+      console.error('Export CSV error:', err);
+      alert(err.response?.data?.msg || 'Failed to export audit logs');
+    }
   };
 
   return (
@@ -341,6 +312,7 @@ export default function AuditLogs() {
             {/* Target Type Filter */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Type</label>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Entity being changed (User, Alliance, Bank, Resource/RSS).</p>
               <select
                 value={targetTypeFilter}
                 onChange={(e) => {
@@ -353,7 +325,7 @@ export default function AuditLogs() {
                 <option value="user">User</option>
                 <option value="alliance">Alliance</option>
                 <option value="bank">Bank</option>
-                <option value="resource">Resource</option>
+                <option value="resource">Resource (RSS)</option>
               </select>
             </div>
 
@@ -446,7 +418,7 @@ export default function AuditLogs() {
                         <span className="text-lg">{getTargetTypeIcon(log.target_type)}</span>
                         <div>
                           <div className="font-medium text-gray-900 dark:text-white">{log.target_name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{log.target_type}</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">{displayTargetType(log.target_type)} · ID #{log.target_id}</div>
                         </div>
                       </div>
                     </td>
@@ -484,6 +456,7 @@ export default function AuditLogs() {
                     <span className="text-lg">{getTargetTypeIcon(log.target_type)}</span>
                     <span className="text-sm text-gray-700 dark:text-gray-400">{log.target_name}</span>
                   </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{displayTargetType(log.target_type)} · ID #{log.target_id}</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">{log.details}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-500">{formatDateTime(log.timestamp)}</div>
                 </div>
@@ -599,7 +572,7 @@ export default function AuditLogs() {
                     <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Target Type</div>
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{getTargetTypeIcon(selectedLog.target_type)}</span>
-                      <span className="font-semibold text-gray-900 dark:text-white capitalize">{selectedLog.target_type}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{displayTargetType(selectedLog.target_type)}</span>
                     </div>
                   </div>
 
@@ -624,20 +597,9 @@ export default function AuditLogs() {
                 {/* Additional Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 border border-gray-200 dark:border-slate-600">
-                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">IP Address</div>
-                    <div className="font-mono text-gray-900 dark:text-white">{selectedLog.ip_address}</div>
-                  </div>
-
-                  <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 border border-gray-200 dark:border-slate-600">
                     <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Log ID</div>
                     <div className="font-mono text-gray-900 dark:text-white">{selectedLog.id}</div>
                   </div>
-                </div>
-
-                {/* User Agent */}
-                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 border border-gray-200 dark:border-slate-600">
-                  <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">User Agent</div>
-                  <div className="text-xs text-gray-700 dark:text-gray-300 font-mono break-all">{selectedLog.user_agent}</div>
                 </div>
               </div>
 

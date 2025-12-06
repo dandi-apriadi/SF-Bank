@@ -1,5 +1,6 @@
 // backend/utils/auditLogger.js
-const Database = require("../config/Database");
+import db from '../config/Database.js';
+import { QueryTypes } from 'sequelize';
 
 /**
  * Utility untuk mencatat semua aktivitas admin
@@ -19,10 +20,13 @@ class AuditLogger {
       const ipAddress = req?.ip || req?.connection?.remoteAddress || "0.0.0.0";
       const userAgent = req?.get("user-agent") || "Unknown";
 
-      await Database.query(
+      await db.query(
         `INSERT INTO audit_logs (user_id, action, target_type, target_id, details, ip_address, user_agent, timestamp)
          VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [userId, action, targetType, targetId, details, ipAddress, userAgent]
+        {
+          replacements: [userId, action, targetType, targetId, details, ipAddress, userAgent],
+          type: QueryTypes.INSERT
+        }
       );
 
       console.log(`[AUDIT LOG] User ${userId} - ${action} ${targetType} #${targetId}: ${details}`);
@@ -110,12 +114,15 @@ class AuditLogger {
    */
   static async getUserAuditTrail(userId, limit = 50) {
     try {
-      const [logs] = await Database.query(
+      const logs = await db.query(
         `SELECT * FROM audit_logs 
          WHERE user_id = ?
          ORDER BY timestamp DESC
          LIMIT ?`,
-        [userId, limit]
+        {
+          replacements: [userId, limit],
+          type: QueryTypes.SELECT
+        }
       );
       return logs;
     } catch (error) {
@@ -129,12 +136,15 @@ class AuditLogger {
    */
   static async getResourceAuditTrail(targetType, targetId, limit = 50) {
     try {
-      const [logs] = await Database.query(
+      const logs = await db.query(
         `SELECT * FROM audit_logs 
          WHERE target_type = ? AND target_id = ?
          ORDER BY timestamp DESC
          LIMIT ?`,
-        [targetType, targetId, limit]
+        {
+          replacements: [targetType, targetId, limit],
+          type: QueryTypes.SELECT
+        }
       );
       return logs;
     } catch (error) {
@@ -144,4 +154,4 @@ class AuditLogger {
   }
 }
 
-module.exports = AuditLogger;
+export default AuditLogger;

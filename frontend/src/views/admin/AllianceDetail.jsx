@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default function AllianceDetail() {
   const { id } = useParams();
@@ -47,57 +50,38 @@ export default function AllianceDetail() {
     };
   }, []);
 
-  // Dummy alliance data (in real app, fetch from API using id)
-  const [alliance, setAlliance] = useState(() => {
-    const tags = ["SF-A", "SF-B", "SF-C", "SF-D", "SF-E"];
-    const food = Math.floor(Math.random() * 50000000) + 10000000;
-    const wood = Math.floor(Math.random() * 40000000) + 8000000;
-    const stone = Math.floor(Math.random() * 35000000) + 7000000;
-    const gold = Math.floor(Math.random() * 30000000) + 5000000;
-    
-    return {
-      id: parseInt(id),
-      name: `Alliance ${id}`,
-      tag: tags[parseInt(id) % tags.length],
-      leader: `Leader ${id}`,
-      bank_id: `BNK-${1000 + parseInt(id)}`,
-      bank_name: `Bank Alliance ${id}`,
-      members_count: Math.floor(Math.random() * 50) + 10,
-      food: food,
-      wood: wood,
-      stone: stone,
-      gold: gold,
-      total_rss: food + wood + stone + gold,
-      weeks_donated: Math.floor(Math.random() * 100) + 1,
-      description: "Strong alliance for kingdom growth and strategic cooperation",
-    };
-  });
+  // State for alliance data
+  const [alliance, setAlliance] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Dummy members with RSS contributions
-  const [members] = useState(() => {
-    const arr = [];
-    for (let i = 1; i <= alliance.members_count; i++) {
-      const memberFood = Math.floor(Math.random() * 5000000) + 500000;
-      const memberWood = Math.floor(Math.random() * 4000000) + 400000;
-      const memberStone = Math.floor(Math.random() * 3500000) + 350000;
-      const memberGold = Math.floor(Math.random() * 3000000) + 300000;
-      
-      arr.push({
-        id: i,
-        name: `Member ${i}`,
-        governor_id: `GOV-${1000 + i}`,
-        food: memberFood,
-        wood: memberWood,
-        stone: memberStone,
-        gold: memberGold,
-        total_rss: memberFood + memberWood + memberStone + memberGold,
-        weeks_donated: Math.floor(Math.random() * 30) + 1,
-        last_contribution: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      });
+  // Fetch alliance data
+  const fetchAllianceData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [allianceRes, membersRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/v1/alliances/${id}`, { withCredentials: true }),
+        axios.get(`${API_BASE_URL}/api/v1/alliances/${id}/members`, { withCredentials: true })
+      ]);
+
+      setAlliance(allianceRes.data);
+      setMembers(membersRes.data);
+    } catch (err) {
+      console.error("Fetch alliance data error:", err);
+      setError(err.response?.data?.msg || "Failed to load alliance data");
+    } finally {
+      setLoading(false);
     }
-    // Sort by total RSS descending
-    return arr.sort((a, b) => b.total_rss - a.total_rss);
-  });
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchAllianceData();
+    }
+  }, [id]);
 
   const getTypeIcon = (tag) => {
     switch (tag) {
@@ -174,46 +158,222 @@ export default function AllianceDetail() {
     setCurrentPage(1);
   }, [searchQuery]);
 
+  const getUtcToday = () => {
+    const now = new Date();
+    const utcDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    return utcDate.toISOString().split('T')[0];
+  };
+
+  const getWeekNumber = (date) => {
+    // Fix: Use UTC to ensure consistent week calculation
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  const getCurrentWeek = () => {
+    return getWeekNumber(new Date());
+  };
+
   // Right panel state for adding RSS
   const [showRssPanel, setShowRssPanel] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [showMemberReport, setShowMemberReport] = useState(false);
+  const [reportMember, setReportMember] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // {memberId, week} for confirmation
   const [rssForm, setRssForm] = useState({
     food: "",
     wood: "",
     stone: "",
     gold: "",
-    lastContributionDate: new Date().toISOString().split('T')[0],
+    lastContributionDate: getUtcToday(),
+    week: getCurrentWeek(),
   });
 
-  const openRssPanel = (member) => {
+  const openRssPanel = async (member) => {
     setSelectedMember(member);
-    setRssForm({ food: "", wood: "", stone: "", gold: "", lastContributionDate: new Date().toISOString().split('T')[0] });
+
+    // Collect existing weeks as numbers
+    const existingWeeks = member.contributions
+      ? member.contributions.map((c) => parseInt(c.week)).filter(Boolean)
+      : [];
+
+    // Determine the first missing week in sequence (enforce no skipping)
+    const sortedWeeks = [...existingWeeks].sort((a, b) => a - b);
+    let expectedWeek = 1;
+    for (const wk of sortedWeeks) {
+      if (wk === expectedWeek) {
+        expectedWeek += 1;
+      } else if (wk > expectedWeek) {
+        break; // found a gap
+      }
+    }
+
+    // Set default form with today's UTC date and the next required week
+    setRssForm({
+      food: "",
+      wood: "",
+      stone: "",
+      gold: "",
+      lastContributionDate: getUtcToday(), // Auto-set to today UTC
+      week: expectedWeek,
+      existingWeeks,
+    });
     setShowRssPanel(true);
   };
 
   const closeRssPanel = () => {
     setShowRssPanel(false);
     setSelectedMember(null);
-    setRssForm({ food: "", wood: "", stone: "", gold: "", lastContributionDate: new Date().toISOString().split('T')[0] });
+    setRssForm({ food: "", wood: "", stone: "", gold: "", lastContributionDate: getUtcToday(), week: getCurrentWeek(), existingWeeks: [] });
+  };
+
+  const openMemberReport = (member) => {
+    setReportMember(member);
+    setShowMemberReport(true);
+  };
+
+  const closeMemberReport = () => {
+    setShowMemberReport(false);
+    setReportMember(null);
+    setDeleteConfirm(null);
+  };
+
+  const deleteWeeklyContribution = async (memberId, week) => {
+    try {
+      // Call backend to delete
+      await axios.delete(
+        `${API_BASE_URL}/api/v1/member-contributions/${memberId}/${alliance.id}/${week}`,
+        { withCredentials: true }
+      );
+      
+      // Show success alert
+      alert(`✅ Week ${week} contribution deleted successfully`);
+      
+      // Refresh data
+      await fetchAllianceData();
+      
+      // If deleting from report modal, update reportMember
+      if (reportMember) {
+        const updatedContributions = reportMember.contributions.filter(c => c.week !== week);
+        setReportMember((prev) => ({
+          ...prev,
+          contributions: updatedContributions
+        }));
+      }
+      
+      // Clear delete confirmation
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error('Delete contribution error:', err);
+      alert(err.response?.data?.msg || 'Failed to delete contribution');
+    }
   };
 
   const handleRssInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // If changing week, auto-load existing data if available
+    if (name === 'week' && value) {
+      const selectedWeek = parseInt(value);
+      const existingContribution = selectedMember.contributions?.find(c => c.week === selectedWeek);
+      
+      if (existingContribution) {
+        // Load existing data for this week
+        setRssForm((prev) => ({
+          ...prev,
+          [name]: value,
+          food: existingContribution.food?.toString() || "",
+          wood: existingContribution.wood?.toString() || "",
+          stone: existingContribution.stone?.toString() || "",
+          gold: existingContribution.gold?.toString() || "",
+        }));
+        return;
+      }
+    }
+    
+    // Normal input change
     setRssForm((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const submitRssForm = (e) => {
+  const submitRssForm = async (e) => {
     e.preventDefault();
+    
+    // Validate week selection
+    if (!rssForm.week) {
+      alert('Please select a week first');
+      return;
+    }
+    
     if (!rssForm.food && !rssForm.wood && !rssForm.stone && !rssForm.gold) {
       alert("Please enter at least one resource amount");
       return;
     }
-    console.log("Submitted RSS for member:", selectedMember.name, rssForm);
-    alert(`RSS added for ${selectedMember.name} on ${rssForm.lastContributionDate}`);
-    closeRssPanel();
+
+    if (!selectedMember) {
+      alert("No member selected");
+      return;
+    }
+
+    if (!rssForm.week || rssForm.week < 1 || rssForm.week > 100) {
+      alert("Please select a valid week (1-100)");
+      return;
+    }
+
+    try {
+      // Check if this is an update or create
+      const selectedWeek = parseInt(rssForm.week);
+      const existingWeeks = (rssForm.existingWeeks || []).map((w) => parseInt(w)).filter(Boolean);
+      const isExistingWeek = existingWeeks.includes(selectedWeek);
+
+      // Enforce no skipping weeks when creating a new week
+      if (!isExistingWeek) {
+        const sorted = [...new Set(existingWeeks)].sort((a, b) => a - b);
+        let expected = 1;
+        for (const wk of sorted) {
+          if (wk === expected) {
+            expected += 1;
+          } else if (wk > expected) {
+            break; // gap found
+          }
+        }
+
+        if (selectedWeek !== expected) {
+          alert(`You must fill Week ${expected} before adding Week ${selectedWeek}`);
+          return;
+        }
+      }
+      
+      // Create contribution record for the member
+      await axios.post(
+        `${API_BASE_URL}/api/v1/member-contributions`,
+        {
+          member_id: selectedMember.member_id || selectedMember.id,
+          alliance_id: id,
+          date: rssForm.lastContributionDate,
+          week: selectedWeek,
+          food: parseInt(rssForm.food) || 0,
+          wood: parseInt(rssForm.wood) || 0,
+          stone: parseInt(rssForm.stone) || 0,
+          gold: parseInt(rssForm.gold) || 0,
+        },
+        { withCredentials: true }
+      );
+
+      const actionText = isExistingWeek ? 'updated' : 'added';
+      alert(`RSS contribution ${actionText} for ${selectedMember.name} in Week ${rssForm.week}`);
+      // Refresh data and close panel
+      await fetchAllianceData();
+      closeRssPanel();
+    } catch (err) {
+      console.error("Submit RSS form error:", err);
+      alert(err.response?.data?.msg || "Failed to add RSS contribution");
+    }
   };
 
   // Calculator state
@@ -318,27 +478,30 @@ export default function AllianceDetail() {
 
   // Add member to alliance state
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-  const [availableUsers, setAvailableUsers] = useState(() => {
-    // Dummy users without alliance
-    const arr = [];
-    for (let i = 1; i <= 15; i++) {
-      arr.push({
-        id: i + 100,
-        user_id: `${2000 + i}`,
-        name: `Available User ${i}`,
-        email: `availableuser${i}@kingdom.com`,
-        alliance: null,
-      });
-    }
-    return arr;
-  });
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [availableUsersLoading, setAvailableUsersLoading] = useState(false);
   const [selectedUsersToAdd, setSelectedUsersToAdd] = useState([]);
   const [addMemberSearch, setAddMemberSearch] = useState("");
 
-  const openAddMemberModal = () => {
-    setShowAddMemberModal(true);
-    setSelectedUsersToAdd([]);
-    setAddMemberSearch("");
+  const openAddMemberModal = async () => {
+    try {
+      setAvailableUsersLoading(true);
+      setSelectedUsersToAdd([]);
+      setAddMemberSearch("");
+      
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/alliances/${id}/available-users`,
+        { withCredentials: true }
+      );
+      
+      setAvailableUsers(response.data || []);
+      setShowAddMemberModal(true);
+    } catch (err) {
+      console.error("Fetch available users error:", err);
+      alert(err.response?.data?.msg || "Failed to load available users");
+    } finally {
+      setAvailableUsersLoading(false);
+    }
   };
 
   const closeAddMemberModal = () => {
@@ -353,17 +516,27 @@ export default function AllianceDetail() {
     );
   };
 
-  const addSelectedMembers = () => {
+  const addSelectedMembers = async () => {
     if (selectedUsersToAdd.length === 0) {
       alert("Please select at least one user");
       return;
     }
-    // In real app, call API to add members to alliance
-    console.log("Adding users to alliance:", selectedUsersToAdd);
-    alert(`Successfully added ${selectedUsersToAdd.length} member(s) to ${alliance.name}`);
-    // Remove added users from available list
-    setAvailableUsers((prev) => prev.filter((u) => !selectedUsersToAdd.includes(u.id)));
-    closeAddMemberModal();
+    
+    try {
+      await axios.post(
+        `${API_BASE_URL}/api/v1/alliances/${id}/members`,
+        { member_ids: selectedUsersToAdd },
+        { withCredentials: true }
+      );
+      
+      alert(`Successfully added ${selectedUsersToAdd.length} member(s) to ${alliance.name}`);
+      // Refresh alliance data and close modal
+      await fetchAllianceData();
+      closeAddMemberModal();
+    } catch (err) {
+      console.error("Add members error:", err);
+      alert(err.response?.data?.msg || "Failed to add members to alliance");
+    }
   };
 
   const filteredAvailableUsers = availableUsers.filter(
@@ -413,26 +586,65 @@ export default function AllianceDetail() {
     }));
   };
 
-  const submitEditAlliance = (e) => {
+  const submitEditAlliance = async (e) => {
     e.preventDefault();
     if (!editAllianceForm.name.trim() || !editAllianceForm.leader.trim()) {
       alert("Alliance name and leader are required");
       return;
     }
-    // Update alliance
-    setAlliance((prev) => ({
-      ...prev,
-      name: editAllianceForm.name.trim(),
-      leader: editAllianceForm.leader.trim(),
-      bank_id: editAllianceForm.bank_id.trim(),
-      bank_name: editAllianceForm.bank_name.trim(),
-      description: editAllianceForm.description.trim(),
-    }));
-    alert(`Alliance details updated successfully`);
-    closeEditAllianceModal();
+
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/v1/alliances/${id}`,
+        {
+          name: editAllianceForm.name.trim(),
+          tag: editAllianceForm.tag?.trim() || null,
+          leader: editAllianceForm.leader.trim(),
+          description: editAllianceForm.description?.trim() || null
+        },
+        { withCredentials: true }
+      );
+
+      alert("Alliance details updated successfully");
+      closeEditAllianceModal();
+      await fetchAllianceData();
+    } catch (err) {
+      console.error("Update alliance error:", err);
+      alert(err.response?.data?.msg || "Failed to update alliance");
+    }
   };
 
+// Loading and error states
+if (loading) {
   return (
+    <div className="w-full min-h-full flex items-center justify-center bg-slate-50 dark:bg-navy-900">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Loading alliance details...</p>
+      </div>
+    </div>
+  );
+}
+
+if (error || !alliance) {
+  return (
+    <div className="w-full min-h-full flex items-center justify-center bg-slate-50 dark:bg-navy-900">
+      <div className="text-center">
+        <div className="text-red-500 text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error Loading Alliance</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">{error || "Alliance not found"}</p>
+        <button 
+          onClick={() => navigate('/admin/alliance')}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+        >
+          Back to Alliance List
+        </button>
+      </div>
+    </div>
+  );
+}
+
+return (
     <div key={`alliance-detail-${isDarkMode}`} className="w-full min-h-full flex flex-col bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 text-gray-800 dark:text-gray-100">
         {/* Back button + Header */}
@@ -452,7 +664,7 @@ export default function AllianceDetail() {
                 <span className="text-4xl">{getTypeIcon(alliance.tag)}</span>
                 {alliance.name}
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Alliance details, resources, and member contributions</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Alliance details, resources, and member contributions overview</p>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -494,10 +706,6 @@ export default function AllianceDetail() {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">Members:</span>
                 <span className="font-semibold text-gray-900 dark:text-white">{alliance.members_count}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Weeks:</span>
-                <span className="font-semibold text-purple-600 dark:text-purple-400">{alliance.weeks_donated}/100</span>
               </div>
               {alliance.bank_id && (
                 <div className="flex justify-between text-sm">
@@ -590,6 +798,7 @@ export default function AllianceDetail() {
                   <th className="px-4 py-3 text-center">📦 Total RSS</th>
                   <th className="px-4 py-3 text-center">📅 Weeks</th>
                   <th className="px-4 py-3 text-center">Last Contribution</th>
+                  <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700/50">
@@ -623,6 +832,24 @@ export default function AllianceDetail() {
                     <td className="px-4 py-3 text-center font-bold text-indigo-600 dark:text-indigo-400">{formatNumber(member.total_rss)}</td>
                     <td className="px-4 py-3 text-center font-semibold text-purple-600 dark:text-purple-400">{member.weeks_donated}/100</td>
                     <td className="px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-400">{formatDate(member.last_contribution)}</td>
+                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => openMemberReport(member)}
+                          className="px-3 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
+                          title="View member report"
+                        >
+                          📊 Report
+                        </button>
+                        <button
+                          onClick={() => openRssPanel(member)}
+                          className="px-3 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors"
+                          title="Add/edit contribution"
+                        >
+                          ➕ Add
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                   );
                 })}
@@ -681,6 +908,26 @@ export default function AllianceDetail() {
                     <div className="text-lg">💰</div>
                     <div className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">{formatNumber(member.gold)}</div>
                   </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openMemberReport(member);
+                    }}
+                    className="px-3 py-2 text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
+                  >
+                    📊 Report
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openRssPanel(member);
+                    }}
+                    className="px-3 py-2 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors"
+                  >
+                    ➕ Add
+                  </button>
                 </div>
               </div>
               );
@@ -772,15 +1019,51 @@ export default function AllianceDetail() {
                       <div className="text-gray-600 dark:text-gray-400">Last Contribution</div>
                       <div className="font-semibold text-gray-900 dark:text-white text-xs">{formatDate(selectedMember.last_contribution)}</div>
                     </div>
-                    <div>
-                      <div className="text-gray-600 dark:text-gray-400">Total Contributed</div>
-                      <div className="font-semibold text-indigo-600 dark:text-indigo-400">{formatNumber(selectedMember.total_rss)}</div>
-                    </div>
                   </div>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={submitRssForm} className="space-y-4">
+                  {/* Week and Date Selection */}
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        📅 Week Number (Can Edit Previous Weeks)
+                      </label>
+                      <select
+                        name="week"
+                        value={rssForm.week}
+                        onChange={handleRssInputChange}
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                      >
+                        <option value="">Select Week</option>
+                        {[...Array(100)].map((_, i) => {
+                          const weekNum = i + 1;
+                          const isExisting = rssForm.existingWeeks && rssForm.existingWeeks.includes(weekNum);
+                          return (
+                            <option key={weekNum} value={weekNum}>
+                              Week {weekNum} {isExisting ? '(Existing - Edit)' : ''}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Select a new week or edit previous week data</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        📆 Contribution Date (Auto: Today UTC)
+                      </label>
+                      <input
+                        type="date"
+                        name="lastContributionDate"
+                        value={rssForm.lastContributionDate}
+                        disabled
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-700/50 text-gray-900 dark:text-white cursor-not-allowed opacity-75"
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Auto-set to today (UTC)</p>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                       🌾 Food
@@ -1159,33 +1442,40 @@ export default function AllianceDetail() {
 
                 {/* Modal Content */}
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                  {/* Search Bar */}
-                  <div className="mb-4">
-                    <div className="relative">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                      </svg>
-                      <input
-                        type="text"
-                        placeholder="Search users by name, ID, or email..."
-                        value={addMemberSearch}
-                        onChange={(e) => setAddMemberSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
+                  {availableUsersLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                      <p className="text-gray-600 dark:text-gray-400">Loading available users...</p>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      {/* Search Bar */}
+                      <div className="mb-4">
+                        <div className="relative">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                          </svg>
+                          <input
+                            type="text"
+                            placeholder="Search users by name, ID, or email..."
+                            value={addMemberSearch}
+                            onChange={(e) => setAddMemberSearch(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+                      </div>
 
-                  {/* Selected Count */}
-                  {selectedUsersToAdd.length > 0 && (
-                    <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-                      <p className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
-                        {selectedUsersToAdd.length} user(s) selected
-                      </p>
-                    </div>
-                  )}
+                      {/* Selected Count */}
+                      {selectedUsersToAdd.length > 0 && (
+                        <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                          <p className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
+                            {selectedUsersToAdd.length} user(s) selected
+                          </p>
+                        </div>
+                      )}
 
-                  {/* Available Users List */}
-                  <div className="space-y-2">
+                      {/* Available Users List */}
+                      <div className="space-y-2">
                     {filteredAvailableUsers.length === 0 ? (
                       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1231,7 +1521,9 @@ export default function AllianceDetail() {
                         </div>
                       ))
                     )}
-                  </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Modal Footer */}
@@ -1401,6 +1693,157 @@ export default function AllianceDetail() {
                   </div>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Member Report Modal */}
+        {showMemberReport && reportMember && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-6">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-slate-900/60 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 p-6 text-white flex items-center justify-between z-10">
+                <div>
+                  <h2 className="text-2xl font-bold">Member Report</h2>
+                  <p className="text-sm opacity-90 mt-1">{reportMember.name} ({reportMember.governor_id})</p>
+                </div>
+                <button
+                  onClick={closeMemberReport}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-6">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/40 dark:to-indigo-800/40 rounded-xl p-4 border border-indigo-200 dark:border-indigo-700">
+                    <div className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold mb-1">Total RSS</div>
+                    <div className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{formatNumber(reportMember.total_rss)}</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/40 dark:to-purple-800/40 rounded-xl p-4 border border-purple-200 dark:border-purple-700">
+                    <div className="text-sm text-purple-600 dark:text-purple-400 font-semibold mb-1">Weeks Donated</div>
+                    <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">{reportMember.weeks_donated}</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
+                    <div className="text-sm text-blue-600 dark:text-blue-400 font-semibold mb-1">Contributions</div>
+                    <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">{reportMember.contributions?.length || 0}</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-800/40 rounded-xl p-4 border border-green-200 dark:border-green-700">
+                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold mb-1">Last Activity</div>
+                    <div className="text-xs font-bold text-green-700 dark:text-green-300 line-clamp-2">{formatDate(reportMember.last_contribution)}</div>
+                  </div>
+                </div>
+
+                {/* Resource Breakdown */}
+                <div className="bg-gray-50 dark:bg-slate-700/30 rounded-xl p-4 border border-gray-200 dark:border-slate-600">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Resource Breakdown</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 text-center border border-gray-200 dark:border-slate-600">
+                      <div className="text-2xl mb-1">🌾</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Food</div>
+                      <div className="text-lg font-bold text-green-600 dark:text-green-400">{formatNumber(reportMember.food)}</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 text-center border border-gray-200 dark:border-slate-600">
+                      <div className="text-2xl mb-1">🪵</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Wood</div>
+                      <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{formatNumber(reportMember.wood)}</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 text-center border border-gray-200 dark:border-slate-600">
+                      <div className="text-2xl mb-1">🪨</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Stone</div>
+                      <div className="text-lg font-bold text-gray-600 dark:text-gray-400">{formatNumber(reportMember.stone)}</div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-lg p-3 text-center border border-gray-200 dark:border-slate-600">
+                      <div className="text-2xl mb-1">💰</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Gold</div>
+                      <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{formatNumber(reportMember.gold)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Weekly Contributions Table */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Weekly Contributions</h3>
+                  {reportMember.contributions && reportMember.contributions.length > 0 ? (
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-600">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100 dark:bg-slate-700/60 sticky top-0">
+                          <tr className="text-xs text-gray-600 dark:text-gray-300 font-semibold">
+                            <th className="px-4 py-3 text-center">Week</th>
+                            <th className="px-4 py-3 text-center">🌾 Food</th>
+                            <th className="px-4 py-3 text-center">🪵 Wood</th>
+                            <th className="px-4 py-3 text-center">🪨 Stone</th>
+                            <th className="px-4 py-3 text-center">💰 Gold</th>
+                            <th className="px-4 py-3 text-center">📦 Total</th>
+                            <th className="px-4 py-3 text-center">📅 Date</th>
+                            <th className="px-4 py-3 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700/50">
+                          {reportMember.contributions
+                            .sort((a, b) => b.week - a.week)
+                            .map((contribution) => (
+                              <tr key={contribution.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                                <td className="px-4 py-3 text-center font-bold text-purple-600 dark:text-purple-400">W{contribution.week}</td>
+                                <td className="px-4 py-3 text-center text-green-600 dark:text-green-400 font-semibold">{formatNumber(contribution.food)}</td>
+                                <td className="px-4 py-3 text-center text-amber-600 dark:text-amber-400 font-semibold">{formatNumber(contribution.wood)}</td>
+                                <td className="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-semibold">{formatNumber(contribution.stone)}</td>
+                                <td className="px-4 py-3 text-center text-yellow-600 dark:text-yellow-400 font-semibold">{formatNumber(contribution.gold)}</td>
+                                <td className="px-4 py-3 text-center text-indigo-600 dark:text-indigo-400 font-bold">{formatNumber(contribution.food + contribution.wood + contribution.stone + contribution.gold)}</td>
+                                <td className="px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-400">{formatDate(contribution.date)}</td>
+                                <td className="px-4 py-3 text-center">
+                                  {deleteConfirm?.week === contribution.week && deleteConfirm?.memberId === reportMember.member_id ? (
+                                    <div className="flex gap-1 justify-center items-center">
+                                      <button
+                                        onClick={() => deleteWeeklyContribution(reportMember.member_id, contribution.week)}
+                                        className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                      >
+                                        Confirm
+                                      </button>
+                                      <button
+                                        onClick={() => setDeleteConfirm(null)}
+                                        className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setDeleteConfirm({ memberId: reportMember.member_id, week: contribution.week })}
+                                      className="px-3 py-1 text-xs bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors font-medium"
+                                      title="Delete this week's contribution"
+                                    >
+                                      🗑️ Delete
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-center">
+                      <p className="text-yellow-800 dark:text-yellow-300">No contributions recorded yet</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700">
+                <button
+                  onClick={closeMemberReport}
+                  className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium"
+                >
+                  Close Report
+                </button>
+              </div>
             </div>
           </div>
         )}

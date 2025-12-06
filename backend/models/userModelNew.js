@@ -88,14 +88,6 @@ const User = db.define('users', {
     updatedAt: 'updated_at',
     indexes: [
         {
-            unique: true,
-            fields: ['user_id']
-        },
-        {
-            unique: true,
-            fields: ['email']
-        },
-        {
             fields: ['role']
         },
         {

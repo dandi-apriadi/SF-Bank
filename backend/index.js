@@ -10,10 +10,11 @@ import multer from 'multer';
 import crypto from 'crypto';
 import db from './config/Database.js';
 import authRoutes from './routes/shared/authRoutes.js';
-// Note: many route modules were removed/cleaned from the repo.
-// Only import shared routes that exist to avoid startup errors.
 import contactRoutes from './routes/shared/contactRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import userManagementRoutes from './routes/administrator/userManagementRoutes.js';
+import allianceRoutes from './routes/administrator/allianceRoutes.js';
+import auditLogRoutes from './routes/audit/auditLogRoutes.js';
 
 // Initialize Express app
 const app = express();
@@ -95,11 +96,9 @@ app.use(
     })
 );
 app.use('/api/shared', authRoutes);
-// Note: `userManagementRoutes` (administrator) was removed/cleaned from the repo.
-// If you need admin routes again, restore `backend/routes/administrator/userManagementRoutes.js`
-// and re-enable the line below.
-// The application currently exposes only shared routes present in `routes/shared` and health route.
-// Restore the other routes if/when those files are re-added to `backend/routes/`.
+app.use('/api/v1/users', userManagementRoutes);
+app.use('/api/v1', allianceRoutes);
+app.use('/api/v1/audit-logs', auditLogRoutes);
 app.use('/', contactRoutes);
 app.use('/', healthRoutes);
 

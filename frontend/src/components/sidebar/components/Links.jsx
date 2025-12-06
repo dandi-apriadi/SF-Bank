@@ -53,13 +53,13 @@ export function SidebarLinks(props) {
   const createLinks = (routes) => {
     const roleColors = getRoleColors();
 
-    // Group routes by parent path
+    // Group routes by parent path - filter out invisible routes
     const mainRoutes = routes.filter(route =>
-      route.layout !== "auth" && !route.parentPath
+      route.layout !== "auth" && !route.parentPath && !route.invisible
     );
 
     const subRoutesByParent = {};
-    routes.filter(route => route.parentPath).forEach(subRoute => {
+    routes.filter(route => route.parentPath && !route.invisible).forEach(subRoute => {
       if (!subRoutesByParent[subRoute.parentPath]) {
         subRoutesByParent[subRoute.parentPath] = [];
       }

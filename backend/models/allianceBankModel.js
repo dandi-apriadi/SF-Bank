@@ -22,7 +22,6 @@ const AllianceBank = db.define('alliance_bank', {
     bank_id: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         comment: 'Unique bank identifier'
     },
     bank_name: {

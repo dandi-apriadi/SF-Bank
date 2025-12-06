@@ -73,8 +73,15 @@ export const login = async (req, res) => {
             // Session debug and save
             console.log("Session before:", req.session ? "Exists" : "Missing");
             
-            // Ensure session is saved properly (use id as primary key)
-            req.session.user_id = user.id;
+            // Store user in session (nested object as expected by authenticate middleware)
+            req.session.user = {
+                id: user.id,
+                user_id: user.user_id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status
+            };
             
             // Force session save for production reliability
             await new Promise((resolve, reject) => {
@@ -83,13 +90,13 @@ export const login = async (req, res) => {
                         console.error('Session save error:', err);
                         reject(err);
                     } else {
-                        console.log("Session saved successfully with user_id:", req.session.user_id);
+                        console.log("Session saved successfully with user:", req.session.user);
                         resolve();
                     }
                 });
             });
             
-            console.log("Session after:", req.session ? `Set with ID ${req.session.user_id}` : "Missing");
+            console.log("Session after:", req.session.user ? `Set with ID ${req.session.user.id}` : "Missing");
 
             // Make safe userData extraction more resilient
             let userData;
@@ -105,7 +112,7 @@ export const login = async (req, res) => {
 
             // Debug final response
             console.log("Login successful, sending response with user data");
-            console.log("Session user_id:", req.session.user_id);
+            console.log("Session user:", req.session.user);
 
             res.status(200).json({
                 msg: "Login successful",
@@ -181,10 +188,10 @@ export const Me = async (req, res) => {
         // Dynamic import of User model from SF BANK models
         const { User } = await import("../../models/index.js");
         
-        if (!req.session || !req.session.user_id) {
+        if (!req.session || !req.session.user || !req.session.user.id) {
             console.log("Session validation failed:", {
                 session: req.session ? 'exists' : 'missing',
-                user_id: req.session ? req.session.user_id : 'N/A'
+                user: req.session ? req.session.user : 'N/A'
             });
             return res.status(401).json({ 
                 msg: "Mohon login ke akun anda",
@@ -209,7 +216,7 @@ export const Me = async (req, res) => {
                 'updated_at'
             ],
             where: {
-                id: req.session.user_id
+                id: req.session.user.id
             }
         });
 

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 export default function Alliance() {
   const navigate = useNavigate();
@@ -46,33 +49,31 @@ export default function Alliance() {
     };
   }, []);
 
-  // Dummy alliance data
-  const [alliances, setAlliances] = useState(() => {
-    const arr = [];
-    const tags = ["SF-A", "SF-B", "SF-C", "SF-D", "SF-E"];
-    
-    for (let i = 1; i <= 20; i++) {
-      const food = Math.floor(Math.random() * 50000000) + 10000000;
-      const wood = Math.floor(Math.random() * 40000000) + 8000000;
-      const stone = Math.floor(Math.random() * 35000000) + 7000000;
-      const gold = Math.floor(Math.random() * 30000000) + 5000000;
-      arr.push({
-        id: i,
-        name: `Alliance ${i}`,
-        tag: tags[i % tags.length],
-        leader: `Leader ${i}`,
-        members_count: Math.floor(Math.random() * 50) + 10,
-        food: food,
-        wood: wood,
-        stone: stone,
-        gold: gold,
-        total_rss: food + wood + stone + gold,
-        weeks_donated: Math.floor(Math.random() * 100) + 1,
-        description: i % 3 === 0 ? "Strong alliance for kingdom growth" : "",
+  // State for alliances data
+  const [alliances, setAlliances] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch alliances from API
+  const fetchAlliances = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/alliances`, {
+        withCredentials: true
       });
+      setAlliances(response.data);
+    } catch (err) {
+      console.error("Fetch alliances error:", err);
+      setError(err.response?.data?.msg || "Failed to load alliances");
+    } finally {
+      setLoading(false);
     }
-    return arr;
-  });
+  };
+
+  useEffect(() => {
+    fetchAlliances();
+  }, []);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -135,57 +136,58 @@ export default function Alliance() {
     setGoldInput("");
   };
 
-  const addAlliance = (e) => {
+  const addAlliance = async (e) => {
     e.preventDefault();
     if (!nameInput.trim()) return alert("Please enter an alliance name.");
     if (!leaderInput.trim()) return alert("Please enter a leader name.");
     
-    const food = parseInt(foodInput) || 0;
-    const wood = parseInt(woodInput) || 0;
-    const stone = parseInt(stoneInput) || 0;
-    const gold = parseInt(goldInput) || 0;
-    
-    const maxId = alliances.length ? Math.max(...alliances.map((a) => a.id)) : 0;
-    const newAlliance = {
-      id: maxId + 1,
-      name: nameInput.trim(),
-      tag: tagInput,
-      leader: leaderInput.trim(),
-      members_count: 0,
-      food: food,
-      wood: wood,
-      stone: stone,
-      gold: gold,
-      total_rss: food + wood + stone + gold,
-      description: descriptionInput.trim(),
-    };
-    setAlliances((prev) => [newAlliance, ...prev]);
-    setShowAddModal(false);
-    setPage(1);
+    try {
+      const payload = {
+        name: nameInput.trim(),
+        tag: tagInput.trim() || null,
+        leader: leaderInput.trim(),
+        description: descriptionInput.trim()
+      };
+
+      await axios.post(`${API_BASE_URL}/api/v1/alliances`, payload, {
+        withCredentials: true
+      });
+
+      alert("Alliance created successfully!");
+      setShowAddModal(false);
+      setPage(1);
+      await fetchAlliances(); // Refresh data
+    } catch (err) {
+      console.error("Create alliance error:", err);
+      alert(err.response?.data?.msg || "Failed to create alliance");
+    }
   };
 
-  const updateAlliance = (e) => {
+  const updateAlliance = async (e) => {
     e.preventDefault();
     if (!nameInput.trim()) return alert("Please enter an alliance name.");
     if (!leaderInput.trim()) return alert("Please enter a leader name.");
     
-    // RSS fields are disabled in edit, so we don't update them
-    setAlliances((prev) =>
-      prev.map((a) =>
-        a.id === selectedAlliance.id
-          ? {
-              ...a,
-              name: nameInput.trim(),
-              tag: tagInput,
-              leader: leaderInput.trim(),
-              description: descriptionInput.trim(),
-              // Keep existing RSS values
-            }
-          : a
-      )
-    );
-    setShowEditModal(false);
-    setSelectedAlliance(null);
+    try {
+      const payload = {
+        name: nameInput.trim(),
+        tag: tagInput,
+        leader: leaderInput.trim(),
+        description: descriptionInput.trim()
+      };
+
+      await axios.put(`${API_BASE_URL}/api/v1/alliances/${selectedAlliance.id}`, payload, {
+        withCredentials: true
+      });
+
+      alert("Alliance updated successfully!");
+      setShowEditModal(false);
+      setSelectedAlliance(null);
+      await fetchAlliances(); // Refresh data
+    } catch (err) {
+      console.error("Update alliance error:", err);
+      alert(err.response?.data?.msg || "Failed to update alliance");
+    }
   };
 
   const getInitials = (name = "") =>
@@ -222,6 +224,37 @@ export default function Alliance() {
         return "🏛️";
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="w-full min-h-full flex items-center justify-center bg-slate-50 dark:bg-navy-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading alliances...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="w-full min-h-full flex items-center justify-center bg-slate-50 dark:bg-navy-900">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error Loading Alliances</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button 
+            onClick={fetchAlliances}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div key={`alliance-${isDarkMode}`} className="w-full min-h-full flex flex-col bg-slate-50 transition-colors duration-300" style={{backgroundColor: isDarkMode ? '#111c44' : '#f8fafc'}}>
@@ -266,8 +299,7 @@ export default function Alliance() {
                 {pagedAlliances.map((a, idx) => (
                   <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
                     <td className="px-2 py-3 text-gray-700 dark:text-gray-400 w-12 text-center font-medium">{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                    <td className="px-4 py-3 flex items-center">
-                      <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center mr-3 font-semibold text-sm">{getInitials(a.name)}</div>
+                    <td className="px-4 py-3">
                       <div>
                         <div className="font-medium text-gray-800 dark:text-gray-200">{a.name}</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">Led by {a.leader}</div>
@@ -322,7 +354,6 @@ export default function Alliance() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">No. {(page - 1) * PAGE_SIZE + idx + 1}</div>
-                    <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-semibold text-sm">{getInitials(a.name)}</div>
                     <div className="flex-1">
                       <div className="font-medium text-gray-800 dark:text-gray-200">{a.name}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">{a.leader}</div>
@@ -458,17 +489,13 @@ export default function Alliance() {
 
                   <div>
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tag</label>
-                    <select 
+                    <input 
+                      type="text" 
                       value={tagInput} 
                       onChange={(e) => setTagInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all"
-                    >
-                      <option value="SF-A">🛡️ SF-A</option>
-                      <option value="SF-B">⚔️ SF-B</option>
-                      <option value="SF-C">🏰 SF-C</option>
-                      <option value="SF-D">👑 SF-D</option>
-                      <option value="SF-E">⭐ SF-E</option>
-                    </select>
+                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
+                      placeholder="Enter alliance tag (e.g., SF-A, SF-B)"
+                    />
                   </div>
 
                   <div>
@@ -490,50 +517,6 @@ export default function Alliance() {
                       onChange={(e) => setDescriptionInput(e.target.value)} 
                       className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
                       placeholder="Add description (optional)"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">🌾 Food</label>
-                    <input 
-                      type="number" 
-                      value={foodInput} 
-                      onChange={(e) => setFoodInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
-                      placeholder="Enter food amount"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">🪵 Wood</label>
-                    <input 
-                      type="number" 
-                      value={woodInput} 
-                      onChange={(e) => setWoodInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
-                      placeholder="Enter wood amount"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">🪨 Stone</label>
-                    <input 
-                      type="number" 
-                      value={stoneInput} 
-                      onChange={(e) => setStoneInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
-                      placeholder="Enter stone amount"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">💰 Gold</label>
-                    <input 
-                      type="number" 
-                      value={goldInput} 
-                      onChange={(e) => setGoldInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" 
-                      placeholder="Enter gold amount"
                     />
                   </div>
 
@@ -590,17 +573,13 @@ export default function Alliance() {
 
                   <div>
                     <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tag</label>
-                    <select 
+                    <input 
+                      type="text" 
                       value={tagInput} 
                       onChange={(e) => setTagInput(e.target.value)} 
-                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all"
-                    >
-                      <option value="SF-A">🛡️ SF-A</option>
-                      <option value="SF-B">⚔️ SF-B</option>
-                      <option value="SF-C">🏰 SF-C</option>
-                      <option value="SF-D">👑 SF-D</option>
-                      <option value="SF-E">⭐ SF-E</option>
-                    </select>
+                      className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white p-2.5 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all" 
+                      placeholder="Enter alliance tag (e.g., SF-A, SF-B)"
+                    />
                   </div>
 
                   <div>

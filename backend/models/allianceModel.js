@@ -13,7 +13,6 @@ const Alliance = db.define('alliances', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
             notEmpty: true,
             len: [2, 100]
@@ -44,7 +43,6 @@ const Alliance = db.define('alliances', {
     bank_id: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true,
         comment: 'Bank identifier for alliance'
     },
     bank_name: {
