@@ -69,7 +69,11 @@ export const createMemberContribution = async (req, res) => {
     }
 
     // Calculate total RSS
-    const totalRss = (parseInt(food) || 0) + (parseInt(wood) || 0) + (parseInt(stone) || 0) + (parseInt(gold) || 0);
+    const foodValue = parseInt(food) || 0;
+    const woodValue = parseInt(wood) || 0;
+    const stoneValue = parseInt(stone) || 0;
+    const goldValue = parseInt(gold) || 0;
+    const totalRss = foodValue + woodValue + stoneValue + goldValue;
 
     // Create or update contribution
     const [contribution, created] = await MemberContribution.findOrCreate({
@@ -80,10 +84,11 @@ export const createMemberContribution = async (req, res) => {
       },
       defaults: {
         date: contributionDate,
-        food: parseInt(food) || 0,
-        wood: parseInt(wood) || 0,
-        stone: parseInt(stone) || 0,
-        gold: parseInt(gold) || 0,
+        food: foodValue,
+        wood: woodValue,
+        stone: stoneValue,
+        gold: goldValue,
+        total_rss: totalRss,
       },
     });
 
@@ -91,10 +96,11 @@ export const createMemberContribution = async (req, res) => {
     if (!created) {
       await contribution.update({
         date: contributionDate,
-        food: parseInt(food) || 0,
-        wood: parseInt(wood) || 0,
-        stone: parseInt(stone) || 0,
-        gold: parseInt(gold) || 0,
+        food: foodValue,
+        wood: woodValue,
+        stone: stoneValue,
+        gold: goldValue,
+        total_rss: totalRss,
       });
     }
 
@@ -151,23 +157,31 @@ export const updateMemberContribution = async (req, res) => {
       return res.status(404).json({ msg: 'Contribution not found' });
     }
 
+    const foodValue = parseInt(food) ?? contribution.food;
+    const woodValue = parseInt(wood) ?? contribution.wood;
+    const stoneValue = parseInt(stone) ?? contribution.stone;
+    const goldValue = parseInt(gold) ?? contribution.gold;
+    const newTotalRss = foodValue + woodValue + stoneValue + goldValue;
+
     const oldData = {
       food: contribution.food,
       wood: contribution.wood,
       stone: contribution.stone,
       gold: contribution.gold,
+      total_rss: contribution.total_rss,
     };
 
     await contribution.update({
-      food: parseInt(food) ?? contribution.food,
-      wood: parseInt(wood) ?? contribution.wood,
-      stone: parseInt(stone) ?? contribution.stone,
-      gold: parseInt(gold) ?? contribution.gold,
+      food: foodValue,
+      wood: woodValue,
+      stone: stoneValue,
+      gold: goldValue,
+      total_rss: newTotalRss,
     });
 
     // Log activity
-    const newTotal = contribution.food + contribution.wood + contribution.stone + contribution.gold;
-    const oldTotal = oldData.food + oldData.wood + oldData.stone + oldData.gold;
+    const newTotal = newTotalRss;
+    const oldTotal = oldData.total_rss;
     await AuditLogger.log(req.user.id, 'UPDATE', 'member_contributions', id, `Updated RSS from ${oldTotal.toLocaleString()} to ${newTotal.toLocaleString()}`);
 
     res.status(200).json({
