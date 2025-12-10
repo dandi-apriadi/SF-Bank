@@ -68,7 +68,7 @@ class DiscordBot {
                 }
             } catch (error) {
                 console.error('Error handling command:', error);
-                const errorMessage = 'Terjadi kesalahan saat memproses command. Silakan coba lagi nanti.';
+                const errorMessage = 'An error occurred while processing the command. Please try again later.';
 
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: errorMessage, ephemeral: true });
@@ -111,7 +111,7 @@ class DiscordBot {
                 return uniqueBanks;
             }
 
-            // Fallback jika tidak ada alliance di database
+            // Fallback if no alliance in database
             return [
                 { name: 'Kingdom Bank', value: 1 },
                 { name: 'Alliance Bank', value: 2 },
@@ -190,23 +190,23 @@ class DiscordBot {
         const commands = [
             {
                 name: 'bank-alliance',
-                description: 'Menampilkan daftar aliansi dengan informasi RSS bank',
+                description: 'Display list of alliances with bank RSS information',
             },
             {
                 name: 'report-user',
-                description: 'Menampilkan laporan lengkap kontribusi RSS user',
+                description: 'Display detailed RSS contribution report for a user',
                 options: [
                     {
                         name: 'alliance_id',
                         type: 4, // INTEGER
-                        description: 'Pilih alliance terlebih dahulu',
+                        description: 'Select alliance first',
                         required: true,
                         choices: bankChoices
                     },
                     {
                         name: 'username',
-                        type: 3, // STRING (autocomplete akan handle ini)
-                        description: 'Username atau nama user yang ingin dilihat laporannya',
+                        type: 3, // STRING (autocomplete will handle this)
+                        description: 'Username or name of the user to view the report',
                         required: true,
                         autocomplete: true
                     }
@@ -214,12 +214,12 @@ class DiscordBot {
             },
             {
                 name: 'bank-rank',
-                description: 'Menampilkan 10 user dengan donasi RSS terbanyak (Leaderboard)',
+                description: 'Display top 10 users with the most RSS donations (Leaderboard)',
                 options: [
                     {
                         name: 'alliance_id',
                         type: 4, // INTEGER
-                        description: 'Pilih alliance untuk melihat ranking',
+                        description: 'Select alliance to view ranking',
                         required: true,
                         choices: bankChoices
                     }
@@ -227,19 +227,19 @@ class DiscordBot {
             },
             {
                 name: 'download-report',
-                description: 'Download laporan bank dalam format Excel (full member, per alliance)',
+                description: 'Download bank report in Excel format (full members, per alliance)',
                 options: [
                     {
                         name: 'alliance_id',
                         type: 4, // INTEGER
-                        description: 'Pilih alliance yang ingin diunduh laporannya',
+                        description: 'Select alliance to download the report',
                         required: true,
                         choices: bankChoices
                     },
                     {
                         name: 'bank_name',
                         type: 3, // STRING
-                        description: 'Nama bank (opsional, untuk judul)',
+                        description: 'Bank name (optional, for title)',
                         required: false
                     }
                 ]
@@ -303,7 +303,7 @@ class DiscordBot {
 
             if (!alliances || alliances.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ Tidak ada aliansi yang terdaftar di database.'
+                    content: '❌ No alliances registered in the database.'
                 });
             }
 
@@ -359,7 +359,7 @@ class DiscordBot {
                 const embed = new EmbedBuilder()
                     .setColor('#FFD700') // Gold color for medieval theme
                     .setTitle(`🏰 Bank Alliance - Kingdom 3946 (${i + 1}-${Math.min(i + itemsPerEmbed, allianceData.length)} of ${allianceData.length})`)
-                    .setDescription('Daftar aliansi dengan total RSS yang tersimpan di bank')
+                    .setDescription('List of alliances with total RSS stored in the bank')
                     .setTimestamp()
                     .setFooter({ text: 'Kingdom 3946 Bank System' });
 
@@ -398,7 +398,7 @@ class DiscordBot {
         } catch (error) {
             console.error('Error in handleBankAlliance:', error);
             await interaction.editReply({
-                content: '❌ Terjadi kesalahan saat mengambil data aliansi.'
+                content: '❌ An error occurred while fetching alliance data.'
             });
         }
     }
@@ -414,7 +414,7 @@ class DiscordBot {
             if (!username || username.trim() === '' || 
                 username === 'NOT_FOUND' || username === 'SEARCH_MORE' || username === 'ERROR') {
                 return await interaction.editReply({
-                    content: `❌ Silakan pilih member yang valid dari daftar atau ketik nama untuk mencari.`
+                    content: `❌ Please select a valid member from the list or type a name to search.`
                 });
             }
 
@@ -430,7 +430,7 @@ class DiscordBot {
 
             if (!user) {
                 return await interaction.editReply({
-                    content: `❌ User dengan username **${username}** tidak ditemukan di alliance yang dipilih.`
+                    content: `❌ User with username **${username}** not found in the selected alliance.`
                 });
             }
 
@@ -442,7 +442,7 @@ class DiscordBot {
 
             if (!contributions || contributions.length === 0) {
                 return await interaction.editReply({
-                    content: `❌ User **${user.name}** belum memiliki riwayat kontribusi RSS.`
+                    content: `❌ User **${user.name}** does not have any RSS contribution history yet.`
                 });
             }
 
@@ -459,7 +459,7 @@ class DiscordBot {
             const embed = new EmbedBuilder()
                 .setColor('#00AA00')
                 .setTitle(`📊 ${user.name} - Contribution Report`)
-                .setDescription(`Laporan detail kontribusi RSS untuk **${user.name}** tersedia di file Excel di bawah.`)
+                .setDescription(`Detailed RSS contribution report for **${user.name}** is available in the Excel file below.`)
                 .addFields(
                     { name: '👤 User ID', value: `${user.id}`, inline: true },
                     { name: '📈 Total Weeks', value: `${contributions.length}`, inline: true },
@@ -478,7 +478,7 @@ class DiscordBot {
         } catch (error) {
             console.error('Error in handleReportUser:', error);
             await interaction.editReply({
-                content: `❌ Terjadi kesalahan saat membuat laporan: ${error.message}`
+                content: `❌ An error occurred while creating the report: ${error.message}`
             });
         }
     }
@@ -493,7 +493,7 @@ class DiscordBot {
             const alliance = await Alliance.findByPk(allianceId);
             if (!alliance) {
                 return await interaction.editReply({
-                    content: '❌ Alliance tidak ditemukan.'
+                    content: '❌ Alliance not found.'
                 });
             }
 
@@ -509,7 +509,7 @@ class DiscordBot {
 
             if (!users || users.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ Tidak ada user yang terdaftar di alliance ini.'
+                    content: '❌ No users registered in this alliance.'
                 });
             }
 
@@ -557,7 +557,7 @@ class DiscordBot {
 
             if (topUsers.length === 0 || topUsers[0].totalRss === 0) {
                 return await interaction.editReply({
-                    content: '❌ Belum ada user dengan kontribusi RSS.'
+                    content: '❌ No users with RSS contributions yet.'
                 });
             }
 
@@ -568,7 +568,7 @@ class DiscordBot {
             const group1 = new EmbedBuilder()
                 .setColor('#FFD700')
                 .setTitle(`🏆 BANK RANK - TOP 10 DONORS 🏆`)
-                .setDescription(`**${alliance.bank_name || alliance.name}**\n\nDaftar user dengan donasi RSS terbanyak`)
+                .setDescription(`**${alliance.bank_name || alliance.name}**\n\nList of users with the most RSS donations`)
                 .setTimestamp()
                 .setFooter({ text: 'Kingdom 3946 Bank System' });
 
@@ -635,7 +635,7 @@ class DiscordBot {
         } catch (error) {
             console.error('Error in handleBankRank:', error);
             await interaction.editReply({
-                content: '❌ Terjadi kesalahan saat mengambil data ranking.'
+                content: '❌ An error occurred while fetching ranking data.'
             });
         }
     }
