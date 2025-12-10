@@ -3,7 +3,8 @@ import { Op } from 'sequelize';
 import Alliance from '../models/Alliance.js';
 import MemberContribution from '../models/MemberContribution.js';
 import User from '../models/User.js';
-import { generateBankRankReport, generateUserDetailReport } from '../utils/excelReportGenerator.js';
+import { generateUserDetailReport, generateAllianceReport } from '../utils/excelReportGenerator.js';
+import fs from 'fs';
 
 class DiscordBot {
     constructor(token, clientId) {
@@ -22,10 +23,11 @@ class DiscordBot {
     }
 
     setupEventHandlers() {
-        this.client.once('ready', () => {
+        this.client.once('clientReady', () => {
             console.log(`✅ Discord Bot is ready! Logged in as ${this.client.user.tag}`);
             console.log(`📡 Bot is active in ${this.client.guilds.cache.size} server(s)`);
             console.log(`🎮 Commands available: /bank-alliance, /report-user, /bank-rank, /download-report`);
+            console.log(`💾 Database: Direct access mode (no backend authentication required)`);
         });
 
         this.client.on('interactionCreate', async (interaction) => {
@@ -37,7 +39,9 @@ class DiscordBot {
                     const focusedValue = options.getFocused(true);
                     if (focusedValue.name === 'username') {
                         try {
-                            const choices = await this.getUsernameChoices(focusedValue.value);
+                            // Get alliance_id from the command options
+                            const allianceId = options.getInteger('alliance_id', false);
+                            const choices = await this.getUsernameChoices(focusedValue.value, allianceId);
                             await interaction.respond(choices);
                         } catch (error) {
                             console.error('Error handling autocomplete:', error);
@@ -65,7 +69,7 @@ class DiscordBot {
             } catch (error) {
                 console.error('Error handling command:', error);
                 const errorMessage = 'Terjadi kesalahan saat memproses command. Silakan coba lagi nanti.';
-                
+
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({ content: errorMessage, ephemeral: true });
                 } else {
@@ -83,7 +87,7 @@ class DiscordBot {
         try {
             // Fetch all alliances from database
             const alliances = await Alliance.findAll({
-                attributes: ['name', 'tag', 'bank_name'],
+                attributes: ['id', 'name', 'tag', 'bank_name'],
                 raw: true,
                 limit: 25 // Discord max 25 choices
             });
@@ -95,7 +99,7 @@ class DiscordBot {
                     const displayTag = alliance.tag ? ` [${alliance.tag}]` : '';
                     return {
                         name: `${displayName}${displayTag}`,
-                        value: displayName
+                        value: alliance.id // use alliance id for download
                     };
                 });
 
@@ -109,47 +113,74 @@ class DiscordBot {
 
             // Fallback jika tidak ada alliance di database
             return [
-                { name: 'Kingdom Bank', value: 'Kingdom Bank' },
-                { name: 'Alliance Bank', value: 'Alliance Bank' },
-                { name: 'General Bank', value: 'General Bank' }
+                { name: 'Kingdom Bank', value: 1 },
+                { name: 'Alliance Bank', value: 2 },
+                { name: 'General Bank', value: 3 }
             ];
         } catch (error) {
             console.error('Error fetching bank choices:', error);
             // Fallback options
             return [
-                { name: 'Kingdom Bank', value: 'Kingdom Bank' },
-                { name: 'Alliance Bank', value: 'Alliance Bank' }
+                { name: 'Kingdom Bank', value: 1 },
+                { name: 'Alliance Bank', value: 2 }
             ];
         }
     }
 
-    async getUsernameChoices(searchQuery = '') {
+    async getUsernameChoices(searchQuery = '', allianceId = null) {
         try {
+            // Build where clause
+            const whereClause = {
+                role: { [Op.ne]: 'Admin' }  // Exclude Admin role
+            };
+            
+            // Filter by alliance_id if provided
+            if (allianceId) {
+                whereClause.alliance_id = allianceId;
+            }
+            
+            // Filter by search query if provided
+            if (searchQuery) {
+                whereClause.name = {
+                    [Op.like]: `%${searchQuery}%`
+                };
+            }
+
             // Query database untuk usernames (name column) yang match dengan search query
             const users = await User.findAll({
                 attributes: ['id', 'name'],
-                where: searchQuery ? {
-                    name: {
-                        [Op.like]: `%${searchQuery}%`
-                    }
-                } : {},
+                where: whereClause,
                 order: [['name', 'ASC']],
-                limit: 25, // Discord max 25 choices
+                limit: 25, // Discord max 25 choices (platform limitation)
                 raw: true
             });
 
             if (!users || users.length === 0) {
-                return [];
+                // Return helpful message when no users found
+                if (searchQuery) {
+                    return [{ name: `No member found matching "${searchQuery}"`, value: 'NOT_FOUND' }];
+                }
+                return [{ name: 'No members in this alliance', value: 'NOT_FOUND' }];
             }
 
             // Format untuk Discord autocomplete - show username dengan ID
-            return users.map(user => ({
+            const choices = users.map(user => ({
                 name: user.name.length > 90 ? user.name.substring(0, 87) + '...' : user.name, // Discord max 100 chars
                 value: user.name // Use username as value
             }));
+
+            // If we hit the limit and no search query, add a hint
+            if (users.length === 25 && !searchQuery) {
+                choices[24] = {
+                    name: '⚠️ Type to search more members...',
+                    value: 'SEARCH_MORE'
+                };
+            }
+
+            return choices;
         } catch (error) {
             console.error('Error fetching username choices:', error);
-            return [];
+            return [{ name: 'Error loading members', value: 'ERROR' }];
         }
     }
 
@@ -166,6 +197,13 @@ class DiscordBot {
                 description: 'Menampilkan laporan lengkap kontribusi RSS user',
                 options: [
                     {
+                        name: 'alliance_id',
+                        type: 4, // INTEGER
+                        description: 'Pilih alliance terlebih dahulu',
+                        required: true,
+                        choices: bankChoices
+                    },
+                    {
                         name: 'username',
                         type: 3, // STRING (autocomplete akan handle ini)
                         description: 'Username atau nama user yang ingin dilihat laporannya',
@@ -177,17 +215,32 @@ class DiscordBot {
             {
                 name: 'bank-rank',
                 description: 'Menampilkan 10 user dengan donasi RSS terbanyak (Leaderboard)',
+                options: [
+                    {
+                        name: 'alliance_id',
+                        type: 4, // INTEGER
+                        description: 'Pilih alliance untuk melihat ranking',
+                        required: true,
+                        choices: bankChoices
+                    }
+                ]
             },
             {
                 name: 'download-report',
-                description: 'Download laporan bank dalam format Excel',
+                description: 'Download laporan bank dalam format Excel (full member, per alliance)',
                 options: [
+                    {
+                        name: 'alliance_id',
+                        type: 4, // INTEGER
+                        description: 'Pilih alliance yang ingin diunduh laporannya',
+                        required: true,
+                        choices: bankChoices
+                    },
                     {
                         name: 'bank_name',
                         type: 3, // STRING
-                        description: 'Pilih nama bank yang terdaftar',
-                        required: true,
-                        choices: bankChoices
+                        description: 'Nama bank (opsional, untuk judul)',
+                        required: false
                     }
                 ]
             }
@@ -203,7 +256,7 @@ class DiscordBot {
 
         try {
             console.log('🔄 Registering Discord slash commands...');
-            
+
             await rest.put(
                 Routes.applicationCommands(this.clientId),
                 { body: commands }
@@ -233,7 +286,7 @@ class DiscordBot {
                 console.error('   Bot does not have permission to register commands.');
                 console.error('   Make sure bot has "applications.commands" scope.\n');
             }
-            
+
             console.error('Full error:', error.message);
             throw error;
         }
@@ -274,7 +327,10 @@ class DiscordBot {
 
                 const totalRss = totalFood + totalWood + totalStone + totalGold;
                 const memberCount = await User.count({
-                    where: { alliance_id: alliance.id }
+                    where: { 
+                        alliance_id: alliance.id,
+                        role: { [Op.ne]: 'Admin' }  // Exclude Admin role
+                    }
                 });
 
                 return {
@@ -299,7 +355,7 @@ class DiscordBot {
 
             for (let i = 0; i < allianceData.length; i += itemsPerEmbed) {
                 const chunk = allianceData.slice(i, i + itemsPerEmbed);
-                
+
                 const embed = new EmbedBuilder()
                     .setColor('#FFD700') // Gold color for medieval theme
                     .setTitle(`🏰 Bank Alliance - Kingdom 3946 (${i + 1}-${Math.min(i + itemsPerEmbed, allianceData.length)} of ${allianceData.length})`)
@@ -351,25 +407,30 @@ class DiscordBot {
         await interaction.deferReply();
 
         try {
+            const allianceId = interaction.options.getInteger('alliance_id');
             const username = interaction.options.getString('username');
 
-            if (!username || username.trim() === '') {
+            // Validate special values
+            if (!username || username.trim() === '' || 
+                username === 'NOT_FOUND' || username === 'SEARCH_MORE' || username === 'ERROR') {
                 return await interaction.editReply({
-                    content: `❌ Username tidak boleh kosong.`
+                    content: `❌ Silakan pilih member yang valid dari daftar atau ketik nama untuk mencari.`
                 });
             }
 
-            // Fetch user data by username (name column)
+            // Fetch user data by username and alliance_id
             const user = await User.findOne({
                 where: {
-                    name: username
+                    name: username,
+                    alliance_id: allianceId,
+                    role: { [Op.ne]: 'Admin' }  // Exclude Admin role
                 },
                 attributes: ['id', 'name', 'email', 'role', 'alliance_id']
             });
 
             if (!user) {
                 return await interaction.editReply({
-                    content: `❌ User dengan username **${username}** tidak ditemukan di database.`
+                    content: `❌ User dengan username **${username}** tidak ditemukan di alliance yang dipilih.`
                 });
             }
 
@@ -407,7 +468,7 @@ class DiscordBot {
                 .setTimestamp()
                 .setFooter({ text: 'Kingdom 3946 Bank System' });
 
-            await interaction.editReply({ 
+            await interaction.editReply({
                 embeds: [embed],
                 files: [attachment]
             });
@@ -426,22 +487,39 @@ class DiscordBot {
         await interaction.deferReply();
 
         try {
-            // Fetch all users with their total contributions
+            const allianceId = interaction.options.getInteger('alliance_id');
+
+            // Fetch alliance info
+            const alliance = await Alliance.findByPk(allianceId);
+            if (!alliance) {
+                return await interaction.editReply({
+                    content: '❌ Alliance tidak ditemukan.'
+                });
+            }
+
+            // Fetch users from selected alliance only (exclude Admin)
             const users = await User.findAll({
+                where: { 
+                    alliance_id: allianceId,
+                    role: { [Op.ne]: 'Admin' }  // Exclude Admin role
+                },
                 attributes: ['id', 'name', 'email', 'alliance_id'],
                 raw: true
             });
 
             if (!users || users.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ Tidak ada user yang terdaftar di database.'
+                    content: '❌ Tidak ada user yang terdaftar di alliance ini.'
                 });
             }
 
             // Calculate total contributions for each user
             const userRankData = await Promise.all(users.map(async (user) => {
                 const contributions = await MemberContribution.findAll({
-                    where: { member_id: user.id }
+                    where: { 
+                        member_id: user.id,
+                        alliance_id: allianceId  // Filter by alliance_id
+                    }
                 });
 
                 let totalRss = 0;
@@ -485,12 +563,12 @@ class DiscordBot {
 
             // Create rank embeds - split into 2 groups (top 5 + bottom 5) for better readability
             const embeds = [];
-            
+
             // Group 1: Rank 1-5
             const group1 = new EmbedBuilder()
                 .setColor('#FFD700')
-                .setTitle('🏆 BANK RANK - TOP 10 DONORS 🏆')
-                .setDescription('Daftar user dengan donasi RSS terbanyak')
+                .setTitle(`🏆 BANK RANK - TOP 10 DONORS 🏆`)
+                .setDescription(`**${alliance.bank_name || alliance.name}**\n\nDaftar user dengan donasi RSS terbanyak`)
                 .setTimestamp()
                 .setFooter({ text: 'Kingdom 3946 Bank System' });
 
@@ -499,7 +577,7 @@ class DiscordBot {
                 const user = topUsers[i];
                 const rank = i + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                
+
                 const foodFormatted = this.formatNumber(user.food);
                 const woodFormatted = this.formatNumber(user.wood);
                 const stoneFormatted = this.formatNumber(user.stone);
@@ -517,7 +595,7 @@ class DiscordBot {
                     inline: false
                 });
             }
-            
+
             embeds.push(group1);
 
             // Group 2: Rank 6-10 (if exists)
@@ -530,7 +608,7 @@ class DiscordBot {
                     const user = topUsers[i];
                     const rank = i + 1;
                     const medal = `#${rank}`;
-                    
+
                     const foodFormatted = this.formatNumber(user.food);
                     const woodFormatted = this.formatNumber(user.wood);
                     const stoneFormatted = this.formatNumber(user.stone);
@@ -548,7 +626,7 @@ class DiscordBot {
                         inline: false
                     });
                 }
-                
+
                 embeds.push(group2);
             }
 
@@ -567,23 +645,44 @@ class DiscordBot {
 
         try {
             const bankName = interaction.options.getString('bank_name');
+            const allianceId = interaction.options.getInteger('alliance_id');
 
-            // Fetch all users with their total contributions
+            if (!allianceId) {
+                return await interaction.editReply({
+                    content: '❌ Mohon sertakan alliance_id untuk mengambil laporan bank.'
+                });
+            }
+
+            // Fetch alliance from database directly
+            const alliance = await Alliance.findByPk(allianceId);
+            if (!alliance) {
+                return await interaction.editReply({
+                    content: '❌ Alliance tidak ditemukan di database.'
+                });
+            }
+
+            // Fetch all users in this alliance (exclude Admin)
             const users = await User.findAll({
-                attributes: ['id', 'name'],
-                raw: true
+                where: { 
+                    alliance_id: allianceId,
+                    role: { [Op.ne]: 'Admin' }  // Exclude Admin role
+                },
+                attributes: ['id', 'name', 'email']
             });
 
             if (!users || users.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ Tidak ada user yang terdaftar di database.'
+                    content: '❌ Tidak ada member dalam alliance ini.'
                 });
             }
 
             // Calculate total contributions for each user
-            const userRankData = await Promise.all(users.map(async (user) => {
+            const memberData = await Promise.all(users.map(async (user) => {
                 const contributions = await MemberContribution.findAll({
-                    where: { member_id: user.id }
+                    where: { 
+                        member_id: user.id,
+                        alliance_id: allianceId  // Filter by alliance_id
+                    }
                 });
 
                 let totalRss = 0;
@@ -615,50 +714,52 @@ class DiscordBot {
                 };
             }));
 
-            // Sort by total RSS descending and get top 10
-            userRankData.sort((a, b) => b.totalRss - a.totalRss);
-            const topUsers = userRankData.slice(0, 10);
+            // Sort by total RSS descending
+            memberData.sort((a, b) => b.totalRss - a.totalRss);
 
-            if (topUsers.length === 0 || topUsers[0].totalRss === 0) {
-                return await interaction.editReply({
-                    content: '❌ Belum ada user dengan kontribusi RSS untuk di-download.'
-                });
-            }
+            // Generate Excel report using local function
+            const reportInfo = await generateAllianceReport(alliance, memberData);
 
-            // Generate Excel report
-            console.log(`📊 Generating Excel report for ${bankName}...`);
-            const reportInfo = await generateBankRankReport(topUsers, bankName);
+            // Read the file
+            const buffer = fs.readFileSync(reportInfo.filepath);
+            const attachment = new AttachmentBuilder(buffer, { name: reportInfo.filename });
 
-            // Create Discord attachment
-            const attachment = new AttachmentBuilder(reportInfo.filepath, {
-                name: reportInfo.filename
+            // Calculate summary stats
+            const totalRss = memberData.reduce((sum, m) => sum + (m.totalRss || 0), 0);
+            const avgWeeks = memberData.length > 0 ? Math.round(memberData.reduce((sum, m) => sum + (m.totalWeeks || 0), 0) / memberData.length) : 0;
+
+            // Get top 3 contributors for preview
+            const top3 = memberData.slice(0, 3);
+            let top3Text = '';
+            top3.forEach((member, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                top3Text += `${medal} **${member.name}** - ${this.formatNumber(member.totalRss)} RSS\n`;
             });
 
-            // Send file to Discord
-            const embed = new EmbedBuilder()
+            // Summary embed with top 3 preview
+            const summaryEmbed = new EmbedBuilder()
                 .setColor('#00FF00')
                 .setTitle('✅ Bank Report Generated Successfully!')
-                .setDescription(`Laporan untuk **${bankName}** telah berhasil dibuat.`)
+                .setDescription(`Laporan untuk **${alliance.bank_name || alliance.name}** telah berhasil dibuat.\n\n**Top 3 Contributors:**\n${top3Text}`)
                 .addFields(
-                    { name: '📊 Total Users', value: `${topUsers.length} users`, inline: true },
-                    { name: '💰 Total RSS', value: this.formatNumber(topUsers.reduce((sum, u) => sum + u.totalRss, 0)), inline: true },
-                    { name: '📅 Average Contributors', value: `${Math.round(topUsers.reduce((sum, u) => sum + u.totalWeeks, 0) / topUsers.length)} weeks`, inline: true },
-                    { name: '📁 Filename', value: reportInfo.filename, inline: false }
+                    { name: '📊 Total Members', value: `${memberData.length} members`, inline: true },
+                    { name: '💰 Total RSS', value: this.formatNumber(totalRss), inline: true },
+                    { name: '📅 Average Weeks', value: `${avgWeeks} weeks`, inline: true },
+                    { name: '📁 File', value: reportInfo.filename, inline: false },
+                    { name: '💡 Tip', value: 'Download file Excel di bawah untuk melihat detail lengkap semua member!', inline: false }
                 )
                 .setTimestamp()
                 .setFooter({ text: 'Kingdom 3946 Bank System' });
 
-            await interaction.editReply({ 
-                embeds: [embed],
+            await interaction.editReply({
+                content: '✅ Laporan bank berhasil dibuat! Silakan download file di bawah ini.',
+                embeds: [summaryEmbed],
                 files: [attachment]
             });
-
-            console.log(`✅ Excel report generated: ${reportInfo.filename}`);
-
         } catch (error) {
-            console.error('Error in handleDownloadReport:', error);
+            console.error('Error in /download-report:', error);
             await interaction.editReply({
-                content: `❌ Terjadi kesalahan saat membuat laporan Excel: ${error.message}`
+                content: `❌ Terjadi kesalahan saat membuat laporan: ${error.message}`
             });
         }
     }

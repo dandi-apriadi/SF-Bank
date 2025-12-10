@@ -45,8 +45,6 @@ function UserManagement() {
       setLoading(true);
       setError(null);
       const response = await userService.getAllUsers({ 
-        page: currentPage, 
-        limit: itemsPerPage,
         role: roleFilter !== "All" ? roleFilter : null 
       });
       

@@ -18,9 +18,12 @@ import {
     deleteMemberContribution
 } from '../../controllers/administrator/memberContributionController.js';
 import { getReportsSummary } from '../../controllers/administrator/reportController.js';
+import bankReportRoutes from './bankReportRoutes.js';
 import { authenticate, authorize } from '../../middleware/AuthUser.js';
 
 const router = express.Router();
+// Integrate bank report download route
+router.use(bankReportRoutes);
 
 // Public routes for bank view (no auth required)
 router.get('/alliances', getAlliances);

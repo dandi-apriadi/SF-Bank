@@ -8,7 +8,7 @@ import auditLogger from '../../utils/auditLogger.js';
  */
 const getAllUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10, role, status, alliance_id } = req.query;
+    const { page = 1, limit = 10000, role, status, alliance_id } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};

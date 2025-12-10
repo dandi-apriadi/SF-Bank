@@ -460,7 +460,7 @@ router.get('/download-report', async (req, res) => {
             member.rank = index + 1;
         });
 
-        // Generate Excel report for all members
+        // Generate Excel report for all members (no slice/top 10)
         console.log(`📊 Generating Excel report for alliance ${alliance.name}...`);
         const reportInfo = await generateBankRankReport(memberData, alliance.name);
 
@@ -473,7 +473,8 @@ router.get('/download-report', async (req, res) => {
                 url: reportInfo.url,
                 totalMembers: memberData.length,
                 totalRss: memberData.reduce((sum, m) => sum + m.totalRss, 0),
-                downloadUrl: `http://localhost:3001${reportInfo.url}`
+                downloadUrl: `http://localhost:3001${reportInfo.url}`,
+                members: memberData // Tambahkan seluruh data member ke response jika diperlukan
             }
         });
 
