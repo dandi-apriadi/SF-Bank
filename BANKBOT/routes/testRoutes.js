@@ -9,8 +9,8 @@ const router = express.Router();
 
 /**
  * GET /api/test/bank-alliance
- * Test endpoint untuk command /bank-alliance
- * Menampilkan daftar semua aliansi dengan RSS mereka
+ * Test endpoint for /bank-alliance command
+ * Display list of all alliances with their RSS
  */
 router.get('/bank-alliance', async (req, res) => {
     try {
@@ -22,7 +22,7 @@ router.get('/bank-alliance', async (req, res) => {
         if (!alliances || alliances.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'Tidak ada aliansi yang terdaftar di database'
+                message: 'No alliances registered in the database'
             });
         }
 
@@ -68,7 +68,7 @@ router.get('/bank-alliance', async (req, res) => {
 
         res.json({
             success: true,
-            message: `Menampilkan ${allianceData.length} aliansi`,
+            message: `Displaying ${allianceData.length} alliances`,
             data: allianceData
         });
 
@@ -76,7 +76,7 @@ router.get('/bank-alliance', async (req, res) => {
         console.error('Error in test bank-alliance:', error);
         res.status(500).json({
             success: false,
-            message: 'Terjadi kesalahan saat mengambil data aliansi',
+            message: 'An error occurred while fetching alliance data',
             error: error.message
         });
     }
@@ -84,8 +84,8 @@ router.get('/bank-alliance', async (req, res) => {
 
 /**
  * GET /api/test/report-user/:userIdentifier
- * Test endpoint untuk command /report-user
- * Support both username (name) dan user ID
+ * Test endpoint for /report-user command
+ * Supports both username (name) and user ID
  * Example: /api/test/report-user/John%20Doe or /api/test/report-user/1
  */
 router.get('/report-user/:userIdentifier', async (req, res) => {
@@ -112,12 +112,12 @@ router.get('/report-user/:userIdentifier', async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: `User dengan ID/username "${userIdentifier}" tidak ditemukan`
+                message: `User with ID/username "${userIdentifier}" not found`
             });
         }
 
         // Fetch user's alliance
-        let allianceName = 'Belum bergabung alliance';
+        let allianceName = 'Not joined any alliance yet';
         if (user.alliance_id) {
             const alliance = await Alliance.findByPk(user.alliance_id);
             if (alliance) {
@@ -134,7 +134,7 @@ router.get('/report-user/:userIdentifier', async (req, res) => {
         if (!contributions || contributions.length === 0) {
             return res.json({
                 success: true,
-                message: 'User tidak memiliki riwayat kontribusi',
+                message: 'User has no contribution history',
                 user: {
                     id: user.id,
                     name: user.name,
@@ -182,7 +182,7 @@ router.get('/report-user/:userIdentifier', async (req, res) => {
 
         res.json({
             success: true,
-            message: `Laporan user ${user.name}`,
+            message: `User report for ${user.name}`,
             user: {
                 id: user.id,
                 name: user.name,
@@ -205,7 +205,7 @@ router.get('/report-user/:userIdentifier', async (req, res) => {
         console.error('Error in test report-user:', error);
         res.status(500).json({
             success: false,
-            message: 'Terjadi kesalahan saat mengambil data user',
+            message: 'An error occurred while fetching user data',
             error: error.message
         });
     }
@@ -213,8 +213,8 @@ router.get('/report-user/:userIdentifier', async (req, res) => {
 
 /**
  * GET /api/test/bank-rank
- * Test endpoint untuk command /bank-rank
- * Menampilkan 10 user dengan total donasi RSS terbanyak (Leaderboard)
+ * Test endpoint for /bank-rank command
+ * Display top 10 users with the most RSS donations (Leaderboard)
  */
 router.get('/bank-rank', async (req, res) => {
     try {
@@ -227,7 +227,7 @@ router.get('/bank-rank', async (req, res) => {
         if (!users || users.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'Tidak ada user yang terdaftar di database'
+                message: 'No users registered in the database'
             });
         }
 
@@ -281,14 +281,14 @@ router.get('/bank-rank', async (req, res) => {
         if (topUsers.length === 0 || topUsers[0].totalRss === 0) {
             return res.json({
                 success: true,
-                message: 'Belum ada user dengan kontribusi RSS',
+                message: 'No users with RSS contributions yet',
                 data: []
             });
         }
 
         res.json({
             success: true,
-            message: `Menampilkan top ${topUsers.length} donors`,
+            message: `Displaying top ${topUsers.length} donors`,
             totalUsers: users.length,
             timestamp: new Date().toISOString(),
             data: topUsers.map(user => ({
@@ -313,7 +313,7 @@ router.get('/bank-rank', async (req, res) => {
         console.error('Error in test bank-rank:', error);
         res.status(500).json({
             success: false,
-            message: 'Terjadi kesalahan saat mengambil data ranking',
+            message: 'An error occurred while fetching ranking data',
             error: error.message
         });
     }
@@ -321,8 +321,8 @@ router.get('/bank-rank', async (req, res) => {
 
 /**
  * GET /api/test/bank-list
- * Test endpoint untuk list available banks
- * Menampilkan semua bank names yang terdaftar di database
+ * Test endpoint to list available banks
+ * Display all registered bank names in the database
  */
 router.get('/bank-list', async (req, res) => {
     try {
@@ -340,7 +340,7 @@ router.get('/bank-list', async (req, res) => {
         if (!alliances || alliances.length === 0) {
             return res.json({
                 success: true,
-                message: 'Tidak ada bank yang terdaftar',
+                message: 'No banks registered',
                 data: [],
                 fallbackOptions: [
                     { name: 'Kingdom Bank', value: 'Kingdom Bank' },
@@ -359,7 +359,7 @@ router.get('/bank-list', async (req, res) => {
 
         res.json({
             success: true,
-            message: `Menampilkan ${bankChoices.length} bank yang terdaftar`,
+            message: `Displaying ${bankChoices.length} registered banks`,
             totalBanks: bankChoices.length,
             data: bankChoices
         });
@@ -368,7 +368,7 @@ router.get('/bank-list', async (req, res) => {
         console.error('Error in test bank-list:', error);
         res.status(500).json({
             success: false,
-            message: 'Terjadi kesalahan saat mengambil data bank',
+            message: 'An error occurred while fetching bank data',
             error: error.message
         });
     }
@@ -376,8 +376,8 @@ router.get('/bank-list', async (req, res) => {
 
 /**
  * GET /api/test/download-report
- * Test endpoint untuk command /download-report
- * Generate dan download Excel report
+ * Test endpoint for /download-report command
+ * Generate and download Excel report
  */
 router.get('/download-report', async (req, res) => {
     try {
@@ -398,7 +398,7 @@ router.get('/download-report', async (req, res) => {
         if (!alliance) {
             return res.status(404).json({
                 success: false,
-                message: 'Aliansi tidak ditemukan. Mohon masukkan alliance_id, alliance_name, atau alliance_tag yang valid.'
+                message: 'Alliance not found. Please provide a valid alliance_id, alliance_name, or alliance_tag.'
             });
         }
 
@@ -412,7 +412,7 @@ router.get('/download-report', async (req, res) => {
         if (!members || members.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'Tidak ada member di aliansi ini.'
+                message: 'No members in this alliance.'
             });
         }
 
@@ -466,7 +466,7 @@ router.get('/download-report', async (req, res) => {
 
         res.json({
             success: true,
-            message: `Excel report untuk aliansi ${alliance.name} telah berhasil dibuat`,
+            message: `Excel report for alliance ${alliance.name} has been successfully created`,
             data: {
                 filename: reportInfo.filename,
                 filepath: reportInfo.filepath,
@@ -474,7 +474,7 @@ router.get('/download-report', async (req, res) => {
                 totalMembers: memberData.length,
                 totalRss: memberData.reduce((sum, m) => sum + m.totalRss, 0),
                 downloadUrl: `http://localhost:3001${reportInfo.url}`,
-                members: memberData // Tambahkan seluruh data member ke response jika diperlukan
+                members: memberData // Add all member data to response if needed
             }
         });
 
@@ -482,7 +482,7 @@ router.get('/download-report', async (req, res) => {
         console.error('Error in test download-report:', error);
         res.status(500).json({
             success: false,
-            message: 'Terjadi kesalahan saat membuat Excel report',
+            message: 'An error occurred while creating the Excel report',
             error: error.message
         });
     }

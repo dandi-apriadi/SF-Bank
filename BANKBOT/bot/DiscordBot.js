@@ -649,7 +649,7 @@ class DiscordBot {
 
             if (!allianceId) {
                 return await interaction.editReply({
-                    content: '❌ Mohon sertakan alliance_id untuk mengambil laporan bank.'
+                    content: '❌ Please provide alliance_id to retrieve the bank report.'
                 });
             }
 
@@ -657,7 +657,7 @@ class DiscordBot {
             const alliance = await Alliance.findByPk(allianceId);
             if (!alliance) {
                 return await interaction.editReply({
-                    content: '❌ Alliance tidak ditemukan di database.'
+                    content: '❌ Alliance not found in database.'
                 });
             }
 
@@ -672,7 +672,7 @@ class DiscordBot {
 
             if (!users || users.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ Tidak ada member dalam alliance ini.'
+                    content: '❌ No members in this alliance.'
                 });
             }
 
@@ -740,26 +740,26 @@ class DiscordBot {
             const summaryEmbed = new EmbedBuilder()
                 .setColor('#00FF00')
                 .setTitle('✅ Bank Report Generated Successfully!')
-                .setDescription(`Laporan untuk **${alliance.bank_name || alliance.name}** telah berhasil dibuat.\n\n**Top 3 Contributors:**\n${top3Text}`)
+                .setDescription(`Report for **${alliance.bank_name || alliance.name}** has been successfully created.\n\n**Top 3 Contributors:**\n${top3Text}`)
                 .addFields(
                     { name: '📊 Total Members', value: `${memberData.length} members`, inline: true },
                     { name: '💰 Total RSS', value: this.formatNumber(totalRss), inline: true },
                     { name: '📅 Average Weeks', value: `${avgWeeks} weeks`, inline: true },
                     { name: '📁 File', value: reportInfo.filename, inline: false },
-                    { name: '💡 Tip', value: 'Download file Excel di bawah untuk melihat detail lengkap semua member!', inline: false }
+                    { name: '💡 Tip', value: 'Download the Excel file below to view full details of all members!', inline: false }
                 )
                 .setTimestamp()
                 .setFooter({ text: 'Kingdom 3946 Bank System' });
 
             await interaction.editReply({
-                content: '✅ Laporan bank berhasil dibuat! Silakan download file di bawah ini.',
+                content: '✅ Bank report successfully created! Please download the file below.',
                 embeds: [summaryEmbed],
                 files: [attachment]
             });
         } catch (error) {
             console.error('Error in /download-report:', error);
             await interaction.editReply({
-                content: `❌ Terjadi kesalahan saat membuat laporan: ${error.message}`
+                content: `❌ An error occurred while creating the report: ${error.message}`
             });
         }
     }

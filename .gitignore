@@ -1,9 +1,32 @@
-# Node.js backend
+# ================================
+# Environment Variables (SENSITIVE)
+# ================================
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# ================================
+# Node.js Dependencies
+# ================================
+node_modules/
+**/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ================================
+# Backend Specific
+# ================================
 /backend/node_modules/
 /backend/.env
-/backend/npm-debug.log
-/backend/yarn-debug.log
-/backend/yarn-error.log
+/backend/.env.*
+!/backend/.env.example
+/backend/npm-debug.log*
+/backend/yarn-debug.log*
+/backend/yarn-error.log*
 /backend/.pnp
 /backend/.pnp.js
 /backend/coverage/
@@ -11,61 +34,159 @@
 /backend/logs/
 /backend/.DS_Store
 
-# Express uploads directory - keep the directory structure but ignore uploaded files
+# Express uploads directory - keep structure but ignore uploaded files
 /backend/public/images/profiles/*
 !/backend/public/images/profiles/.gitkeep
 /backend/public/uploads/*
 !/backend/public/uploads/.gitkeep
 
-# Frontend / React
+# ================================
+# Frontend Specific
+# ================================
 /frontend/node_modules/
 /frontend/.env
-/frontend/.env.local
-/frontend/.env.development.local
-/frontend/.env.test.local
-/frontend/.env.production.local
+/frontend/.env.*
+!/frontend/.env.example
 /frontend/.pnp
 /frontend/.pnp.js
 /frontend/coverage/
+/frontend/build/
 /frontend/dist/
-/frontend/npm-debug.log
-/frontend/yarn-debug.log
-/frontend/yarn-error.log
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
 /frontend/.DS_Store
 
-# Editor settings
+# ================================
+# BANKBOT Specific
+# ================================
+/BANKBOT/node_modules/
+/BANKBOT/.env
+/BANKBOT/.env.*
+!/BANKBOT/.env.example
+/BANKBOT/npm-debug.log*
+/BANKBOT/yarn-debug.log*
+/BANKBOT/yarn-error.log*
+/BANKBOT/public/uploads/*
+!/BANKBOT/public/uploads/.gitkeep
+/BANKBOT/logs/
+/BANKBOT/.DS_Store
+
+# ================================
+# Database & Backup Files
+# ================================
+*.sql
+*.sql.gz
+*.db
+*.sqlite
+*.sqlite3
+/backup/
+/backups/
+hasil_backup.sql
+*.dump
+
+# ================================
+# Logs
+# ================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ================================
+# Editor & IDE Settings
+# ================================
 .idea/
 .vscode/
 *.swp
 *.swo
+*.swn
 .vs/
 *~
 *.sublime*
+*.sublime-project
+*.sublime-workspace
+.history/
 
+# ================================
 # Operating System Files
+# ================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+*.lnk
 
-# Temporary files
+# ================================
+# Temporary Files
+# ================================
 *.tmp
-*.log
-logs/
+*.temp
+*.cache
+.cache/
 tmp/
+temp/
+.temp/
 
-# Local environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# ================================
+# Test Coverage & Reports
+# ================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage/
+htmlcov/
+test-results/
+junit.xml
 
-# Dependency directories
-node_modules/
+# ================================
+# Build Artifacts
+# ================================
+dist/
+build/
+out/
+*.bundle.js
+*.bundle.js.map
 
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# ================================
+# Package Manager
+# ================================
+.npm/
+.yarn/
+.pnp.*
+.yarn-integrity
+
+# ================================
+# Security & Certificates
+# ================================
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+secrets/
+credentials/
+
+# ================================
+# Misc
+# ================================
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vercel

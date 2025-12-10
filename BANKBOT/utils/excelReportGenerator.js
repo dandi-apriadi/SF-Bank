@@ -6,10 +6,10 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Generate Excel report untuk Bank Rank
+ * Generate Excel report for Bank Rank
  * @param {Array} topUsers - Array of top users
- * @param {String} bankName - Nama bank/aliansi
- * @returns {Promise<String>} Path ke file Excel yang dibuat
+ * @param {String} bankName - Bank/alliance name
+ * @returns {Promise<String>} Path to the generated Excel file
  */
 export async function generateBankRankReport(topUsers, bankName = 'Kingdom Bank') {
     const workbook = new ExcelJS.Workbook();
@@ -140,10 +140,10 @@ export async function generateBankRankReport(topUsers, bankName = 'Kingdom Bank'
 }
 
 /**
- * Generate Excel report untuk detailed user contributions
+ * Generate Excel report for detailed user contributions
  * @param {Object} user - User object
  * @param {Array} contributions - Array of contributions
- * @returns {Promise<String>} Path ke file Excel yang dibuat
+ * @returns {Promise<String>} Path to the generated Excel file
  */
 export async function generateUserDetailReport(user, contributions) {
     const workbook = new ExcelJS.Workbook();
@@ -281,7 +281,7 @@ export async function generateUserDetailReport(user, contributions) {
 }
 
 /**
- * Generate Excel report untuk Alliance Bank (semua member dalam alliance)
+ * Generate Excel report for Alliance Bank (all members in alliance)
  * @param {Object} alliance - Alliance object
  * @param {Array} members - Array of members with their contributions
  * @returns {Promise<Object>} File info object
