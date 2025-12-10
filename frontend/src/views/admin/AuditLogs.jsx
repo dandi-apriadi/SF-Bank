@@ -4,7 +4,7 @@ import { FiSearch, FiFilter, FiDownload, FiEye, FiX } from "react-icons/fi";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 const displayTargetType = (type) => {
   if (type === 'resource') return 'Resource (RSS)';

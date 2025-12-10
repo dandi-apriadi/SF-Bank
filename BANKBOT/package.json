@@ -1,0 +1,31 @@
+{
+  "name": "kingdom3946-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord Bot for Kingdom 3946 Bank System - Standalone Application",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "kingdom3946",
+    "rise-of-kingdoms"
+  ],
+  "author": "Kingdom 3946 Dev Team",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.22.1",
+    "mysql2": "^3.11.5",
+    "sequelize": "^6.37.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

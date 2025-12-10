@@ -27,10 +27,10 @@ const ensureDatabaseExists = async () => {
         connection = await mysql.createConnection({
             host: process.env.DB_HOST || 'localhost',
             user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASS || ''
+            password: process.env.DB_PASS || 'sacred'
         });
 
-        const dbName = process.env.DB_NAME || 'prima';
+        const dbName = process.env.DB_NAME || 'sf';
         
         // Create database if not exists
         await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);

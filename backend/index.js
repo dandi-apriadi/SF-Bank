@@ -182,7 +182,7 @@ const startServer = async () => {
     
     // Start the HTTP server
     app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} | Env: ${process.env.NODE_ENV || 'development'} | CORS: ${process.env.CLIENT_ORIGIN || "http://localhost:3000"}`);
+        console.log(`🚀 Server running on port ${PORT} | Env: ${process.env.NODE_ENV || 'development'} | CORS: ${process.env.CLIENT_ORIGIN || "http://localhost:3000"}`);
     });
 };
 
@@ -191,3 +191,4 @@ startServer().catch(error => {
     console.error('Failed to start server:', error);
     process.exit(1);
 });
+
